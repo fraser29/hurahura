@@ -19,28 +19,12 @@ import numpy as np
 import datetime
 import pandas as pd
 ## Local imports
+from miresearch import mi_utils
 from spydcmtk import dcmTK
 
 abcList = 'abcdefghijklmnopqrstuvwxyz'
 
 physiologyDataDir = '/mnt/x-bigdata/MRI-Proc/Vol03/ScannerPhysiologicalData'
-
-DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
-                                "MagneticFieldStrength",
-                                "Manufacturer",
-                                "ManufacturerModelName",
-                                "Modality",
-                                "PatientBirthDate",
-                                "PatientID",
-                                "PatientName",
-                                "PatientSex",
-                                "ReceiveCoilName",
-                                "SoftwareVersions",
-                                "StudyDate",
-                                "StudyDescription",
-                                "StudyID",
-                                "StudyInstanceUID"]
-
 
 class DirectoryStructure(object):
     def __init__(self, name, childrenList=[]) -> None:
@@ -58,11 +42,6 @@ DEFAULT_DIRECTORY_STRUCTURE_TREE = DirectoryStructureTree([DirectoryStructure('R
 
 
 # ====================================================================================================
-#       HELPERS
-# ====================================================================================================
-
-
-# ====================================================================================================
 #       ABSTRACT SUBJECT CLASS
 # ====================================================================================================
 class AbstractSubject(object):
@@ -77,7 +56,7 @@ class AbstractSubject(object):
         self.DIRECTORY_STURCTURE_TREE = DIRECTORY_STURCTURE_TREE
         self.logfile = None
         self.BUILD_DIR_IF_NEED = True
-        self.dicomMetaTagList = DEFAULT_DICOM_META_TAG_LIST
+        self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
 
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -121,16 +100,19 @@ class AbstractSubject(object):
             print(strOut)
 
     def initDirectroyStructure(self):
+        if os.path.isdir(self.getTopDir()):
+            self.log(f"Study participant {self.subjID} exists at {self.getTopDir()}. Adding to")
         os.makedirs(self.getTopDir(), exist_ok=True)
         self.getDicomsDir()
         self.getMetaDir()
+        self.log(f"Directory structure correct for {self.subjID} at {self.getTopDir()}.")
 
     def getSeriesMetaCSV(self):
         return os.path.join(self.getMetaDir(), 'ScanSeriesInfo.csv')
 
     def buildSeriesDataMetaCSV(self):
         seInfoList = []
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True)
+        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmSE in dcmStudy:
             seInfoList.append(dcmSE.getSeriesInfoDict())
         df = pd.DataFrame(data=seInfoList)
@@ -177,7 +159,7 @@ class AbstractSubject(object):
         return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr)
 
     def getSeriesNumbersMatchingDescriptionStr(self, descriptionStr):
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True, ONE_FILE_PER_DIR=True)
+        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
         dOut = {}
         for iSeries in dcmStudy:
             if descriptionStr.lower() in iSeries.getTag('SeriesDescription').lower():
@@ -199,10 +181,13 @@ class AbstractSubject(object):
         return list(df.loc[df['SeriesNumber'] == seNum, varName])[0]
 
     ### LOADING
-    def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, TQDM_HIDE=False):
+    def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
         self.initDirectroyStructure()
-        dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=TQDM_HIDE)
         self.log('LoadDicoms(%s, %s)'%(dicomFolderToLoad, self.getDicomsDir()))
+        d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
+        dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
+        dO = self.countNumberOfDicoms()
+        self.log(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
     def exists(self):
@@ -274,7 +259,7 @@ class AbstractSubject(object):
 
     def studyDicomTagsToMeta(self):
         # this uses pydicom - so tag names are different.
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True)
+        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         dd = dcmStudy.getStudySummaryDict()
         self.updateMetaFile(dd)
 
@@ -293,8 +278,11 @@ class AbstractSubject(object):
             dirName = dirName.replace(self.dataRoot, swapRoot)
         return dirName
     
+    def countNumberOfDicoms(self):
+        return mi_utils.countFilesInDir(self.getDicomsDir())
+    
     def getDicomSeriesDir(self, seriesNum, swapRoot=None, seriesUID=None):
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True, ONE_FILE_PER_DIR=True)
+        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
         if seriesUID is not None:
             dcmSeries = dcmStudy.getSeriesByUID()
             if dcmSeries is None:
@@ -310,7 +298,7 @@ class AbstractSubject(object):
         return dirName
 
     def getDicomFoldersListStr(self, FULL=True, excludeSeNums=None, swapRoot=None):
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, TQDM_HIDE=True)
+        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
         dFolders = [i.getRootDir() for i in dcmStudy]
         # dFolders = [i for sublist in dFolders for i in sublist]
         dS = sorted(dFolders, key=dcmTK.dcmTools.instanceNumberSortKey)
@@ -393,7 +381,7 @@ class AbstractSubject(object):
         return self.getMetaDict()['PatientSex']
 
     # ------------------------------------------------------------------------------------------------------------------
-    def copyGatingToStudy(self):
+    def copyGatingToStudy(self): # TODO this is not very general - maybbe live in sub-class
         if "3" in self.getTagValue("MagneticFieldStrength"):
             gatingDir = os.path.join(physiologyDataDir, '3T', 'gating')
         else:
@@ -405,6 +393,7 @@ class AbstractSubject(object):
         doScan = self.getMetaDict()['StudyDate']
         t1 = datetime.datetime.strptime(str(doScan+tStart), '%Y%m%d%H%M%S')
         t2 = datetime.datetime.strptime(str(doScan+tEnd), '%Y%m%d%H%M%S')
+        self.log(f"Searching gating files from {str(doScan+tStart)} to {str(doScan+tEnd)}")
         gatingFiles = os.listdir(gatingDir)
         c0 = 0
         for iFile in gatingFiles:

@@ -18,8 +18,17 @@ class TestSubject(unittest.TestCase):
     def runTest(self):
         newSubj = mi_subject.AbstractSubject('MI000001', TEMP_DIRECTORY)
         newSubj.loadDicomsToSubject(DCM_DIRECTORY)
+        self.assertEqual(newSubj.countNumberOfDicoms(), 2, msg="Incorrect number of dicoms")
+        newSubj.buildSeriesDataMetaCSV()
+        newSubj.studyDicomTagsToMeta()
+        pWeight = int(newSubj.getTagValue('PatientWeight'))
+        self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
+        self.assertEqual(newSubj.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
+        dcmStr = newSubj.getDicomFoldersListStr()
+        print(dcmStr)
+
         # if not DEBUG:
-        #     shutil.rmtree(tmpDir)
+        #     shutil.rmtree(TEMP_DIRECTORY)
         
 
 
