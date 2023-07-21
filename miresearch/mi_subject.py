@@ -19,7 +19,9 @@ import numpy as np
 import datetime
 import pandas as pd
 ## Local imports
-from spydcmtk import dcmTK
+from spydcmtk import dcmTK, spydcm
+import spydmctk
+
 
 abcList = 'abcdefghijklmnopqrstuvwxyz'
 
@@ -130,7 +132,7 @@ class AbstractSubject(object):
 
     def buildSeriesDataMetaCSV(self):
         seInfoList = []
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True)
+        dcmStudy = spydcmtk.DicomStudy.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True)
         for dcmSE in dcmStudy:
             seInfoList.append(dcmSE.getSeriesInfoDict())
         df = pd.DataFrame(data=seInfoList)
