@@ -86,16 +86,19 @@ class AbstractSubject(object):
             return int(self.getTagValue('StudyID')) < int(self.getTagValue('StudyID'))
         return dos1 < dos2
 
+    def str(self):
+        return f"{self.subjID} at {self.dataRoot}"
+
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
     ### ----------------------------------------------------------------------------------------------------------------
     def log(self, message, LEVEL='INFO', STREAM=True):
         if self.logfile is None:
-            self.logfile = os.path.join(self.getMetaDir(), '%s.log'%(self.subjID))
+            self.logfile = os.path.join(self.getMetaDir(), f'{self.subjID}.log')
         with open(self.logfile, 'a+') as fid:
             sNow = datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")
-            strOut =  '%s|%s|%s'%(sNow, LEVEL, message)
-            fid.write('%s\r\n'%(strOut))
+            strOut =  f"{sNow}|{LEVEL:8s}|{message}"
+            fid.write(f"{strOut}\r\n")
         if STREAM:
             print(strOut)
 
