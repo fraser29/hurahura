@@ -17,6 +17,8 @@ DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
                                 "StudyID",
                                 "StudyInstanceUID"]
 
+DEFAULT_DICOM_DATE_FORMAT = "%H%M%S"
+
 
 def countFilesInDir(dirName):
     files = []
@@ -25,5 +27,5 @@ def countFilesInDir(dirName):
             files.extend(filenames)
     return len(files)
 
-def datetimeToStrTime(dateTimeVal):
-    return dateTimeVal.strftime("%H%M%S")
+def datetimeToStrTime(dateTimeVal, strFormat=DEFAULT_DICOM_DATE_FORMAT):
+    return dateTimeVal.strftime(DEFAULT_DICOM_DATE_FORMAT)
