@@ -13,7 +13,6 @@ Adapted for general use from KMR project.
 
 
 import os
-import base64
 import shutil
 import numpy as np
 import datetime
@@ -23,8 +22,6 @@ from spydcmtk import dcmTK
 from miresearch import mi_utils
 
 abcList = 'abcdefghijklmnopqrstuvwxyz'
-
-physiologyDataDir = '/mnt/x-bigdata/MRI-Proc/Vol03/ScannerPhysiologicalData'
 
 class DirectoryStructure(object):
     def __init__(self, name, childrenList=[]) -> None:
@@ -57,6 +54,7 @@ class AbstractSubject(object):
         self.logfile = None
         self.BUILD_DIR_IF_NEED = True
         self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
+        self.QUIET = False
 
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -76,15 +74,18 @@ class AbstractSubject(object):
         return not (self == other)
 
     def __lt__(self, other):
-        try:
-            dos1 = dcmTK.dcmTools.dbDateToDateTime(self.getTagValue('StudyDate'))
-            dos2 = dcmTK.dcmTools.dbDateToDateTime(other.getTagValue('StudyDate'))
-        except AttributeError:
-            dos1 = 1
-            dos2 = 1
-        if dos1 == dos2:
-            return int(self.getTagValue('StudyID')) < int(self.getTagValue('StudyID'))
-        return dos1 < dos2
+        return self.getPrefix_Number()[1] < other.getPrefix_Number()[1]
+        # dos1 = dcmTK.dcmTools.dbDateToDateTime(self.getTagValue('StudyDate', NOT_FOUND='19000101'))
+        # dos2 = dcmTK.dcmTools.dbDateToDateTime(other.getTagValue('StudyDate', NOT_FOUND='19000101'))
+        # # try:
+        # #     dos1 = dcmTK.dcmTools.dbDateToDateTime(self.getTagValue('StudyDate', NOT_FOUND=1))
+        # #     dos2 = dcmTK.dcmTools.dbDateToDateTime(other.getTagValue('StudyDate', NOT_FOUND=1))
+        # # except (AttributeError, TypeError):
+        # #     dos1 = 1
+        # #     dos2 = 1
+        # if dos1 == dos2:
+        #     return int(self.getTagValue('StudyID', NOT_FOUND=1)) < int(self.getTagValue('StudyID', NOT_FOUND=1))
+        # return dos1 < dos2
 
     def str(self):
         return f"{self.subjID} at {self.dataRoot}"
@@ -99,7 +100,7 @@ class AbstractSubject(object):
             sNow = datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")
             strOut =  f"{sNow}|{LEVEL:8s}|{message}"
             fid.write(f"{strOut}\r\n")
-        if STREAM:
+        if STREAM and (not self.QUIET):
             print(strOut)
 
     def initDirectroyStructure(self):
@@ -109,6 +110,9 @@ class AbstractSubject(object):
         self.getDicomsDir()
         self.getMetaDir()
         self.log(f"Directory structure correct for {self.subjID} at {self.getTopDir()}.")
+
+    def getPrefix_Number(self):
+        return splitSubjID(self.subjID)
 
     def getSeriesMetaCSV(self):
         return os.path.join(self.getMetaDir(), 'ScanSeriesInfo.csv')
@@ -260,7 +264,7 @@ class AbstractSubject(object):
         dcmTK.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
         self.log('updateMetaFile')
 
-    def studyDicomTagsToMeta(self):
+    def buildDicomMeta(self):
         # this uses pydicom - so tag names are different.
         dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         dd = dcmStudy.getStudySummaryDict()
@@ -341,6 +345,14 @@ class AbstractSubject(object):
     def getSeriesDescriptionsStr(self):
         return ','.join(self.getDicomFoldersListStr(FULL=False))
 
+
+    def getStudyDate(self, RETURN_Datetime=False):
+        dos = self.getTagValue('StudyDate')
+        if RETURN_Datetime:
+            dcmTK.dcmTools.dbDateToDateTime(dos)
+        return dos
+
+
     # def getPtAndNormFromDicomSeries(self, seriesNum, swapRoot=None):
     #     dicomf = mrtk.returnFirstDcmFound(self.getDicomSeriesDir(seriesNum, swapRoot))
     #     norm = mrtk.getImagePlaneNormal(dicomf)
@@ -384,29 +396,6 @@ class AbstractSubject(object):
         return self.getMetaDict()['PatientSex']
 
     # ------------------------------------------------------------------------------------------------------------------
-    def copyGatingToStudy(self): # TODO this is not very general - maybbe live in sub-class
-        if "3" in self.getTagValue("MagneticFieldStrength"):
-            gatingDir = os.path.join(physiologyDataDir, '3T', 'gating')
-        else:
-            gatingDir = os.path.join(physiologyDataDir, '1.5T', 'gating')
-        if not os.path.isdir(gatingDir):
-            self.log("Gating backup directory not accessible", "ERROR")
-        tStart, tEnd = self.getStartTime_EndTimeOfExam()
-        tStart, tEnd = str(tStart), str(tEnd)
-        doScan = self.getMetaDict()['StudyDate']
-        t1 = datetime.datetime.strptime(str(doScan+tStart), '%Y%m%d%H%M%S')
-        t2 = datetime.datetime.strptime(str(doScan+tEnd), '%Y%m%d%H%M%S')
-        self.log(f"Searching gating files from {str(doScan+tStart)} to {str(doScan+tEnd)}")
-        gatingFiles = os.listdir(gatingDir)
-        c0 = 0
-        for iFile in gatingFiles:
-            parts = iFile.split('_')
-            fileDate = datetime.datetime.strptime(parts[-4]+parts[-3]+parts[-2], '%m%d%Y%H%M%S')
-            if (fileDate < t2) and (fileDate > t1):
-                shutil.copy2(os.path.join(gatingDir, iFile), self.getMetaDir())
-                c0 += 1
-        self.log(f"Copied {c0} gating files to Meta directory")
-        
     def zipUpSubject(self, outputDirectory):
         archive_name = os.path.join(outputDirectory, self.subjID)
         zipfileOut = shutil.make_archive(archive_name, 'zip', root_dir=self.getTopDir())
@@ -414,69 +403,68 @@ class AbstractSubject(object):
         return zipfileOut
 
 
-
-### ====================================================================================================================
-
-def getAllSubjects(DATA_DIR):
-    allDir = os.listdir(DATA_DIR)
-    subjObjList = [AbstractSubject(i, projectRoot=DATA_DIR) for i in allDir]
-    subjObjList = [i for i in subjObjList if i.exists()]
-    return sorted(subjObjList)
-
+# ====================================================================================================
+#       LIST OF SUBJECTS CLASS
+# ====================================================================================================
 class SubjectList(list):
     """
     Container for a list of subjects
     """
-    def __init__(self):
-        list.__init__(self)
+    def __init__(self, subjList=[]):
+        super().__init__(i for i in subjList)
+
+
+    @classmethod
+    def setByDirectory(cls, rootDirectory, subjectPrefix=None):
+        listOfSubjects = getAllSubjects(rootDirectory, subjectPrefix)
+        return cls(listOfSubjects)
+
+
+    def filterSubjectListByDOS(self, dateOfScan_YYYYMMDD, dateEnd_YYYYMMDD=None):
+        """
+        Take list, return only those that match DOS or between start and end (inclusive) if dateEnd given
+        :param subjList:
+        :param dateOfScan_YYYYMMDD: str
+        :param dateEnd_YYYYMMDD: str - optional 
+        :return:
+        """
+        filteredMatchList = []
+        for isO in self:
+            iDOS = isO.getTagValue('StudyDate')
+            try:
+                if iDOS == dateOfScan_YYYYMMDD:
+                    filteredMatchList.append(isO)
+            except ValueError: # maybe don't have tag, or wrong format
+                continue
+        return SubjectList(filteredMatchList)
+
 
 
 ### ====================================================================================================================
 ### ====================================================================================================================
 ### ====================================================================================================================
-
-def filterSubjectListByDOS(subjList, dateOfScan_YYYY_MM_DD):
-    """
-    Take list, return only those that match DOS
-    :param subjList:
-    :param dateOfScan_YYYY_MM_DD: list of ints
-    :return:
-    """
-    try:
-        Y, M, D = dateOfScan_YYYY_MM_DD
-    except ValueError:
-        Y = int(dateOfScan_YYYY_MM_DD[:4])
-        M = int(dateOfScan_YYYY_MM_DD[4:6])
-        D = int(dateOfScan_YYYY_MM_DD[6:])
-    filteredMatchList = []
-    for isO in subjList:
-        YYYYMMDD = isO.getTagValue('StudyDate')
-        try:
-            if (int(YYYYMMDD[:4]) == Y) & (int(YYYYMMDD[4:6]) == M) & (int(YYYYMMDD[6:]) == D):
-                filteredMatchList.append(isO)
-        except ValueError: # maybe don't have tag, or wrong format
-            continue
-    # if len(filteredMatchList) == 0:
-    #     print(' ## WARNING ## filtering by DOS reduced list from %d to 0'%(len(subjList)))
-    return filteredMatchList
+def splitSubjID(s):
+    prefix = s.rstrip('0123456789')
+    number = int(s[len(prefix):])
+    return prefix, number
 
 
-#==================================================================
-def encodeString(strIn, passcode):
-    enc = []
-    for i in range(len(strIn)):
-        key_c = passcode[i % len(passcode)]
-        enc_c = chr((ord(strIn[i]) + ord(key_c)) % 256)
-        enc.append(enc_c)
-    return base64.urlsafe_b64encode("".join(enc).encode()).decode()
+def guessSubjectPrefix(rootDir):
+    allDir = [i for i in os.listdir(rootDir) if os.path.isdir(os.path.join(rootDir, i))]
+    allDir_subj = {}
+    for i in allDir:
+        prefix, N = splitSubjID(i)
+        allDir_subj.setdefault(prefix, []).append(N)
+    options = list(allDir_subj.keys())
+    counts = [len(allDir_subj[i]) for i in options]
+    return options[np.argmax(counts)]
 
-def decodeString(encStr, passcode):
-    dec = []
-    enc = base64.urlsafe_b64decode(encStr).decode()
-    for i in range(len(enc)):
-        key_c = passcode[i % len(passcode)]
-        dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
-        dec.append(dec_c)
-    return "".join(dec)
 
+def getAllSubjects(DATA_DIR, subjectPrefix=None):
+    if subjectPrefix is None:
+        subjectPrefix = guessSubjectPrefix(DATA_DIR)
+    allDir = os.listdir(DATA_DIR)
+    subjObjList = [AbstractSubject(i, projectRoot=DATA_DIR) for i in allDir]
+    subjObjList = [i for i in subjObjList if i.exists()]
+    return sorted(subjObjList)
 

@@ -14,3 +14,10 @@ This package may be easily adapted and expanded upon for a high level control ov
 AbstractSubject
     
 
+
+## TODO
+
+Load subject - helper classmethod - make meta, make ID
+    load multiple
+
+
