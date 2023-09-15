@@ -114,8 +114,50 @@ class AbstractSubject(object):
     def getPrefix_Number(self):
         return splitSubjID(self.subjID)
 
+    ### LOADING
+    def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
+        self.initDirectroyStructure()
+        self.log('LoadDicoms(%s, %s)'%(dicomFolderToLoad, self.getDicomsDir()))
+        d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
+        dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
+        dO = self.countNumberOfDicoms()
+        self.log(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
+
+    ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
+    def exists(self):
+        return os.path.isdir(self.getTopDir())
+
+    def getTopDir(self):
+        return os.path.join(self.dataRoot, self.subjID)
+
+    def _getDir(self, listOfDirsBeyondStudyDir, BUILD_IF_NEED=True):
+        dd = os.path.join(self.getTopDir(), *listOfDirsBeyondStudyDir)
+        if not os.path.isdir(dd):
+            if BUILD_IF_NEED & self.BUILD_DIR_IF_NEED:
+                if not os.path.isdir(self.getTopDir()):
+                    raise IOError(' %s does not exist'%(self.getTopDir()))
+                try:
+                    os.makedirs(dd)
+                except OSError:
+                    pass
+        return dd
+
+    def getMetaDir(self):
+        return self._getDir(["META"])
+
+    def getRawDir(self):
+        return self._getDir(["RAW"])
+    
+    def getDicomsDir(self):
+        dirName = self._getDir(["RAW", "DICOM"])
+        return dirName
+    
+    ### META STUFF -----------------------------------------------------------------------------------------------------
     def getSeriesMetaCSV(self):
         return os.path.join(self.getMetaDir(), 'ScanSeriesInfo.csv')
+
+    def getSeriesMetaAsDataFrame(self):
+        return pd.read_csv(self.getSeriesMetaCSV(),  encoding="ISO-8859-1")
 
     def buildSeriesDataMetaCSV(self):
         seInfoList = []
@@ -126,6 +168,21 @@ class AbstractSubject(object):
         df.to_csv(self.getSeriesMetaCSV())
         self.log('buildSeriesDataMetaCSV')
 
+    def printDicomsInfo(self):
+        dicomFolderList = self.getDicomFoldersListStr(False)
+        print(str(self))
+        ss = ["    " + i for i in dicomFolderList]
+        print("\n".join(ss))
+        print("")
+
+    def askUserForDicomSeriesNumber(self):
+        self.printDicomsInfo()
+        seNum = input("Enter the dicom series number: ")
+        return int(seNum)
+
+    def findDicomSeries(self, descriptionStr, excludeStr=None):
+        return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr, excludeStr=excludeStr)
+    
     def getStartTime_EndTimeOfExam(self):
         NN = self.getListOfSeNums()
         Ns = min(NN)
@@ -134,21 +191,21 @@ class AbstractSubject(object):
 
     def getTimeTakenForSeriesN(self, N, df=None):
         if df is None:
-            df = pd.read_csv(self.getSeriesMetaCSV(),  encoding="ISO-8859-1")
+            df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'ScanDuration'])[0]
 
     def getHRForSeriesN(self, N, df=None):
         if df is None:
-            df = pd.read_csv(self.getSeriesMetaCSV(),  encoding="ISO-8859-1")
+            df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'HeartRate'])[0]
 
     def getStartTimeForSeriesN_HHMMSS(self, N, df=None):
         if df is None:
-            df = pd.read_csv(self.getSeriesMetaCSV(),  encoding="ISO-8859-1")
+            df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'StartTime'])[0]
 
     def getDifferenceBetweenStartTimesOfTwoScans_s(self, seN1, seN2):
-        df = pd.read_csv(self.getSeriesMetaCSV(), encoding="ISO-8859-1")
+        df = self.getSeriesMetaAsDataFrame()
         t1 = self.getStartTimeForSeriesN_HHMMSS(seN1, df)
         t2 = self.getStartTimeForSeriesN_HHMMSS(seN2, df)
         t1 = datetime.datetime.strptime(str(t1), '%H%M%S.%f')
@@ -184,39 +241,8 @@ class AbstractSubject(object):
                                  nCols nRow nSlice nTime
         :return:
         """
-        df = pd.read_csv(self.getSeriesMetaCSV(), encoding="ISO-8859-1")
+        df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber'] == seNum, varName])[0]
-
-    ### LOADING
-    def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
-        self.initDirectroyStructure()
-        self.log('LoadDicoms(%s, %s)'%(dicomFolderToLoad, self.getDicomsDir()))
-        d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
-        dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
-        dO = self.countNumberOfDicoms()
-        self.log(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
-
-    ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
-    def exists(self):
-        return os.path.isdir(self.getTopDir())
-
-    def getTopDir(self):
-        return os.path.join(self.dataRoot, self.subjID)
-
-    def _getDir(self, listOfDirsBeyondStudyDir, BUILD_IF_NEED=True):
-        dd = os.path.join(self.getTopDir(), *listOfDirsBeyondStudyDir)
-        if not os.path.isdir(dd):
-            if BUILD_IF_NEED & self.BUILD_DIR_IF_NEED:
-                if not os.path.isdir(self.getTopDir()):
-                    raise IOError(' %s does not exist'%(self.getTopDir()))
-                try:
-                    os.makedirs(dd)
-                except OSError:
-                    pass
-        return dd
-
-    def getMetaDir(self):
-        return self._getDir(["META"])
 
     def getMetaTagsFile(self, suffix=""):
         return os.path.join(self.getMetaDir(), "%sTags%s.json" % (self.subjID, suffix))
@@ -240,24 +266,6 @@ class AbstractSubject(object):
             else:
                 raise e
 
-    # def setName(self, NAME, FIRST_NAMES):
-    #     """
-    #     funct to add name after (will encode)
-    #     :param NAME:
-    #     :param FIRST_NAMES:
-    #     :return:
-    #     """
-    #     dd = {'NAME': encodeString(NAME, xxfyz),
-    #           'FIRST_NAMES': encodeString(FIRST_NAMES, xxfyz)}
-    #     self.updateMetaFile(dd)
-
-    # def getName(self):
-    #     return decodeString(self.getTagValue("NAME", nameUnknown), xxfyz)
-
-    # def getName_FirstNames(self):
-    #     return decodeString(self.getTagValue("NAME", nameUnknown), xxfyz), \
-    #            decodeString(self.getTagValue("FIRST_NAMES", nameUnknown), xxfyz)
-
     def updateMetaFile(self, metaDict, metasuffix=""):
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
@@ -269,26 +277,16 @@ class AbstractSubject(object):
         dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         dd = dcmStudy.getStudySummaryDict()
         self.updateMetaFile(dd)
-
-    def setArchived(self):
-        self.updateMetaFile({'ARCHIVED': 'True'})
-
-    def isArchived(self):
-        return self.getTagValue('ARCHIVED', 'False') == 'True'
-
-    def getRawDir(self):
-        return self._getDir(["RAW"])
-    
-    def getDicomsDir(self, swapRoot=None):
-        dirName = self._getDir(["RAW", "DICOM"])
-        if swapRoot:
-            dirName = dirName.replace(self.dataRoot, swapRoot)
-        return dirName
-    
     def countNumberOfDicoms(self):
         return mi_utils.countFilesInDir(self.getDicomsDir())
     
-    def getDicomSeriesDir(self, seriesNum, swapRoot=None, seriesUID=None):
+    def getDicomSeriesDir_Description(self, seriesDescription):
+        dd = self.getSeriesNumbersMatchingDescriptionStr(seriesDescription)
+        seNs = dd.keys()
+        seN = min(seNs)
+        return self.getDicomSeriesDir(seN)
+    
+    def getDicomSeriesDir(self, seriesNum, seriesUID=None):
         dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
         if seriesUID is not None:
             dcmSeries = dcmStudy.getSeriesByUID()
@@ -299,12 +297,21 @@ class AbstractSubject(object):
             if dcmSeries is None:
                 raise ValueError("## ERROR: Series with SE number: %s NOT FOUND"%(str(seriesNum)))
         dirName = dcmSeries.getRootDir()
-        nFile = len(os.listdir(dirName))
-        if (nFile<1) & (swapRoot is not None):
-            dirName = dirName.replace(self.dataRoot, swapRoot)
         return dirName
 
-    def getDicomFoldersListStr(self, FULL=True, excludeSeNums=None, swapRoot=None):
+    def getDicomFile(self, seriesNum, instanceNum=1):
+        #FIXME Note - at some point the files were named incorrectly - this has to work around this... Could be better
+        # (and the number of leading zeros changed)
+        dicomf = os.path.join(self.getDicomSeriesDir(seriesNum), 'IM-%04d-%04d.dcm'%(seriesNum, instanceNum))
+        if not os.path.isfile(dicomf):
+            dicomf = os.path.join(self.getDicomSeriesDir(seriesNum),
+                                  'IM-%04d-%04d.dcm' % (1, instanceNum))
+        if not os.path.isfile(dicomf):
+            dicomf = os.path.join(self.getDicomSeriesDir(seriesNum),
+                                  'IM-%05d-%05d.dcm' % (seriesNum, instanceNum))
+        return dicomf
+
+    def getDicomFoldersListStr(self, FULL=True, excludeSeNums=None):
         dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
         dFolders = [i.getRootDir() for i in dcmStudy]
         # dFolders = [i for sublist in dFolders for i in sublist]
@@ -322,8 +329,6 @@ class AbstractSubject(object):
                 pass
         dcmDirList = [self.getDicomSeriesDir(i) for i in seN if i not in excludeSeNums]
         dcmDirList = sorted(dcmDirList, key=dcmTK.dcmTools.instanceNumberSortKey)
-        if swapRoot is not None:
-            dcmDirList = [i.replace(self.dataRoot, swapRoot) for i in dcmDirList]
         return dcmDirList
 
     def getListOfSeNums(self):
@@ -351,13 +356,6 @@ class AbstractSubject(object):
         if RETURN_Datetime:
             dcmTK.dcmTools.dbDateToDateTime(dos)
         return dos
-
-
-    # def getPtAndNormFromDicomSeries(self, seriesNum, swapRoot=None):
-    #     dicomf = mrtk.returnFirstDcmFound(self.getDicomSeriesDir(seriesNum, swapRoot))
-    #     norm = mrtk.getImagePlaneNormal(dicomf)
-    #     cp = mrtk.getCenterOfDicom(dicomf, RETURN_m=True)
-    #     return cp, norm
 
     def getInfoStr(self):
         # Return values_list, info_keys:
@@ -394,6 +392,10 @@ class AbstractSubject(object):
 
     def getGender(self):
         return self.getMetaDict()['PatientSex']
+    
+    def isMale(self):
+        sex = self.getGender()
+        return sex.strip().lower() == 'm'
 
     # ------------------------------------------------------------------------------------------------------------------
     def zipUpSubject(self, outputDirectory):
@@ -419,8 +421,15 @@ class SubjectList(list):
         listOfSubjects = getAllSubjects(rootDirectory, subjectPrefix)
         return cls(listOfSubjects)
 
+    def reduceToExist(self):
+        toRemove = []
+        for i in self:
+            if not i.exists():
+                toRemove.append(i)
+        for i in toRemove:
+            self.remove(i)
 
-    def filterSubjectListByDOS(self, dateOfScan_YYYYMMDD, dateEnd_YYYYMMDD=None):
+    def filterSubjectListByDOS(self, dateOfScan_YYYYMMDD, dateEnd_YYYYMMDD=None): #TODO
         """
         Take list, return only those that match DOS or between start and end (inclusive) if dateEnd given
         :param subjList:
@@ -438,6 +447,56 @@ class SubjectList(list):
                 continue
         return SubjectList(filteredMatchList)
 
+    def findSubjMatchingStudyID(self, studyID):
+        """
+        :param studyID (or examID): int
+        :return: mi_subject
+        """
+        for iSubj in self:
+            try:
+                if int(iSubj.getTagValue("StudyID")) == studyID:
+                    return iSubj
+            except ValueError:
+                pass
+        return None
+    
+    def findSubjMatchingPatientID(self, patientID, dateOfScan_YYYYMMDD=None):
+        """
+        :param patientID:
+        :param dateOfScan_YYYY_MM_DD: list of ints for DOS to fix ambiguity
+        :return: SubjectList
+        """
+        patientID = str(patientID)
+        matchList = SubjectList()
+        for iSubj in self:
+            try:
+                if iSubj.getTagValue("PatientID") == patientID:
+                    matchList.append(iSubj)
+            except ValueError:
+                pass
+        if (len(matchList)>1) & (dateOfScan_YYYYMMDD is not None):
+            return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
+        return matchList
+
+    def findSubjMatchingName(self, nameStr, dateOfScan_YYYYMMDD=None):
+        """
+        :param nameStr:
+        :param dateOfScan_YYYYMMDD: if given will use to filter list matching name
+        :return: SubjectList
+        """
+        nameStr_l = nameStr.lower()
+        matchList = SubjectList()
+        for iSubj in self:
+            iName = decodeString(iSubj.getTagValue("NAME", nameUnknown), xxfyz).lower()
+            try:
+                if nameStr_l in iName:
+                    matchList.append(iSubj)
+            except ValueError:
+                pass
+        if (len(matchList)>1) & (dateOfScan_YYYYMMDD is not None):
+            return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
+        return matchList
+
 
 
 ### ====================================================================================================================
@@ -448,6 +507,8 @@ def splitSubjID(s):
     number = int(s[len(prefix):])
     return prefix, number
 
+def getNumberFromSubjID(subjID):
+    return splitSubjID(subjID)[1]
 
 def guessSubjectPrefix(rootDir):
     allDir = [i for i in os.listdir(rootDir) if os.path.isdir(os.path.join(rootDir, i))]
@@ -468,3 +529,18 @@ def getAllSubjects(DATA_DIR, subjectPrefix=None):
     subjObjList = [i for i in subjObjList if i.exists()]
     return sorted(subjObjList)
 
+def buildSubjectID(subjN, prefix):
+    return f"{prefix}{subjN:06d}"
+
+def getNextId(dataRootDir, prefix):
+    allNums = [int(i[len(prefix):]) for i in os.listdir(dataRootDir) if i.startswith(prefix)]
+    try:
+        return max(allNums)+1
+    except ValueError:
+        return 0
+
+def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubject, CHECK_EXIST=True):
+    subjList = SubjectList([SubjClass(iN, dataRoot, subjPrefix) for iN in subjNList])
+    if CHECK_EXIST:
+        subjList.reduceToExist()
+    return subjList

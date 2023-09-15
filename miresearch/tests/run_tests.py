@@ -39,11 +39,11 @@ class TestSubject(unittest.TestCase):
         pWeight = int(self.newSubj.getTagValue('PatientWeight'))
         self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
         self.assertEqual(self.newSubj.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
-        dcmStr = self.newSubj.getDicomFoldersListStr()
-        print(dcmStr)
+
+        nSE_dict = self.newSubj.getSeriesNumbersMatchingDescriptionStr('RVLA')
+        self.assertEqual(int(list(nSE_dict.keys())[0]), 41, msg="Error finding se matching SeriesDescription")
 
     def tearDown(self):
-        # print(f'Removing {self.tmpDir}')
         shutil.rmtree(self.tmpDir)
 
 class TestSubjects(unittest.TestCase):
@@ -77,34 +77,9 @@ class TestSubjects(unittest.TestCase):
         
 
     def tearDown(self):
-        # print(f'Removing {self.tmpDir}')
         shutil.rmtree(self.tmpDir)
         
 
-# class TestSubjects(unittest.TestCase):
-
-#     def setUp(self):
-#         self.tmpDir = os.path.join(this_dir, 'tmpTestSubjs')
-#         if os.path.isdir(self.tmpDir):
-#             shutil.rmtree(self.tmpDir)
-#         os.makedirs(self.tmpDir)
-
-#     def runTest(self):
-#         newSubj = mi_subject.AbstractSubject('MI000001', self.tmpDir)
-#         newSubj.loadDicomsToSubject(TEST_DIR)
-#         self.assertEqual(newSubj.countNumberOfDicoms(), 2, msg="Incorrect number of dicoms")
-#         newSubj.buildSeriesDataMetaCSV()
-#         newSubj.studyDicomTagsToMeta()
-#         pWeight = int(newSubj.getTagValue('PatientWeight'))
-#         self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
-#         self.assertEqual(newSubj.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
-#         dcmStr = newSubj.getDicomFoldersListStr()
-#         print(dcmStr)
-
-#     def tearDown(self):
-#         if not config.DEBUG:
-#             print('Run tear down')
-#             shutil.rmtree(self.tmpDir)
         
 
 if __name__ == '__main__':
