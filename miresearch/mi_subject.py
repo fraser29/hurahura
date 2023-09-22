@@ -36,7 +36,7 @@ class DirectoryStructureTree():
 
 DEFAULT_DIRECTORY_STRUCTURE_TREE = DirectoryStructureTree([DirectoryStructure('RAW', [DirectoryStructure('DICOM')]),
                                                             DirectoryStructure('META')])
-
+UNKNOWN = 'UNKNOWN'
 
 # ====================================================================================================
 #       ABSTRACT SUBJECT CLASS
@@ -478,7 +478,7 @@ class SubjectList(list):
             return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
         return matchList
 
-    def findSubjMatchingName(self, nameStr, dateOfScan_YYYYMMDD=None):
+    def findSubjMatchingName(self, nameStr, dateOfScan_YYYYMMDD=None, decodePassword=None):
         """
         :param nameStr:
         :param dateOfScan_YYYYMMDD: if given will use to filter list matching name
@@ -487,7 +487,9 @@ class SubjectList(list):
         nameStr_l = nameStr.lower()
         matchList = SubjectList()
         for iSubj in self:
-            iName = decodeString(iSubj.getTagValue("NAME", nameUnknown), xxfyz).lower()
+            iName = iSubj.getTagValue("NAME", UNKNOWN)
+            if decodePassword is not None:
+                iName = mi_utils.decodeString(iName, decodePassword).lower()
             try:
                 if nameStr_l in iName:
                     matchList.append(iSubj)

@@ -11,11 +11,11 @@ import argparse
 import miresearch.mi_subject as mi_subject
 
 
-def buildNewSubject(dbRoot, subjectSuffix, dicomDirectory=None):
+def buildNewSubject(dbRoot, dicomDirectory=None, subjectSuffix=None):
     pass
 
 
-def buildNewSubject_Multi(dbRoot, subjectSuffix, directoryOfDicomStudies):
+def buildNewSubject_Multi(dbRoot, directoryOfDicomStudies, subjectSuffix=None):
     pass
 
 
@@ -51,7 +51,7 @@ def main():
     # --------------------------------------------------------------------------
     #  ARGUMENT PARSING
     # --------------------------------------------------------------------------
-    ap = MyParser(description='Simple Python Dicom Toolkit - spydcmtk')
+    ap = MyParser(description='Medical Imaging Research assistant - miresearch')
 
     ap.add_argument('-i', dest='inputPath', help='Path to find dicoms (file or directory or tar or tar.gz or zip)', type=str, required=True)
     ap.add_argument('-y', dest='dataRoot', help='Path for output - if set then will organise dicoms into this folder', type=str, default=None)
