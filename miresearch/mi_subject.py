@@ -161,7 +161,7 @@ class AbstractSubject(object):
 
     def buildSeriesDataMetaCSV(self):
         seInfoList = []
-        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True)
+        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             for dcmSE in dcmStudy:
                 seInfoList.append(dcmSE.getSeriesInfoDict())
@@ -223,7 +223,7 @@ class AbstractSubject(object):
     def findDicomSeries(self, descriptionStr):
         return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr)
 
-    def getSeriesNumbersMatchingDescriptionStr(self, descriptionStr):
+    def getSeriesNumbersMatchingDescriptionStr(self, descriptionStr): # FIXME what if mult studies
         dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
         dOut = {}
         for iSeries in dcmStudy:
@@ -275,9 +275,12 @@ class AbstractSubject(object):
 
     def buildDicomMeta(self):
         # this uses pydicom - so tag names are different.
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
-        dd = dcmStudy.getStudySummaryDict()
-        self.updateMetaFile(dd)
+        ddFull = {}
+        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
+        for dcmStudy in dcmStudies:
+            ddFull.update(dcmStudy.getStudySummaryDict())
+        self.updateMetaFile(ddFull)
+
     def countNumberOfDicoms(self):
         return mi_utils.countFilesInDir(self.getDicomsDir())
     
@@ -288,13 +291,19 @@ class AbstractSubject(object):
         return self.getDicomSeriesDir(seN)
     
     def getDicomSeriesDir(self, seriesNum, seriesUID=None):
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
+        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
         if seriesUID is not None:
-            dcmSeries = dcmStudy.getSeriesByUID()
+            for dcmStudy in dcmStudies:
+                dcmSeries = dcmStudy.getSeriesByUID()
+                if dcmSeries is not None:
+                    break
             if dcmSeries is None:
                 raise ValueError("## ERROR: Series with UID: %s NOT FOUND"%(seriesUID))
         else:
-            dcmSeries = dcmStudy.getSeriesByID(seriesNum)
+            for dcmStudy in dcmStudies:
+                dcmSeries = dcmStudy.getSeriesByID(seriesNum)
+                if dcmSeries is not None:
+                    break
             if dcmSeries is None:
                 raise ValueError("## ERROR: Series with SE number: %s NOT FOUND"%(str(seriesNum)))
         dirName = dcmSeries.getRootDir()
@@ -303,6 +312,7 @@ class AbstractSubject(object):
     def getDicomFile(self, seriesNum, instanceNum=1):
         #FIXME Note - at some point the files were named incorrectly - this has to work around this... Could be better
         # (and the number of leading zeros changed)
+        # possible fix - work it out on per subject basis
         dicomf = os.path.join(self.getDicomSeriesDir(seriesNum), 'IM-%04d-%04d.dcm'%(seriesNum, instanceNum))
         if not os.path.isfile(dicomf):
             dicomf = os.path.join(self.getDicomSeriesDir(seriesNum),
@@ -313,9 +323,11 @@ class AbstractSubject(object):
         return dicomf
 
     def getDicomFoldersListStr(self, FULL=True, excludeSeNums=None):
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
-        dFolders = [i.getRootDir() for i in dcmStudy]
-        # dFolders = [i for sublist in dFolders for i in sublist]
+        dFolders = []
+        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
+        for dcmStudy in dcmStudies:
+            for iSeries in dcmStudy:
+                dFolders.append(iSeries.getRootDir())
         dS = sorted(dFolders, key=dcmTK.dcmTools.instanceNumberSortKey)
         if not FULL:
             dS = [os.path.split(i)[1] for i in dS]
