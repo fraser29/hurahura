@@ -161,9 +161,10 @@ class AbstractSubject(object):
 
     def buildSeriesDataMetaCSV(self):
         seInfoList = []
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
-        for dcmSE in dcmStudy:
-            seInfoList.append(dcmSE.getSeriesInfoDict())
+        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), TQDM_HIDE=True)
+        for dcmStudy in dcmStudies:
+            for dcmSE in dcmStudy:
+                seInfoList.append(dcmSE.getSeriesInfoDict())
         df = pd.DataFrame(data=seInfoList)
         df.to_csv(self.getSeriesMetaCSV())
         self.log('buildSeriesDataMetaCSV')
