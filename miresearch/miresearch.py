@@ -66,7 +66,7 @@ def main():
     if arguments.inputPath is not None:
         arguments.inputPath = os.path.abspath(arguments.inputPath)
         if not arguments.QUIET:
-            print(f'Running SPYDCMTK with input {arguments.inputPath}')
+            print(f'Running MIRESEARCH with input {arguments.inputPath}')
     ## -------------
 
     runActions(arguments, ap)
