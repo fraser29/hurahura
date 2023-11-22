@@ -17,7 +17,8 @@ import shutil
 import numpy as np
 import datetime
 import pandas as pd
-## Local imports
+import logging
+##
 from spydcmtk import dcmTK
 from miresearch import mi_utils
 
@@ -51,10 +52,15 @@ class AbstractSubject(object):
         self.subjID = subjectFullID
         self.dataRoot = projectRoot
         self.DIRECTORY_STURCTURE_TREE = DIRECTORY_STURCTURE_TREE
-        self.logfile = None
         self.BUILD_DIR_IF_NEED = True
         self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
         self.QUIET = False
+
+        # Logging
+        self.logger = logging.getLogger(subjectFullID)
+        self.logger.setLevel(logging.INFO)
+        fh = logging.FileHandler(os.path.join(self.getMetaDir(), f'{self.subjID}.log'))
+        self.logger.addHandler(fh)
 
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -93,12 +99,12 @@ class AbstractSubject(object):
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
     ### ----------------------------------------------------------------------------------------------------------------
-    def log(self, message, LEVEL='INFO', STREAM=True):
+    def log(self, message, STREAM=True):
         if self.logfile is None:
             self.logfile = os.path.join(self.getMetaDir(), f'{self.subjID}.log')
         with open(self.logfile, 'a+') as fid:
             sNow = datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")
-            strOut =  f"{sNow}|{LEVEL:8s}|{message}"
+            strOut =  f"{sNow}|{self.LOG_LEVEL:8s}|{message}"
             fid.write(f"{strOut}\r\n")
         if STREAM and (not self.QUIET):
             print(strOut)
