@@ -3,6 +3,7 @@ from context import miresearch # This is useful for testing outside of environme
 
 import os
 import unittest
+import time
 import shutil
 from miresearch import mi_subject
 from miresearch import config
@@ -17,15 +18,17 @@ P4_extra = os.path.join(TEST_DIR, "P4_extra")
 
 
 class TestSubject(unittest.TestCase):
-    def setUp(self):
-        self.tmpDir = os.path.join(this_dir, 'tmpTestSubj')
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj')
         # print(f"Building {self.tmpDir}")
-        if os.path.isdir(self.tmpDir):
-            self.tearDown()
-        os.makedirs(self.tmpDir)
-        self.newSubj = mi_subject.AbstractSubject('MI000001', self.tmpDir)
-        self.newSubj.QUIET = True
-        self.newSubj.loadDicomsToSubject(P1, HIDE_PROGRESSBAR=True)
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDown()
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.AbstractSubject('MI000001', cls.tmpDir)
+        cls.newSubj.QUIET = True
+        cls.newSubj.loadDicomsToSubject(P1, HIDE_PROGRESSBAR=True)
+        cls.newSubj.loadDicomsToSubject(P1, HIDE_PROGRESSBAR=True)
 
     def test_newSubj(self):
         self.assertEqual(self.newSubj.countNumberOfDicoms(), 2, msg="Incorrect number of dicoms")
@@ -43,27 +46,29 @@ class TestSubject(unittest.TestCase):
         nSE_dict = self.newSubj.getSeriesNumbersMatchingDescriptionStr('RVLA')
         self.assertEqual(int(list(nSE_dict.keys())[0]), 41, msg="Error finding se matching SeriesDescription")
 
-    def tearDown(self):
-        shutil.rmtree(self.tmpDir)
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmpDir)
 
 class TestSubjects(unittest.TestCase):
-    def setUp(self):
-        self.tmpDir = os.path.join(this_dir, 'tmpTestSubjs')
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubjs')
         # print(f"Building {self.tmpDir}")
-        if os.path.isdir(self.tmpDir):
-            self.tearDown()
-        os.makedirs(self.tmpDir)
-        self.newSubj = mi_subject.AbstractSubject('MI000001', self.tmpDir)
-        self.newSubj.QUIET = True
-        self.newSubj.loadDicomsToSubject(P1, HIDE_PROGRESSBAR=True)
-        self.newSubj = mi_subject.AbstractSubject('MI000002', self.tmpDir)
-        self.newSubj.QUIET = True
-        self.newSubj.loadDicomsToSubject(P2, HIDE_PROGRESSBAR=True)
-        self.newSubj.buildDicomMeta()
-        self.newSubj = mi_subject.AbstractSubject('MI000003', self.tmpDir)
-        self.newSubj.QUIET = True
-        self.newSubj.loadDicomsToSubject(P3_4, HIDE_PROGRESSBAR=True)
-        self.subjList = mi_subject.SubjectList.setByDirectory(self.tmpDir)
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDown()
+        os.makedirs(cls.tmpDir)
+        cls.newSubj1 = mi_subject.AbstractSubject('MI000001', cls.tmpDir)
+        cls.newSubj1.QUIET = True
+        cls.newSubj1.loadDicomsToSubject(P1, HIDE_PROGRESSBAR=True)
+        cls.newSubj2 = mi_subject.AbstractSubject('MI000002', cls.tmpDir)
+        cls.newSubj2.QUIET = True
+        cls.newSubj2.loadDicomsToSubject(P2, HIDE_PROGRESSBAR=True)
+        cls.newSubj2.buildDicomMeta()
+        cls.newSubj3 = mi_subject.AbstractSubject('MI000003', cls.tmpDir)
+        cls.newSubj3.QUIET = True
+        cls.newSubj3.loadDicomsToSubject(P3_4, HIDE_PROGRESSBAR=True)
+        cls.subjList = mi_subject.SubjectList.setByDirectory(cls.tmpDir)
 
     def test_newSubjs(self):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI000001')))
@@ -76,8 +81,9 @@ class TestSubjects(unittest.TestCase):
         self.assertEqual(len(filtList), 1, "Error filtering subject list")
         
 
-    def tearDown(self):
-        shutil.rmtree(self.tmpDir)
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmpDir)
         
 
         

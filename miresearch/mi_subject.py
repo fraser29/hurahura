@@ -55,12 +55,8 @@ class AbstractSubject(object):
         self.BUILD_DIR_IF_NEED = True
         self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
         self.QUIET = False
-
-        # Logging
-        self.logger = logging.getLogger(subjectFullID)
-        self.logger.setLevel(logging.INFO)
-        fh = logging.FileHandler(os.path.join(self.getMetaDir(), f'{self.subjID}.log'))
-        self.logger.addHandler(fh)
+        #
+        self._logger = None
 
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -81,41 +77,37 @@ class AbstractSubject(object):
 
     def __lt__(self, other):
         return self.getPrefix_Number()[1] < other.getPrefix_Number()[1]
-        # dos1 = dcmTK.dcmTools.dbDateToDateTime(self.getTagValue('StudyDate', NOT_FOUND='19000101'))
-        # dos2 = dcmTK.dcmTools.dbDateToDateTime(other.getTagValue('StudyDate', NOT_FOUND='19000101'))
-        # # try:
-        # #     dos1 = dcmTK.dcmTools.dbDateToDateTime(self.getTagValue('StudyDate', NOT_FOUND=1))
-        # #     dos2 = dcmTK.dcmTools.dbDateToDateTime(other.getTagValue('StudyDate', NOT_FOUND=1))
-        # # except (AttributeError, TypeError):
-        # #     dos1 = 1
-        # #     dos2 = 1
-        # if dos1 == dos2:
-        #     return int(self.getTagValue('StudyID', NOT_FOUND=1)) < int(self.getTagValue('StudyID', NOT_FOUND=1))
-        # return dos1 < dos2
 
     def str(self):
         return f"{self.subjID} at {self.dataRoot}"
 
     ### ----------------------------------------------------------------------------------------------------------------
+    ### Logging
+    ### ----------------------------------------------------------------------------------------------------------------
+    @property
+    def logger(self):
+        if self._logger is None:
+            rr = os.path.split(self.dataRoot)[1]
+            self._logger = logging.getLogger(f"{rr}/{self.subjID}")
+            self._logger.setLevel(logging.INFO)
+            fh = logging.FileHandler(os.path.join(self.getMetaDir(), f'{self.subjID}.log'))
+            fh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+            self._logger.addHandler(fh)
+            if not self.QUIET:
+                self._logger.addHandler(logging.StreamHandler())
+        return self._logger
+
+
+    ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
     ### ----------------------------------------------------------------------------------------------------------------
-    def log(self, message, STREAM=True):
-        if self.logfile is None:
-            self.logfile = os.path.join(self.getMetaDir(), f'{self.subjID}.log')
-        with open(self.logfile, 'a+') as fid:
-            sNow = datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")
-            strOut =  f"{sNow}|{self.LOG_LEVEL:8s}|{message}"
-            fid.write(f"{strOut}\r\n")
-        if STREAM and (not self.QUIET):
-            print(strOut)
-
     def initDirectroyStructure(self):
         if os.path.isdir(self.getTopDir()):
-            self.log(f"Study participant {self.subjID} exists at {self.getTopDir()}. Adding to")
+            self.logger.info(f"Study participant {self.subjID} exists at {self.getTopDir()}. Adding to")
         os.makedirs(self.getTopDir(), exist_ok=True)
         self.getDicomsDir()
         self.getMetaDir()
-        self.log(f"Directory structure correct for {self.subjID} at {self.getTopDir()}.")
+        self.logger.info(f"Directory structure correct for {self.subjID} at {self.getTopDir()}.")
 
     def getPrefix_Number(self):
         return splitSubjID(self.subjID)
@@ -123,11 +115,11 @@ class AbstractSubject(object):
     ### LOADING
     def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
         self.initDirectroyStructure()
-        self.log('LoadDicoms(%s, %s)'%(dicomFolderToLoad, self.getDicomsDir()))
+        self.logger.info('LoadDicoms(%s, %s)'%(dicomFolderToLoad, self.getDicomsDir()))
         d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
         dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
         dO = self.countNumberOfDicoms()
-        self.log(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
+        self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
     def exists(self):
@@ -173,7 +165,7 @@ class AbstractSubject(object):
                 seInfoList.append(dcmSE.getSeriesInfoDict())
         df = pd.DataFrame(data=seInfoList)
         df.to_csv(self.getSeriesMetaCSV())
-        self.log('buildSeriesDataMetaCSV')
+        self.logger.info('buildSeriesDataMetaCSV')
 
     def printDicomsInfo(self):
         dicomFolderList = self.getDicomFoldersListStr(False)
@@ -277,7 +269,7 @@ class AbstractSubject(object):
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
         dcmTK.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
-        self.log('updateMetaFile')
+        self.logger.info('updateMetaFile')
 
     def buildDicomMeta(self):
         # this uses pydicom - so tag names are different.
@@ -420,7 +412,7 @@ class AbstractSubject(object):
     def zipUpSubject(self, outputDirectory):
         archive_name = os.path.join(outputDirectory, self.subjID)
         zipfileOut = shutil.make_archive(archive_name, 'zip', root_dir=self.getTopDir())
-        self.log(f'Zipped subject to {zipfileOut}')
+        self.logger.info(f'Zipped subject to {zipfileOut}')
         return zipfileOut
 
 
