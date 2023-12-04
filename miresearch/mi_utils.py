@@ -25,12 +25,12 @@ DEFAULT_DICOM_DATE_FORMAT = "%H%M%S"
 def countFilesInDir(dirName):
     files = []
     if os.path.isdir(dirName):
-        for path, dirs, filenames in os.walk(dirName):  # @UnusedVariable
+        for _, _, filenames in os.walk(dirName):  # @UnusedVariable
             files.extend(filenames)
     return len(files)
 
 def datetimeToStrTime(dateTimeVal, strFormat=DEFAULT_DICOM_DATE_FORMAT):
-    return dateTimeVal.strftime(DEFAULT_DICOM_DATE_FORMAT)
+    return dateTimeVal.strftime(strFormat)
 
 #==================================================================
 def encodeString(strIn, passcode):
@@ -50,3 +50,13 @@ def decodeString(encStr, passcode):
         dec.append(dec_c)
     return "".join(dec)
 
+
+class DirectoryStructure(object):
+    def __init__(self, name, childrenList=[]) -> None:
+        super().__init__()
+        self.name = name
+        self.childrenList = childrenList
+
+class DirectoryStructureTree():
+    def __init__(self, topList) -> None:
+        self.topList = topList

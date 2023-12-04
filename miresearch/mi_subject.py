@@ -22,22 +22,14 @@ import logging
 from spydcmtk import dcmTK
 from miresearch import mi_utils
 
+# ====================================================================================================
 abcList = 'abcdefghijklmnopqrstuvwxyz'
-
-class DirectoryStructure(object):
-    def __init__(self, name, childrenList=[]) -> None:
-        super().__init__()
-        self.name = name
-        self.childrenList = childrenList
-
-class DirectoryStructureTree():
-    def __init__(self, topList) -> None:
-        self.topList = topList
-
-
-DEFAULT_DIRECTORY_STRUCTURE_TREE = DirectoryStructureTree([DirectoryStructure('RAW', [DirectoryStructure('DICOM')]),
-                                                            DirectoryStructure('META')])
 UNKNOWN = 'UNKNOWN'
+
+# ====================================================================================================
+
+DEFAULT_DIRECTORY_STRUCTURE_TREE = mi_utils.DirectoryStructureTree([mi_utils.DirectoryStructure('RAW', [mi_utils.DirectoryStructure('DICOM')]),
+                                                                    mi_utils.DirectoryStructure('META')])
 
 # ====================================================================================================
 #       ABSTRACT SUBJECT CLASS
@@ -449,11 +441,15 @@ class SubjectList(list):
         :return:
         """
         filteredMatchList = []
-        for isO in self:
-            iDOS = isO.getTagValue('StudyDate')
+        for iSubj in self:
+            iDOS = iSubj.getTagValue('StudyDate')
             try:
-                if iDOS == dateOfScan_YYYYMMDD:
-                    filteredMatchList.append(isO)
+                if dateEnd_YYYYMMDD is None:
+                    if iDOS == dateOfScan_YYYYMMDD:
+                        filteredMatchList.append(iSubj)
+                else:
+                    if (int(iDOS) >= int(dateOfScan_YYYYMMDD)) and (int(iDOS) <= int(dateEnd_YYYYMMDD)):
+                        filteredMatchList.append(iSubj)
             except ValueError: # maybe don't have tag, or wrong format
                 continue
         return SubjectList(filteredMatchList)
