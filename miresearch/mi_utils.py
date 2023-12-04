@@ -41,6 +41,7 @@ def encodeString(strIn, passcode):
         enc.append(enc_c)
     return base64.urlsafe_b64encode("".join(enc).encode()).decode()
 
+
 def decodeString(encStr, passcode):
     dec = []
     enc = base64.urlsafe_b64decode(encStr).decode()
@@ -49,4 +50,29 @@ def decodeString(encStr, passcode):
         dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
         dec.append(dec_c)
     return "".join(dec)
+
+
+def readFileToListOfLines(fileName, commentSymbol='#'):
+    ''' Read file - return list - elements made up of each line
+        Will split on "," if present
+        Will skip starting with #
+    '''
+    with open(fileName, 'r') as fid:
+        lines = fid.readlines()
+    lines = [l.strip('\n') for l in lines]
+    lines = [l for l in lines if len(l) > 0]
+    lines = [l for l in lines if l[0]!=commentSymbol]
+    lines = [l.split(',') for l in lines]
+    return lines
+
+
+def subjFileToSubjN(subjFile):
+    allLines = readFileToListOfLines(subjFile)
+    try:
+        return [int(i[0]) for i in allLines]
+    except ValueError:
+        tf = [i.isnumeric() for i in allLines[0][0]]
+        first_numeric = tf.index(True)
+        return [int(i[0][first_numeric:]) for i in allLines]
+
 
