@@ -19,17 +19,21 @@ import datetime
 import pandas as pd
 import logging
 ##
-from spydcmtk import dcmTK
+from spydcmtk import spydcm
 from miresearch import mi_utils
 
 # ====================================================================================================
 abcList = 'abcdefghijklmnopqrstuvwxyz'
 UNKNOWN = 'UNKNOWN'
+META = "META"
+RAW = "RAW"
+DICOM = "DICOM"
+
+DEFAULT_DIRECTORY_STRUCTURE_TREE = mi_utils.DirectoryStructureTree([mi_utils.DirectoryStructure(RAW, [mi_utils.DirectoryStructure(DICOM)]),
+                                                                    mi_utils.DirectoryStructure(META)])
 
 # ====================================================================================================
 
-DEFAULT_DIRECTORY_STRUCTURE_TREE = mi_utils.DirectoryStructureTree([mi_utils.DirectoryStructure('RAW', [mi_utils.DirectoryStructure('DICOM')]),
-                                                                    mi_utils.DirectoryStructure('META')])
 
 # ====================================================================================================
 #       ABSTRACT SUBJECT CLASS
@@ -40,10 +44,10 @@ class AbstractSubject(object):
     """
     def __init__(self, subjectFullID, 
                         projectRoot, 
-                        DIRECTORY_STURCTURE_TREE=DEFAULT_DIRECTORY_STRUCTURE_TREE) -> None:
+                        DIRECTORY_STRUCTURE_TREE=DEFAULT_DIRECTORY_STRUCTURE_TREE) -> None:
         self.subjID = subjectFullID
         self.dataRoot = projectRoot
-        self.DIRECTORY_STURCTURE_TREE = DIRECTORY_STURCTURE_TREE
+        self.DIRECTORY_STRUCTURE_TREE = DIRECTORY_STRUCTURE_TREE
         self.BUILD_DIR_IF_NEED = True
         self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
         self.QUIET = False
@@ -93,9 +97,9 @@ class AbstractSubject(object):
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
     ### ----------------------------------------------------------------------------------------------------------------
-    def initDirectroyStructure(self):
+    def initDirectoryStructure(self):
         if os.path.isdir(self.getTopDir()):
-            self.logger.info(f"Study participant {self.subjID} exists at {self.getTopDir()}. Adding to")
+            self.logger.info(f"Study participant {self.subjID} exists at {self.getTopDir()}. Updating directory structure")
         os.makedirs(self.getTopDir(), exist_ok=True)
         self.getDicomsDir()
         self.getMetaDir()
@@ -106,10 +110,10 @@ class AbstractSubject(object):
 
     ### LOADING
     def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
-        self.initDirectroyStructure()
+        self.initDirectoryStructure()
         self.logger.info('LoadDicoms(%s, %s)'%(dicomFolderToLoad, self.getDicomsDir()))
         d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
-        dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
+        spydcm.dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
         dO = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
@@ -126,20 +130,17 @@ class AbstractSubject(object):
             if BUILD_IF_NEED & self.BUILD_DIR_IF_NEED:
                 if not os.path.isdir(self.getTopDir()):
                     raise IOError(' %s does not exist'%(self.getTopDir()))
-                try:
-                    os.makedirs(dd)
-                except OSError:
-                    pass
+                os.makedirs(dd, exist_ok=True)
         return dd
 
     def getMetaDir(self):
-        return self._getDir(["META"])
+        return self._getDir([META])
 
     def getRawDir(self):
-        return self._getDir(["RAW"])
+        return self._getDir([RAW])
     
     def getDicomsDir(self):
-        dirName = self._getDir(["RAW", "DICOM"])
+        dirName = self._getDir([RAW, DICOM])
         return dirName
     
     ### META STUFF -----------------------------------------------------------------------------------------------------
@@ -151,7 +152,7 @@ class AbstractSubject(object):
 
     def buildSeriesDataMetaCSV(self):
         seInfoList = []
-        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
+        dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             for dcmSE in dcmStudy:
                 seInfoList.append(dcmSE.getSeriesInfoDict())
@@ -214,7 +215,7 @@ class AbstractSubject(object):
         return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr)
 
     def getSeriesNumbersMatchingDescriptionStr(self, descriptionStr): # FIXME what if mult studies
-        dcmStudy = dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
+        dcmStudy = spydcm.dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
         dOut = {}
         for iSeries in dcmStudy:
             if descriptionStr.lower() in iSeries.getTag('SeriesDescription').lower():
@@ -245,7 +246,7 @@ class AbstractSubject(object):
         ff = self.getMetaTagsFile(suffix)
         dd = {}
         if os.path.isfile(ff):
-            dd = dcmTK.dcmTools.parseJsonToDictionary(ff)
+            dd = spydcm.dcmTools.parseJsonToDictionary(ff)
         return dd
 
     def getTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
@@ -260,13 +261,13 @@ class AbstractSubject(object):
     def updateMetaFile(self, metaDict, metasuffix=""):
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
-        dcmTK.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
+        spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
         self.logger.info('updateMetaFile')
 
     def buildDicomMeta(self):
         # this uses pydicom - so tag names are different.
         ddFull = {}
-        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
+        dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             ddFull.update(dcmStudy.getStudySummaryDict())
         self.updateMetaFile(ddFull)
@@ -281,7 +282,7 @@ class AbstractSubject(object):
         return self.getDicomSeriesDir(seN)
     
     def getDicomSeriesDir(self, seriesNum, seriesUID=None):
-        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
+        dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
         if seriesUID is not None:
             for dcmStudy in dcmStudies:
                 dcmSeries = dcmStudy.getSeriesByUID()
@@ -314,11 +315,11 @@ class AbstractSubject(object):
 
     def getDicomFoldersListStr(self, FULL=True, excludeSeNums=None):
         dFolders = []
-        dcmStudies = dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
+        dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             for iSeries in dcmStudy:
                 dFolders.append(iSeries.getRootDir())
-        dS = sorted(dFolders, key=dcmTK.dcmTools.instanceNumberSortKey)
+        dS = sorted(dFolders, key=spydcm.dcmTools.instanceNumberSortKey)
         if not FULL:
             dS = [os.path.split(i)[1] for i in dS]
             return dS
@@ -331,7 +332,7 @@ class AbstractSubject(object):
             except ValueError:
                 pass
         dcmDirList = [self.getDicomSeriesDir(i) for i in seN if i not in excludeSeNums]
-        dcmDirList = sorted(dcmDirList, key=dcmTK.dcmTools.instanceNumberSortKey)
+        dcmDirList = sorted(dcmDirList, key=spydcm.dcmTools.instanceNumberSortKey)
         return dcmDirList
 
     def getListOfSeNums(self):
@@ -357,7 +358,7 @@ class AbstractSubject(object):
     def getStudyDate(self, RETURN_Datetime=False):
         dos = self.getTagValue('StudyDate')
         if RETURN_Datetime:
-            dcmTK.dcmTools.dbDateToDateTime(dos)
+            spydcm.dcmTools.dbDateToDateTime(dos)
         return dos
 
     def getInfoStr(self):
@@ -389,7 +390,7 @@ class AbstractSubject(object):
         try:
             birth = dd["PatientBirthDate"]
             study = dd["StudyDate"]
-            return (dcmTK.dcmTools.dbDateToDateTime(study) - dcmTK.dcmTools.dbDateToDateTime(birth)).days / 365.0
+            return (spydcm.dcmTools.dbDateToDateTime(study) - spydcm.dcmTools.dbDateToDateTime(birth)).days / 365.0
         except (KeyError, ValueError):
             return np.nan
 
@@ -529,7 +530,6 @@ def guessSubjectPrefix(rootDir):
     counts = [len(allDir_subj[i]) for i in options]
     return options[np.argmax(counts)]
 
-
 def getAllSubjects(DATA_DIR, subjectPrefix=None):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(DATA_DIR)
@@ -541,15 +541,35 @@ def getAllSubjects(DATA_DIR, subjectPrefix=None):
 def buildSubjectID(subjN, prefix):
     return f"{prefix}{subjN:06d}"
 
-def getNextId(dataRootDir, prefix):
+def getNextSubjN(dataRootDir, prefix):
     allNums = [int(i[len(prefix):]) for i in os.listdir(dataRootDir) if i.startswith(prefix)]
     try:
         return max(allNums)+1
     except ValueError:
         return 0
 
+def getNextSubjID(dataRootDir, prefix):
+    return buildSubjectID(getNextSubjN(dataRootDir, prefix), prefix)
+
 def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubject, CHECK_EXIST=True):
     subjList = SubjectList([SubjClass(iN, dataRoot, subjPrefix) for iN in subjNList])
     if CHECK_EXIST:
         subjList.reduceToExist()
     return subjList
+
+def loadNewSubject(dicomDirToLoad, dataRoot, subjPrefix, SubjClass=AbstractSubject, subjID=None):
+    if not os.path.isdir(dicomDirToLoad):
+        raise IOError(" Load dir does not exist")
+    if spydcm.returnFirstDicomFound(dicomDirToLoad) is None:
+        raise IOError(f"Can not find valid dicoms under {dicomDirToLoad}")
+    if not os.path.isdir(dataRoot):
+        raise IOError(" Destination does not exist")
+    if subjID is None:
+        subjID = getNextSubjID(dataRoot, subjPrefix)
+    newSubj = SubjClass(subjID, dataRoot)
+    newSubj.initDirectoryStructure()
+    newSubj.loadDicomsToSubject(dicomDirToLoad)
+    newSubj.buildDicomMeta()
+    newSubj.buildSeriesDataMetaCSV()
+    #
+    return newSubj

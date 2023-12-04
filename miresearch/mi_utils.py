@@ -21,7 +21,18 @@ DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
 
 DEFAULT_DICOM_DATE_FORMAT = "%H%M%S"
 
+#==================================================================
+class DirectoryStructure(object):
+    def __init__(self, name, childrenList=[]) -> None:
+        super().__init__()
+        self.name = name
+        self.childrenList = childrenList
 
+class DirectoryStructureTree():
+    def __init__(self, topList) -> None:
+        self.topList = topList
+
+#==================================================================
 def countFilesInDir(dirName):
     files = []
     if os.path.isdir(dirName):
@@ -41,6 +52,7 @@ def encodeString(strIn, passcode):
         enc.append(enc_c)
     return base64.urlsafe_b64encode("".join(enc).encode()).decode()
 
+
 def decodeString(encStr, passcode):
     dec = []
     enc = base64.urlsafe_b64decode(encStr).decode()
@@ -51,12 +63,27 @@ def decodeString(encStr, passcode):
     return "".join(dec)
 
 
-class DirectoryStructure(object):
-    def __init__(self, name, childrenList=[]) -> None:
-        super().__init__()
-        self.name = name
-        self.childrenList = childrenList
+def readFileToListOfLines(fileName, commentSymbol='#'):
+    ''' Read file - return list - elements made up of each line
+        Will split on "," if present
+        Will skip starting with #
+    '''
+    with open(fileName, 'r') as fid:
+        lines = fid.readlines()
+    lines = [l.strip('\n') for l in lines]
+    lines = [l for l in lines if len(l) > 0]
+    lines = [l for l in lines if l[0]!=commentSymbol]
+    lines = [l.split(',') for l in lines]
+    return lines
 
-class DirectoryStructureTree():
-    def __init__(self, topList) -> None:
-        self.topList = topList
+
+def subjFileToSubjN(subjFile):
+    allLines = readFileToListOfLines(subjFile)
+    try:
+        return [int(i[0]) for i in allLines]
+    except ValueError:
+        tf = [i.isnumeric() for i in allLines[0][0]]
+        first_numeric = tf.index(True)
+        return [int(i[0][first_numeric:]) for i in allLines]
+
+
