@@ -17,10 +17,7 @@ AbstractSubject
 
 ## TODO
 
-### High
-Load subject - helper classmethod - make meta, make ID
-    load multiple
+Load subject - from zip etc
 
+use abstract class
 
-### Low
-abstract class - mri subject. 

@@ -8,15 +8,27 @@ import sys
 import argparse
 
 # Local imports 
-import miresearch.mi_utils as mi_utils
+# import miresearch.mi_utils as mi_utils
+# import miresearch.mi_subject as mi_subject
+import mi_utils 
+import mi_subject
 
 
-def buildNewSubject(dbRoot, dicomDirectory=None, subjectSuffix=None):
-    pass
+
+def buildNewSubject(dataRoot, SubjectClass, dicomDirectory=None):
+    """Will build a new subject of SubjectClass in dataRoot using dicomDirectory to populate 
+
+    Args:
+        dataRoot (str): path to root directory of subject filesystem database
+        SubjectClass (mi_subject.AbstractSubject): class mi_subject.AbstractSubject (or derived from)
+        dicomDirectory (str, optional): Path to directory of dicoms to load into new subject. Defaults to None.
+    """
+    newSubj = SubjectClass()
 
 
-def buildNewSubject_Multi(dbRoot, directoryOfDicomStudies, subjectSuffix=None):
-    pass
+def buildNewSubject_Multi(dataRoot, directoryOfDicomStudies, subjectPrefix=None):
+    if subjectPrefix is None:
+        subjectPrefix = mi_subject.guessSubjectPrefix(dataRoot)
 
 
 def seeWhatIveGotIn_kmr():
@@ -43,11 +55,23 @@ def setNList(args):
 
 
 def checkArgs(args):
-    return True
+    if args.dataRoot is not None:
+        args.dataRoot = os.path.abspath(args.dataRoot)
+    else:
+        args.dataRoot = mi_utils.getDataRoot()
+    if not args.QUIET:
+        print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
+    if args.loadPath is not None:
+        args.loadPath = os.path.abspath(args.loadPath)
+        if not args.QUIET:
+            print(f'Running MIRESEARCH with loadPath {args.loadPath}')
+    ## -------------
+    setNList(args=args)
 
 ##  ========= RUN ACTIONS =========
-def runActions(args, ap):
-    pass
+def runActions(args):
+    if args.loadPath is not None:
+        mi_subject.createNewSubjectHelper(args.loadPath)
     ####
         ##
 
@@ -55,19 +79,24 @@ def runActions(args, ap):
 ### ====================================================================================================================
 # S T A R T
 def main():
+    arguments = parseArgs(sys.argv[1:])
+    runActions(arguments)
+
+def parseArgs(args):
     # --------------------------------------------------------------------------
     #  ARGUMENT PARSING
     # --------------------------------------------------------------------------
     ParentAP = MiResearchParser(add_help=False,
-                                       epilog='Fraser M. Callaghan', 
-                                       description='Medical Imaging Research assistant - miresearch')
+                                epilog='Fraser M. Callaghan', 
+                                description='Medical Imaging Research assistant - miresearch')
     
     groupS = ParentAP.add_argument_group('Subject Definition')
-    groupS.add_argument('-i', dest='inputPath', help='Path to find dicoms (file / directory / tar / tar.gz / zip)', type=str, required=True)
     groupS.add_argument('-s', dest='subjNList', help='Subject number', nargs="*", type=int, default=[])
     groupS.add_argument('-sf', dest='subjNListFile', help='Subject numbers in file', type=str, default=None)
     groupS.add_argument('-sR', dest='subjRange', help='Subject range', nargs=2, type=int, default=[])
-    groupS.add_argument('-y', dest='dataRoot', help='Path for output - if set then will organise dicoms into this folder', type=str, default=None)
+    groupS.add_argument('-y', dest='dataRoot', help='Path of root data directory (where subjects are stored) [dfault None -> will get from config file]', type=str, default=None)
+    groupS.add_argument('-load', dest='loadPath', help='Path to load dicoms from (file / directory / tar / tar.gz / zip)', type=str, default=None)
+    groupS.add_argument('-LoadMulti', dest='LoadMulti', help='Load new subject for each subdirectory under loadPath', action='store_true')
 
 
     groupS.add_argument('-FORCE', dest='FORCE', help='force reading even if not standard dicom (needed if dicom files missing header meta)',
@@ -75,22 +104,10 @@ def main():
     groupS.add_argument('-QUIET', dest='QUIET', help='Suppress progress bars and logging to terminal',
                             action='store_true')
     ##
-
-
-
-
-
-
     arguments = ParentAP.parse_args()
-    if arguments.inputPath is not None:
-        arguments.inputPath = os.path.abspath(arguments.inputPath)
-        if not arguments.QUIET:
-            print(f'Running MIRESEARCH with input {arguments.inputPath}')
-    ## -------------
-
-    runActions(arguments, ParentAP)
+    checkArgs(arguments)
+    return arguments
 
 
 if __name__ == '__main__':
-
     main()

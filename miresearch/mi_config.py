@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import configparser
+import json
 from collections import OrderedDict
 import os
 
@@ -19,5 +20,6 @@ all_config_files = [os.path.join(rootDir,thisConfFileName),
 config.read(all_config_files)
 
 environment = config.get("app", "environment")
-DEBUG = config.get("app", "debug")
+DEBUG = config.get("app", "debug").lower() == "true"
+DataRootDir = config.get("app", "data_root_dir")
 

@@ -20,7 +20,7 @@ import pandas as pd
 import logging
 ##
 from spydcmtk import spydcm
-from miresearch import mi_utils
+from miresearch import  mi_utils
 
 # ====================================================================================================
 abcList = 'abcdefghijklmnopqrstuvwxyz'
@@ -42,17 +42,39 @@ class AbstractSubject(object):
     """
     An abstract subject controlling most basic structure
     """
-    def __init__(self, subjectFullID, 
-                        projectRoot, 
+    def __init__(self, subjectNumber, 
+                        dataRoot, 
+                        subjectPrefix=None,
                         DIRECTORY_STRUCTURE_TREE=DEFAULT_DIRECTORY_STRUCTURE_TREE) -> None:
-        self.subjID = subjectFullID
-        self.dataRoot = projectRoot
+        try:
+            int(subjectNumber)
+            self.subjN = subjectNumber
+        except ValueError:
+            tSubjPrefix, self.subjN = splitSubjID(subjectNumber)
+            if subjectPrefix is not None:
+                if subjectPrefix != tSubjPrefix:
+                    raise mi_utils.SubjPrefixError("Subject prefix passed does not match subjectID passed")
+            else:
+                subjectPrefix = tSubjPrefix
+        self.dataRoot = dataRoot
+        if subjectPrefix is None:
+            self.subjectPrefix = guessSubjectPrefix(self.dataRoot)
+        else:
+            self.subjectPrefix = subjectPrefix
         self.DIRECTORY_STRUCTURE_TREE = DIRECTORY_STRUCTURE_TREE
         self.BUILD_DIR_IF_NEED = True
         self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
         self.QUIET = False
         #
         self._logger = None
+
+
+    ### ----------------------------------------------------------------------------------------------------------------
+    ### Class Methods
+    ### ----------------------------------------------------------------------------------------------------------------
+    @classmethod
+    def setFromImageDataDirectroy(cls, imageDataDirectory, dataRoot, subjectPrefix=None, subjectNumber=None):
+        pass
 
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -78,6 +100,13 @@ class AbstractSubject(object):
         return f"{self.subjID} at {self.dataRoot}"
 
     ### ----------------------------------------------------------------------------------------------------------------
+    ### Properties
+    ### ----------------------------------------------------------------------------------------------------------------
+    @property
+    def subjID(self):
+        return buildSubjectID(self.subjN, self.subjectPrefix)
+
+    ### ----------------------------------------------------------------------------------------------------------------
     ### Logging
     ### ----------------------------------------------------------------------------------------------------------------
     @property
@@ -87,7 +116,7 @@ class AbstractSubject(object):
             self._logger = logging.getLogger(f"{rr}/{self.subjID}")
             self._logger.setLevel(logging.INFO)
             fh = logging.FileHandler(os.path.join(self.getMetaDir(), f'{self.subjID}.log'))
-            fh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+            fh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
             self._logger.addHandler(fh)
             if not self.QUIET:
                 self._logger.addHandler(logging.StreamHandler())
@@ -111,7 +140,7 @@ class AbstractSubject(object):
     ### LOADING
     def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
         self.initDirectoryStructure()
-        self.logger.info('LoadDicoms(%s, %s)'%(dicomFolderToLoad, self.getDicomsDir()))
+        self.logger.info(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()})")
         d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
         spydcm.dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
         dO = self.countNumberOfDicoms()
@@ -129,7 +158,7 @@ class AbstractSubject(object):
         if not os.path.isdir(dd):
             if BUILD_IF_NEED & self.BUILD_DIR_IF_NEED:
                 if not os.path.isdir(self.getTopDir()):
-                    raise IOError(' %s does not exist'%(self.getTopDir()))
+                    raise IOError(f"{self.getTopDir()} does not exist")
                 os.makedirs(dd, exist_ok=True)
         return dd
 
@@ -237,7 +266,7 @@ class AbstractSubject(object):
         return list(df.loc[df['SeriesNumber'] == seNum, varName])[0]
 
     def getMetaTagsFile(self, suffix=""):
-        return os.path.join(self.getMetaDir(), "%sTags%s.json" % (self.subjID, suffix))
+        return os.path.join(self.getMetaDir(), f"{self.subjID}Tags{suffix}.json")
 
     def setTagValue(self, tag, value, suffix=""):
         self.updateMetaFile({tag:value}, suffix)
@@ -266,10 +295,10 @@ class AbstractSubject(object):
 
     def buildDicomMeta(self):
         # this uses pydicom - so tag names are different.
-        ddFull = {}
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
-        for dcmStudy in dcmStudies:
-            ddFull.update(dcmStudy.getStudySummaryDict())
+        ddFull = dcmStudies[0].getStudySummaryDict()
+        for k1 in range(1, len(dcmStudies)):
+            ddFull['Series'] += dcmStudies[k1].getStudySummaryDict()['Series']
         self.updateMetaFile(ddFull)
 
     def countNumberOfDicoms(self):
@@ -289,14 +318,14 @@ class AbstractSubject(object):
                 if dcmSeries is not None:
                     break
             if dcmSeries is None:
-                raise ValueError("## ERROR: Series with UID: %s NOT FOUND"%(seriesUID))
+                raise ValueError(f"## ERROR: Series with UID: {seriesUID} NOT FOUND")
         else:
             for dcmStudy in dcmStudies:
                 dcmSeries = dcmStudy.getSeriesByID(seriesNum)
                 if dcmSeries is not None:
                     break
             if dcmSeries is None:
-                raise ValueError("## ERROR: Series with SE number: %s NOT FOUND"%(str(seriesNum)))
+                raise ValueError(f"## ERROR: Series with SE number: {seriesNum} NOT FOUND")
         dirName = dcmSeries.getRootDir()
         return dirName
 
@@ -421,8 +450,8 @@ class SubjectList(list):
 
 
     @classmethod
-    def setByDirectory(cls, rootDirectory, subjectPrefix=None):
-        listOfSubjects = getAllSubjects(rootDirectory, subjectPrefix)
+    def setByDirectory(cls, dataRoot, subjectPrefix=None):
+        listOfSubjects = getAllSubjects(dataRoot, subjectPrefix)
         return cls(listOfSubjects)
 
     def reduceToExist(self):
@@ -520,36 +549,64 @@ def splitSubjID(s):
 def getNumberFromSubjID(subjID):
     return splitSubjID(subjID)[1]
 
-def guessSubjectPrefix(rootDir):
-    allDir = [i for i in os.listdir(rootDir) if os.path.isdir(os.path.join(rootDir, i))]
+def guessSubjectPrefix(dataRootDir):
+    """Guess the subject prefix by looking for common names in the dataRootDir
+
+    Args:
+        dataRootDir (str): path to root directory of subject filesystem database
+
+    Returns:
+        str: subject prefix string
+
+    Exception:
+        mi_utils.SubjPrefixError: is ambiguous
+    """
+    allDir = [i for i in os.listdir(dataRootDir) if os.path.isdir(os.path.join(dataRootDir, i))]
     allDir_subj = {}
     for i in allDir:
-        prefix, N = splitSubjID(i)
+        try:
+            prefix, N = splitSubjID(i)
+        except ValueError: 
+            continue # directory not correct format - could not split to integer
         allDir_subj.setdefault(prefix, []).append(N)
     options = list(allDir_subj.keys())
+    if len(options) == 0:
+        raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous")
     counts = [len(allDir_subj[i]) for i in options]
-    return options[np.argmax(counts)]
+    maxCount = np.argmax(counts)
+    if options.count(options[maxCount]) != 1:
+        raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous")
+    return options[maxCount]
 
-def getAllSubjects(DATA_DIR, subjectPrefix=None):
+def getAllSubjects(dataRootDir, subjectPrefix=None):
     if subjectPrefix is None:
-        subjectPrefix = guessSubjectPrefix(DATA_DIR)
-    allDir = os.listdir(DATA_DIR)
-    subjObjList = [AbstractSubject(i, projectRoot=DATA_DIR) for i in allDir]
+        subjectPrefix = guessSubjectPrefix(dataRootDir)
+    allDir = os.listdir(dataRootDir)
+    subjObjList = [AbstractSubject(i, dataRoot=dataRootDir) for i in allDir]
     subjObjList = [i for i in subjObjList if i.exists()]
     return sorted(subjObjList)
 
-def buildSubjectID(subjN, prefix):
-    return f"{prefix}{subjN:06d}"
+def buildSubjectID(subjN, subjectPrefix):
+    return f"{subjectPrefix}{subjN:06d}"
 
-def getNextSubjN(dataRootDir, prefix):
-    allNums = [int(i[len(prefix):]) for i in os.listdir(dataRootDir) if i.startswith(prefix)]
+def getNextSubjN(dataRootDir, subjectPrefix=None):
+    if subjectPrefix is None:
+        subjectPrefix = guessSubjectPrefix(dataRootDir)
+    allNums = [int(i[len(subjectPrefix):]) for i in os.listdir(dataRootDir) if (os.path.isdir(os.path.join(dataRootDir, i)) and  i.startswith(subjectPrefix))]
     try:
         return max(allNums)+1
     except ValueError:
-        return 0
+        return 1
 
-def getNextSubjID(dataRootDir, prefix):
-    return buildSubjectID(getNextSubjN(dataRootDir, prefix), prefix)
+def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None):
+    if subjectPrefix is None:
+        subjectPrefix = guessSubjectPrefix(dataRootDir)
+    return os.path.isdir(dataRootDir, buildSubjectID(subjN, subjectPrefix))
+
+def getNextSubjID(dataRootDir, subjectPrefix=None):
+    if subjectPrefix is None:
+        subjectPrefix = guessSubjectPrefix(dataRootDir)
+    return buildSubjectID(getNextSubjN(dataRootDir, subjectPrefix), subjectPrefix)
 
 def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubject, CHECK_EXIST=True):
     subjList = SubjectList([SubjClass(iN, dataRoot, subjPrefix) for iN in subjNList])
@@ -557,19 +614,46 @@ def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubjec
         subjList.reduceToExist()
     return subjList
 
-def loadNewSubject(dicomDirToLoad, dataRoot, subjPrefix, SubjClass=AbstractSubject, subjID=None):
+def createNewSubject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, FORCE=False):
     if not os.path.isdir(dicomDirToLoad):
         raise IOError(" Load dir does not exist")
     if spydcm.returnFirstDicomFound(dicomDirToLoad) is None:
         raise IOError(f"Can not find valid dicoms under {dicomDirToLoad}")
     if not os.path.isdir(dataRoot):
         raise IOError(" Destination does not exist")
-    if subjID is None:
-        subjID = getNextSubjID(dataRoot, subjPrefix)
-    newSubj = SubjClass(subjID, dataRoot)
+    if subjNumber is None:
+        subjNumber = getNextSubjN(dataRoot, subjPrefix)
+    else:
+        if (not FORCE) and doesSubjectExist(subjNumber, dataRoot, subjPrefix):
+            raise ValueError("Subject already exists - use FORCE argument to add data to existing subject.")
+    newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
+    newSubj.QUIET = QUIET
     newSubj.initDirectoryStructure()
-    newSubj.loadDicomsToSubject(dicomDirToLoad)
+    newSubj.loadDicomsToSubject(dicomDirToLoad, anonName=anonName, HIDE_PROGRESSBAR=QUIET)
     newSubj.buildDicomMeta()
     newSubj.buildSeriesDataMetaCSV()
     #
     return newSubj
+
+def createNewSubjects_Multi(multiDicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjPrefix=None, QUIET=False):
+    if not os.path.isdir(multiDicomDirToLoad):
+        raise IOError(" Load dir does not exist")
+    dirsToLoad = [os.path.join(multiDicomDirToLoad, i) for i in os.listdir(multiDicomDirToLoad)]
+    dirsToLoad = [i for i in dirsToLoad if os.path.isdir(i)]
+    dirsToLoadChecked = []
+    for iDir in dirsToLoad:
+        if spydcm.returnFirstDicomFound(iDir) is not None:
+            dirsToLoadChecked.append(iDir)
+    if len(dirsToLoadChecked) == 0:
+        raise IOError(f"Can not find valid dicoms under {multiDicomDirToLoad}")
+    if not os.path.isdir(dataRoot):
+        raise IOError(" Destination does not exist")
+    newSubjsList = []
+    for iDir in dirsToLoadChecked:
+        newSubjsList.append(createNewSubject(iDir, 
+                                             dataRoot=dataRoot,
+                                             SubjClass=SubjClass,
+                                             subjPrefix=subjPrefix,
+                                             QUIET=QUIET,
+                                             FORCE=False))
+    return SubjectList(newSubjsList)

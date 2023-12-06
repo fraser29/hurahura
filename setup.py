@@ -8,7 +8,6 @@ setup(
     author_email='callaghan.fm@gmail.com',
     packages=find_packages(),
     install_requires=[
-        'spydcmtk @ git+https://github.com/fraser29/spydcmtk.git',
         'pandas'
     ],
 )

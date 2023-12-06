@@ -1,5 +1,6 @@
 import os
 import base64
+from miresearch import mi_config
 
 
 
@@ -19,7 +20,16 @@ DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
                                 "StudyID",
                                 "StudyInstanceUID"]
 
-DEFAULT_DICOM_DATE_FORMAT = "%H%M%S"
+DEFAULT_DICOM_TIME_FORMAT = "%H%M%S"
+
+#==================================================================
+def getDataRoot():
+    """Function to return data root from configuration. 
+
+    Returns:
+        str: Path to data root - found from config
+    """
+    return mi_config.DataRootDir
 
 #==================================================================
 class DirectoryStructure(object):
@@ -40,7 +50,7 @@ def countFilesInDir(dirName):
             files.extend(filenames)
     return len(files)
 
-def datetimeToStrTime(dateTimeVal, strFormat=DEFAULT_DICOM_DATE_FORMAT):
+def datetimeToStrTime(dateTimeVal, strFormat=DEFAULT_DICOM_TIME_FORMAT):
     return dateTimeVal.strftime(strFormat)
 
 #==================================================================
@@ -87,3 +97,11 @@ def subjFileToSubjN(subjFile):
         return [int(i[0][first_numeric:]) for i in allLines]
 
 
+#==================================================================
+class SubjPrefixError(Exception):
+    ''' SubjPrefixError
+            If errors to do with the subject prefix '''
+    def __init__(self, msg2=''):
+        self.msg = 'SubjPrefixError: please provide as imput.' + '\n' + msg2
+    def __str__(self):
+        return self.msg
