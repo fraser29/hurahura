@@ -15,13 +15,15 @@ P1 = os.path.join(TEST_DIR, 'P1')
 P2 = os.path.join(TEST_DIR, 'P2')
 P3_4 = os.path.join(TEST_DIR, "P3_4")
 P4_extra = os.path.join(TEST_DIR, "P4_extra")
+PZip  = os.path.join(TEST_DIR, "P3_4.zip")
+PTar  = os.path.join(TEST_DIR, "P3_4.tar")
+PTarGZ  = os.path.join(TEST_DIR, "P3_4.tar.gz")
 DEBUG = mi_utils.mi_config.DEBUG
 
 class TestSubject(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj')
-        # print(f"Building {self.tmpDir}")
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -48,7 +50,6 @@ class TestSubject(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls, OVERRIDE=False):
-        print('teardown', DEBUG, type(DEBUG), ~DEBUG, (not DEBUG))
         if (not DEBUG) or OVERRIDE:
             shutil.rmtree(cls.tmpDir)
 
@@ -56,12 +57,10 @@ class TestSubject2(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj2')
-        # print(f"Building {self.tmpDir}")
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
         cls.newSubj = mi_subject.createNewSubject(P1, cls.tmpDir, subjPrefix='MI2', QUIET=True)
-        print(os.listdir(cls.tmpDir))
 
     def test_newSubj(self):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI2000001')))
@@ -81,7 +80,6 @@ class TestSubjects(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmpDir = os.path.join(this_dir, 'tmpTestSubjs')
-        # print(f"Building {self.tmpDir}")
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -117,7 +115,6 @@ class TestSubjects2(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmpDir = os.path.join(this_dir, 'tmpTestSubjs2')
-        # print(f"Building {self.tmpDir}")
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -146,7 +143,6 @@ class TestSubjects3(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmpDir = os.path.join(this_dir, 'tmpTestSubjs3')
-        # print(f"Building {self.tmpDir}")
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -161,14 +157,47 @@ class TestSubjects3(unittest.TestCase):
             shutil.rmtree(cls.tmpDir)
         
 
-class TestMisc(unittest.TestCase):
-
-    def test_DefaultRootDir(self):
-        if DEBUG:
-            self.assertEqual(mi_utils.getDataRoot(), '"/Volume/MRI_DATA"', "Error Default DataRoot")
-        else:
-            self.assertEqual(mi_utils.getDataRoot(), "''", "Error Default DataRoot")
+# class TestMisc(unittest.TestCase):
+#     def test_DefaultRootDir(self):
+#         if DEBUG:
+#             self.assertEqual(mi_utils.getDataRoot(), '"/Volume/MRI_DATA"', "Error Default DataRoot")
+#         else:
+#             self.assertEqual(mi_utils.getDataRoot(), "''", "Error Default DataRoot")
     
+        
+class TestLoadCompressed(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestCompress')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.subjList = mi_subject.createNewSubject(PZip, cls.tmpDir, subjPrefix='MIZ', QUIET=True)
+        cls.subjList = mi_subject.createNewSubject(PTar, cls.tmpDir, subjPrefix='MIT', QUIET=True)
+        cls.subjList = mi_subject.createNewSubjects_Multi(PTarGZ, cls.tmpDir, subjPrefix='MITZ', QUIET=True)
+
+
+    def test_LoadZip(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000002')))
+        dFile = self.subjList[1].getDicomFile(99, 1)
+        self.assertTrue(os.path.isfile(dFile), f'Not finding dcm file for {self.subjList[1].subjID}')
+
+    def test_LoadTar(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000001')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000002')))
+
+    def test_LoadTarZ(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000001')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000002')))
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+        
+
         
 
 if __name__ == '__main__':

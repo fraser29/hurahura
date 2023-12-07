@@ -146,6 +146,16 @@ class AbstractSubject(object):
         dO = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
+    def loadSpydcmStudyToSubject(self, dicomData, anonName=None):
+        self.initDirectoryStructure()
+        self.logger.info(f"LoadDicoms (spydcmtk data ==> {self.getDicomsDir()})")
+        d0, dI = self.countNumberOfDicoms(), dicomData.getNumberOfDicoms()
+        dicomData.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
+        dO = self.countNumberOfDicoms()
+        self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
+
+
+
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
     def exists(self):
         return os.path.isdir(self.getTopDir())
@@ -601,7 +611,7 @@ def getNextSubjN(dataRootDir, subjectPrefix=None):
 def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
-    return os.path.isdir(dataRootDir, buildSubjectID(subjN, subjectPrefix))
+    return os.path.isdir(os.path.join(dataRootDir, buildSubjectID(subjN, subjectPrefix)))
 
 def getNextSubjID(dataRootDir, subjectPrefix=None):
     if subjectPrefix is None:
@@ -614,18 +624,61 @@ def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubjec
         subjList.reduceToExist()
     return subjList
 
-def createNewSubject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, FORCE=False):
+def __createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjPrefix, anonName, QUIET):
+    newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
+    newSubj.QUIET = QUIET
+    newSubj.initDirectoryStructure()
+    try:
+        os.path.isdir(dicomDir_orData)
+        newSubj.loadDicomsToSubject(dicomDir_orData, anonName=anonName, HIDE_PROGRESSBAR=QUIET)
+    except TypeError:
+        newSubj.loadSpydcmStudyToSubject(dicomDir_orData, anonName=anonName)
+    newSubj.buildDicomMeta()
+    newSubj.buildSeriesDataMetaCSV()
+    #
+    return newSubj
+
+def createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSubject, 
+                                subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
+    if compressedFile.endswith('zip'):
+        listOfSubjects = spydcm.dcmTK.ListOfDicomStudies.setFromZip(compressedFile, HIDE_PROGRESSBAR=QUIET)
+    elif compressedFile.endswith('tar') or compressedFile.endswith('tar.gz'):
+        listOfSubjects = spydcm.dcmTK.ListOfDicomStudies.setFromTar(compressedFile, HIDE_PROGRESSBAR=QUIET)
+    else: 
+        raise ValueError("Currently only upporting .zip, .tar and .tar.gz compressed files")
+    if len(listOfSubjects) > 1:
+        if subjNumber is not None:
+            raise ValueError(f"More than one study in {compressedFile} - can not supply subjNumber")
+    newSubjList = []
+    for i in listOfSubjects:
+        iSubjNumber = __subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
+        newSubj = __createSubjectHelper(i, SubjClass, iSubjNumber, dataRoot, subjPrefix, anonName, QUIET)
+        newSubjList.append(newSubj)
+    if len(newSubjList) == 1:
+        return newSubjList[0]
+    return newSubjList
+
+def __subjNumberHelper(dataRoot, subjNumber, subjPrefix):
+    if subjNumber is None:
+        subjNumber = getNextSubjN(dataRoot, subjPrefix)
+    else:
+        if doesSubjectExist(subjNumber, dataRoot, subjPrefix):
+            raise ValueError("Subject already exists - use loadDicomsToSubject method to add data to existing subject.")
+    return subjNumber
+
+def createNewSubject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, 
+                     subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
     if not os.path.isdir(dicomDirToLoad):
+        if os.path.isfile(dicomDirToLoad):
+            newSubj = createNewSubject_Compressed(dicomDirToLoad, dataRoot, SubjClass=SubjClass, subjNumber=subjNumber, 
+                                        subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
+            return newSubj
         raise IOError(" Load dir does not exist")
     if spydcm.returnFirstDicomFound(dicomDirToLoad) is None:
         raise IOError(f"Can not find valid dicoms under {dicomDirToLoad}")
     if not os.path.isdir(dataRoot):
         raise IOError(" Destination does not exist")
-    if subjNumber is None:
-        subjNumber = getNextSubjN(dataRoot, subjPrefix)
-    else:
-        if (not FORCE) and doesSubjectExist(subjNumber, dataRoot, subjPrefix):
-            raise ValueError("Subject already exists - use FORCE argument to add data to existing subject.")
+    subjNumber = __subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
     newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
     newSubj.QUIET = QUIET
     newSubj.initDirectoryStructure()
@@ -637,6 +690,10 @@ def createNewSubject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjNu
 
 def createNewSubjects_Multi(multiDicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjPrefix=None, QUIET=False):
     if not os.path.isdir(multiDicomDirToLoad):
+        if os.path.isfile(multiDicomDirToLoad):
+            newSubjList = createNewSubject_Compressed(multiDicomDirToLoad, dataRoot, SubjClass=SubjClass, 
+                                        subjPrefix=subjPrefix, QUIET=QUIET)
+            return newSubjList
         raise IOError(" Load dir does not exist")
     dirsToLoad = [os.path.join(multiDicomDirToLoad, i) for i in os.listdir(multiDicomDirToLoad)]
     dirsToLoad = [i for i in dirsToLoad if os.path.isdir(i)]
@@ -654,6 +711,5 @@ def createNewSubjects_Multi(multiDicomDirToLoad, dataRoot, SubjClass=AbstractSub
                                              dataRoot=dataRoot,
                                              SubjClass=SubjClass,
                                              subjPrefix=subjPrefix,
-                                             QUIET=QUIET,
-                                             FORCE=False))
+                                             QUIET=QUIET))
     return SubjectList(newSubjsList)

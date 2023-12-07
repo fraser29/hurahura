@@ -7,11 +7,8 @@ import os
 import sys
 import argparse
 
-# Local imports 
-# import miresearch.mi_utils as mi_utils
-# import miresearch.mi_subject as mi_subject
-import mi_utils 
-import mi_subject
+from miresearch import mi_utils
+from miresearch import mi_subject
 
 
 
