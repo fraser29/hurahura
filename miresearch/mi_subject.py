@@ -20,7 +20,7 @@ import pandas as pd
 import logging
 ##
 from spydcmtk import spydcm
-from miresearch import  mi_utils
+from miresearch import mi_utils
 
 # ====================================================================================================
 abcList = 'abcdefghijklmnopqrstuvwxyz'
@@ -72,10 +72,6 @@ class AbstractSubject(object):
     ### ----------------------------------------------------------------------------------------------------------------
     ### Class Methods
     ### ----------------------------------------------------------------------------------------------------------------
-    @classmethod
-    def setFromImageDataDirectroy(cls, imageDataDirectory, dataRoot, subjectPrefix=None, subjectNumber=None):
-        pass
-
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Overriding methods
@@ -154,7 +150,8 @@ class AbstractSubject(object):
         dO = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
-
+    def postLoadPipeLine(self, *args, **kwargs):
+        pass
 
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
     def exists(self):
@@ -410,6 +407,9 @@ class AbstractSubject(object):
         aa = '%5.2f'%(self.getAge())
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa], infoKeys + ['Age']
 
+    def anonymise(self):
+        spydcm.anonymiseInPlace(self.getDicomsDir())
+        self.buildDicomMeta()
     # ------------------------------------------------------------------------------------------
     def getSummary_list(self):
         hh = ["SubjectID","PatientID","Gender","StudyDate","NumberOfSeries","SERIES_DECRIPTIONS"]
@@ -507,6 +507,15 @@ class SubjectList(list):
                 pass
         return None
     
+    def findSubjMatchingStudyUID(self, studyUID):
+        for iSubj in self:
+            try:
+                if iSubj.getTagValue("StudyInstanceUID") == studyUID:
+                    return iSubj
+            except TypeError:
+                pass
+        return None
+
     def findSubjMatchingPatientID(self, patientID, dateOfScan_YYYYMMDD=None):
         """
         :param patientID:
@@ -546,6 +555,18 @@ class SubjectList(list):
             return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
         return matchList
 
+
+### ====================================================================================================================
+def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None):
+    if os.path.isdir(dicomDir_OrData):
+        ds = spydcm.returnFirstDicomFound(dicomDir_OrData)
+        queryUID = ds.get('StudyInstanceUID', None)
+    else:
+        queryUID = dicomDir_OrData.getTag('StudyInstanceUID', ifNotFound=None)
+    if queryUID is None: 
+        return None
+    SubjList = SubjectList.setByDirectory(dataRoot=dataRoot, subjectPrefix=subjPrefix)
+    return SubjList.findSubjMatchingStudyUID(queryUID)
 
 
 ### ====================================================================================================================
@@ -588,11 +609,11 @@ def guessSubjectPrefix(dataRootDir):
         raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous")
     return options[maxCount]
 
-def getAllSubjects(dataRootDir, subjectPrefix=None):
+def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
     allDir = os.listdir(dataRootDir)
-    subjObjList = [AbstractSubject(i, dataRoot=dataRootDir) for i in allDir]
+    subjObjList = [SubjClass(i, dataRoot=dataRootDir) for i in allDir]
     subjObjList = [i for i in subjObjList if i.exists()]
     return sorted(subjObjList)
 
@@ -625,7 +646,15 @@ def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubjec
     return subjList
 
 def __createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjPrefix, anonName, QUIET):
-    newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
+    newSubj = None
+    if subjNumber is None:
+        # We check if a subject with dicoms matching this study already exists
+        newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix)
+        if newSubj is not None:
+            print(f"Found existing subject {newSubj.subjID} at {dataRoot} - adding to")
+    if newSubj is None: 
+        subjNumber = __subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
+        newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
     newSubj.QUIET = QUIET
     newSubj.initDirectoryStructure()
     try:
@@ -638,7 +667,7 @@ def __createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subj
     #
     return newSubj
 
-def createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSubject, 
+def __createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSubject, 
                                 subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
     if compressedFile.endswith('zip'):
         listOfSubjects = spydcm.dcmTK.ListOfDicomStudies.setFromZip(compressedFile, HIDE_PROGRESSBAR=QUIET)
@@ -651,8 +680,8 @@ def createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSubj
             raise ValueError(f"More than one study in {compressedFile} - can not supply subjNumber")
     newSubjList = []
     for i in listOfSubjects:
-        iSubjNumber = __subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
-        newSubj = __createSubjectHelper(i, SubjClass, iSubjNumber, dataRoot, subjPrefix, anonName, QUIET)
+        newSubj = __createSubjectHelper(i, SubjClass, subjNumber=None, dataRoot=dataRoot, 
+                                        subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
         newSubjList.append(newSubj)
     if len(newSubjList) == 1:
         return newSubjList[0]
@@ -666,11 +695,11 @@ def __subjNumberHelper(dataRoot, subjNumber, subjPrefix):
             raise ValueError("Subject already exists - use loadDicomsToSubject method to add data to existing subject.")
     return subjNumber
 
-def createNewSubject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, 
+def __createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, 
                      subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
     if not os.path.isdir(dicomDirToLoad):
         if os.path.isfile(dicomDirToLoad):
-            newSubj = createNewSubject_Compressed(dicomDirToLoad, dataRoot, SubjClass=SubjClass, subjNumber=subjNumber, 
+            newSubj = __createNewSubject_Compressed(dicomDirToLoad, dataRoot, SubjClass=SubjClass, subjNumber=subjNumber, 
                                         subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
             return newSubj
         raise IOError(" Load dir does not exist")
@@ -678,38 +707,67 @@ def createNewSubject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject,
         raise IOError(f"Can not find valid dicoms under {dicomDirToLoad}")
     if not os.path.isdir(dataRoot):
         raise IOError(" Destination does not exist")
-    subjNumber = __subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
-    newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
-    newSubj.QUIET = QUIET
-    newSubj.initDirectoryStructure()
-    newSubj.loadDicomsToSubject(dicomDirToLoad, anonName=anonName, HIDE_PROGRESSBAR=QUIET)
-    newSubj.buildDicomMeta()
-    newSubj.buildSeriesDataMetaCSV()
+    newSubj = __createSubjectHelper(dicomDirToLoad, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
+                                    subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
     #
     return newSubj
 
-def createNewSubjects_Multi(multiDicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjPrefix=None, QUIET=False):
+def __createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjPrefix=None, QUIET=False):
     if not os.path.isdir(multiDicomDirToLoad):
-        if os.path.isfile(multiDicomDirToLoad):
-            newSubjList = createNewSubject_Compressed(multiDicomDirToLoad, dataRoot, SubjClass=SubjClass, 
-                                        subjPrefix=subjPrefix, QUIET=QUIET)
-            return newSubjList
         raise IOError(" Load dir does not exist")
     dirsToLoad = [os.path.join(multiDicomDirToLoad, i) for i in os.listdir(multiDicomDirToLoad)]
     dirsToLoad = [i for i in dirsToLoad if os.path.isdir(i)]
-    dirsToLoadChecked = []
+    dirsToLoad_checked = []
     for iDir in dirsToLoad:
         if spydcm.returnFirstDicomFound(iDir) is not None:
-            dirsToLoadChecked.append(iDir)
-    if len(dirsToLoadChecked) == 0:
+            dirsToLoad_checked.append(iDir)
+    if len(dirsToLoad_checked) == 0:
         raise IOError(f"Can not find valid dicoms under {multiDicomDirToLoad}")
     if not os.path.isdir(dataRoot):
-        raise IOError(" Destination does not exist")
+        raise IOError("Destination does not exist")
     newSubjsList = []
-    for iDir in dirsToLoadChecked:
-        newSubjsList.append(createNewSubject(iDir, 
+    for iDir in dirsToLoad_checked:
+        newSubjsList.append(__createNew_OrAddTo_Subject(iDir, 
                                              dataRoot=dataRoot,
                                              SubjClass=SubjClass,
                                              subjPrefix=subjPrefix,
                                              QUIET=QUIET))
-    return SubjectList(newSubjsList)
+    return newSubjsList
+
+def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject, 
+                           subjNumber=None, subjPrefix=None, anonName=None, LOAD_MULTI=False, QUIET=False):
+    """Used to create a new subject (or add data to already existing subject) from an input directory (or compressed file).
+    Current compressed file tpyes supported: zip, tar, tar.gz
+
+    Args:
+        loadDirectory (str): the directory from which data to be loaded
+        dataRoot (str): the root directory where subjects are stored
+        SubjClass (subclass of AbstractClass, optional): subclass of AbstractClass. Defaults to AbstractSubject.
+        subjNumber (int, optional): subject number to create or load to. Will take next available number if none given. Defaults to None.
+        subjPrefix (str, optional): the subject prefix. If not given will attempt to guess from dataRoot. Defaults to None.
+        anonName (str, optional): An anonymis name to give to this subject. Defaults to None.
+        LOAD_MULTI (bool, optional): If true then each sub-directory in "loadDirectory" will be used to load a new subject. Defaults to False.
+        QUIET (bool, optional): If true will supress output. Defaults to False.
+
+    Raises:
+        ValueError: If incompatible arguments given (can not give subjNumber if LOAD_MULTI is given)
+
+    Returns:
+        list: list of Subject Objects added to or created
+    """
+    if LOAD_MULTI and ((subjNumber is not None) or (anonName is not None)):
+        raise ValueError("Can not pass subjNumber if LOAD_MULTI set True")
+    if LOAD_MULTI:
+        return SubjectList(__createNew_OrAddTo_Subjects_Multi(loadDirectory, 
+                                       dataRoot=dataRoot, 
+                                       SubjClass=SubjClass, 
+                                       subjPrefix=subjPrefix, 
+                                       QUIET=QUIET))
+    else:
+        return SubjectList([__createNew_OrAddTo_Subject(loadDirectory, 
+                                dataRoot=dataRoot,
+                                SubjClass=SubjClass,
+                                subjNumber=subjNumber,
+                                subjPrefix=subjPrefix, 
+                                anonName=anonName, 
+                                QUIET=QUIET)])

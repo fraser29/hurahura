@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import configparser
-import json
 from collections import OrderedDict
 import os
 
@@ -17,9 +16,14 @@ all_config_files = [os.path.join(rootDir,thisConfFileName),
                     os.path.join(os.path.expanduser("~"), '.config',thisConfFileName),
                     os.environ.get("MIRESEARCH_CONF", '')]
 
+# for iFile in all_config_files:
+#     if os.path.isfile(iFile):
+#         print(f"Reading config from {iFile}")
+
 config.read(all_config_files)
 
 environment = config.get("app", "environment")
-DEBUG = config.get("app", "debug").lower() == "true"
+DEBUG = config.getboolean("app", "debug")
 DataRootDir = config.get("app", "data_root_dir")
+stableAge = config.getint("app", "stable_directory_age_sec")
 

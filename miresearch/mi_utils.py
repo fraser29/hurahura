@@ -1,5 +1,8 @@
 import os
+import sys
+import argparse
 import base64
+
 from miresearch import mi_config
 
 
@@ -20,7 +23,7 @@ DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
                                 "StudyID",
                                 "StudyInstanceUID"]
 
-DEFAULT_DICOM_TIME_FORMAT = "%H%M%S"
+DEFAULT_DICOM_TIME_FORMAT = "%H%M%S" # TODO to config (and above) - or from spydcmtk
 
 #==================================================================
 def getDataRoot():
@@ -42,6 +45,21 @@ class DirectoryStructureTree():
     def __init__(self, topList) -> None:
         self.topList = topList
 
+#==================================================================
+# Override error to show help on argparse error (missing required argument etc)
+class MiResearchParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
+def setNList(args):
+    if len(args.subjRange) == 2:
+        args.subjNList = args.subjNList+list(range(args.subjRange[0], args.subjRange[1]))
+    if args.subjNListFile:
+        args.subjNList = args.subjNList+subjFileToSubjN(args.subjNListFile)
+    # args.subjNList = sorted(list(set(args.subjNList)))
+    
 #==================================================================
 def countFilesInDir(dirName):
     files = []

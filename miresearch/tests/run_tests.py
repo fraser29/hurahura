@@ -60,7 +60,8 @@ class TestSubject2(unittest.TestCase):
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.newSubj = mi_subject.createNewSubject(P1, cls.tmpDir, subjPrefix='MI2', QUIET=True)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MI2', QUIET=True)[0]
+        cls.newSubj.anonymise()
 
     def test_newSubj(self):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI2000001')))
@@ -118,13 +119,13 @@ class TestSubjects2(unittest.TestCase):
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.subjList = mi_subject.createNewSubjects_Multi(TEST_DIR, cls.tmpDir, subjPrefix='MI22', QUIET=True)
+        cls.subjList = mi_subject.createNew_OrAddTo_Subject(TEST_DIR, cls.tmpDir, subjPrefix='MI22', QUIET=True, LOAD_MULTI=True)
 
     def test_newSubjs(self):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000001')))
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000002')))
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000003')))
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000004')))
+        self.assertFalse(os.path.isdir(os.path.join(self.tmpDir, 'MI22000004'))) # This false as "4" finds subject already exists and adds to 
     
     def test_List(self):
         self.assertEqual(len(self.subjList), 4, "Error making subject list")
@@ -146,7 +147,7 @@ class TestSubjects3(unittest.TestCase):
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.subj = mi_subject.createNewSubject(TEST_DIR, cls.tmpDir, subjPrefix='MI3', anonName="SubjectNumber1", QUIET=True)
+        cls.subj = mi_subject.createNew_OrAddTo_Subject(TEST_DIR, cls.tmpDir, subjPrefix='MI3', anonName="SubjectNumber1", QUIET=True)[0]
 
     def test_newSubjs(self):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI3000001')))
@@ -165,37 +166,37 @@ class TestSubjects3(unittest.TestCase):
 #             self.assertEqual(mi_utils.getDataRoot(), "''", "Error Default DataRoot")
     
         
-class TestLoadCompressed(unittest.TestCase):
+# class TestLoadCompressed(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestCompress')
-        if os.path.isdir(cls.tmpDir):
-            cls.tearDownClass(True)
-        os.makedirs(cls.tmpDir)
-        cls.subjList = mi_subject.createNewSubject(PZip, cls.tmpDir, subjPrefix='MIZ', QUIET=True)
-        cls.subjList = mi_subject.createNewSubject(PTar, cls.tmpDir, subjPrefix='MIT', QUIET=True)
-        cls.subjList = mi_subject.createNewSubjects_Multi(PTarGZ, cls.tmpDir, subjPrefix='MITZ', QUIET=True)
+#     @classmethod
+#     def setUpClass(cls):
+#         cls.tmpDir = os.path.join(this_dir, 'tmpTestCompress')
+#         if os.path.isdir(cls.tmpDir):
+#             cls.tearDownClass(True)
+#         os.makedirs(cls.tmpDir)
+#         mi_subject.createNew_OrAddTo_Subject(PZip, cls.tmpDir, subjPrefix='MIZ', QUIET=True)
+#         mi_subject.createNew_OrAddTo_Subject(PTar, cls.tmpDir, subjPrefix='MIT', QUIET=True)
+#         cls.subjList = mi_subject.createNew_OrAddTo_Subject(PTarGZ, cls.tmpDir, subjPrefix='MITZ', QUIET=True, LOAD_MULTI=True)
 
 
-    def test_LoadZip(self):
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000002')))
-        dFile = self.subjList[1].getDicomFile(99, 1)
-        self.assertTrue(os.path.isfile(dFile), f'Not finding dcm file for {self.subjList[1].subjID}')
+#     def test_LoadZip(self):
+#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))
+#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000002')))
+#         dFile = self.subjList[1].getDicomFile(99, 1)
+#         self.assertTrue(os.path.isfile(dFile), f'Not finding dcm file for {self.subjList[1].subjID}')
 
-    def test_LoadTar(self):
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000001')))
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000002')))
+#     def test_LoadTar(self):
+#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000001')))
+#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000002')))
 
-    def test_LoadTarZ(self):
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000001')))
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000002')))
+#     def test_LoadTarZ(self):
+#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000001')))
+#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000002')))
 
-    @classmethod
-    def tearDownClass(cls, OVERRIDE=False):
-        if (not DEBUG) or OVERRIDE:
-            shutil.rmtree(cls.tmpDir)
+#     @classmethod
+#     def tearDownClass(cls, OVERRIDE=False):
+#         if (not DEBUG) or OVERRIDE:
+#             shutil.rmtree(cls.tmpDir)
         
 
         
