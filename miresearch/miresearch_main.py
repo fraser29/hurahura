@@ -5,11 +5,10 @@
 
 import os
 import sys
-import argparse
 
 from miresearch import mi_utils
 from miresearch import mi_subject
-from miresearch import miresearchTK
+from miresearch import miresearch_watchdog
 
 
 ### ====================================================================================================================
@@ -45,7 +44,7 @@ def runActions(args):
         ##
     elif args.WatchDirectory is not None:
 
-        MIWatcher = miresearchTK.MIResearch_WatchDog(args.WatchDirectory,
+        MIWatcher = miresearch_watchdog.MIResearch_WatchDog(args.WatchDirectory,
                                         args.dataRoot,
                                         args.subjPrefix,
                                         TO_ANONYMISE=(args.anonName is not None))

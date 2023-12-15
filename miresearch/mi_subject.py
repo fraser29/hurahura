@@ -47,8 +47,7 @@ class AbstractSubject(object):
                         subjectPrefix=None,
                         DIRECTORY_STRUCTURE_TREE=DEFAULT_DIRECTORY_STRUCTURE_TREE) -> None:
         try:
-            int(subjectNumber)
-            self.subjN = subjectNumber
+            self.subjN = int(subjectNumber)
         except ValueError:
             tSubjPrefix, self.subjN = splitSubjID(subjectNumber)
             if subjectPrefix is not None:
@@ -464,6 +463,14 @@ class SubjectList(list):
         listOfSubjects = getAllSubjects(dataRoot, subjectPrefix)
         return cls(listOfSubjects)
 
+    @property
+    def subjIDs(self):
+        return [i.subjID for i in self]
+    
+    @property
+    def subjNs(self):
+        return [i.subjN for i in self]
+
     def reduceToExist(self):
         toRemove = []
         for i in self:
@@ -558,10 +565,10 @@ class SubjectList(list):
 
 ### ====================================================================================================================
 def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None):
-    if os.path.isdir(dicomDir_OrData):
+    try:
         ds = spydcm.returnFirstDicomFound(dicomDir_OrData)
         queryUID = ds.get('StudyInstanceUID', None)
-    else:
+    except TypeError:
         queryUID = dicomDir_OrData.getTag('StudyInstanceUID', ifNotFound=None)
     if queryUID is None: 
         return None
@@ -646,12 +653,12 @@ def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubjec
     return subjList
 
 def __createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjPrefix, anonName, QUIET):
-    newSubj = None
-    if subjNumber is None:
-        # We check if a subject with dicoms matching this study already exists
-        newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix)
-        if newSubj is not None:
-            print(f"Found existing subject {newSubj.subjID} at {dataRoot} - adding to")
+    newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix)
+    if newSubj is not None:
+        if subjNumber is not None:
+            if subjNumber != newSubj.subjN:
+                raise ValueError(f"You supplied subject number {subjNumber} but a different subject matching your input dicom study exists at {newSubj.subjN}")
+        print(f"Found existing subject {newSubj.subjID} at {dataRoot} - adding to")
     if newSubj is None: 
         subjNumber = __subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
         newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
@@ -680,7 +687,7 @@ def __createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSu
             raise ValueError(f"More than one study in {compressedFile} - can not supply subjNumber")
     newSubjList = []
     for i in listOfSubjects:
-        newSubj = __createSubjectHelper(i, SubjClass, subjNumber=None, dataRoot=dataRoot, 
+        newSubj = __createSubjectHelper(i, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
                                         subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
         newSubjList.append(newSubj)
     if len(newSubjList) == 1:
