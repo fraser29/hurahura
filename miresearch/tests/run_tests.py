@@ -41,9 +41,9 @@ class TestSubject(unittest.TestCase):
         self.newSubj.buildDicomMeta()
         self.assertTrue(os.path.isfile(self.newSubj.getMetaTagsFile()))
 
-        pWeight = int(self.newSubj.getTagValue('PatientWeight'))
+        pWeight = int(self.newSubj.getMetaTagValue('PatientWeight'))
         self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
-        self.assertEqual(self.newSubj.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
+        self.assertEqual(self.newSubj.getMetaTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
 
         nSE_dict = self.newSubj.getSeriesNumbersMatchingDescriptionStr('RVLA')
         self.assertEqual(int(list(nSE_dict.keys())[0]), 41, msg="Error finding se matching SeriesDescription")

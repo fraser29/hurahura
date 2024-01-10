@@ -25,6 +25,13 @@ DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
 
 DEFAULT_DICOM_TIME_FORMAT = "%H%M%S" # TODO to config (and above) - or from spydcmtk
 
+abcList = 'abcdefghijklmnopqrstuvwxyz'
+UNKNOWN = 'UNKNOWN'
+META = "META"
+RAW = "RAW"
+DICOM = "DICOM"
+
+
 #==================================================================
 def getDataRoot():
     """Function to return data root from configuration. 
@@ -44,6 +51,39 @@ class DirectoryStructure(object):
 class DirectoryStructureTree():
     def __init__(self, topList) -> None:
         self.topList = topList
+
+    def addTopLevelDirectory(self, name):
+        self.topList.append(DirectoryStructure(name))
+    
+    def addSecondLevelDirectory(self, nameTopLevel, nameSecondLevel):
+        for i in self.topList:
+            if i.name == nameTopLevel:
+                i.childrenList.append(nameSecondLevel)
+
+def _getDefautDirectoryStructureTree():
+    DEFAULT_DIRECTORY_STRUCTURE_TREE = DirectoryStructureTree([DirectoryStructure(RAW, [DirectoryStructure(DICOM)]),
+                                                                        DirectoryStructure(META)])
+    return DEFAULT_DIRECTORY_STRUCTURE_TREE
+
+def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
+    """This will build the directory structure for a project using a base structure and any added subfolder names
+
+    Args:
+        listOfExtraSubfolders (list): A list of subfolders, if an entry is itself a list, 
+                                    then the first item of that entry is the toplevel subfolder 
+                                    and the following items are subfolders of that toplevel folder.
+                                    Default: empty list
+    """
+    #  first remove any conflists with default list:
+    listOfExtraSubfolders = [i for i in listOfExtraSubfolders if i not in [RAW, META]]
+    baseStructure = _getDefautDirectoryStructureTree()
+    for i in listOfExtraSubfolders:
+        if type(i) == list:
+            baseStructure.addTopLevelDirectory(i[0])
+            for k1 in range(1, len(i)):
+                baseStructure.addSecondLevelDirectory(i[k1])
+        else:
+            baseStructure.addTopLevelDirectory(i)
 
 #==================================================================
 # Override error to show help on argparse error (missing required argument etc)

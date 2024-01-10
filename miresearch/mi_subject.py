@@ -23,15 +23,6 @@ from spydcmtk import spydcm
 from miresearch import mi_utils
 
 # ====================================================================================================
-abcList = 'abcdefghijklmnopqrstuvwxyz'
-UNKNOWN = 'UNKNOWN'
-META = "META"
-RAW = "RAW"
-DICOM = "DICOM"
-
-DEFAULT_DIRECTORY_STRUCTURE_TREE = mi_utils.DirectoryStructureTree([mi_utils.DirectoryStructure(RAW, [mi_utils.DirectoryStructure(DICOM)]),
-                                                                    mi_utils.DirectoryStructure(META)])
-
 # ====================================================================================================
 
 
@@ -45,7 +36,7 @@ class AbstractSubject(object):
     def __init__(self, subjectNumber, 
                         dataRoot, 
                         subjectPrefix=None,
-                        DIRECTORY_STRUCTURE_TREE=DEFAULT_DIRECTORY_STRUCTURE_TREE) -> None:
+                        DIRECTORY_STRUCTURE_TREE=mi_utils.buildDirectoryStructureTree()) -> None:
         try:
             self.subjN = int(subjectNumber)
         except ValueError:
@@ -91,7 +82,7 @@ class AbstractSubject(object):
     def __lt__(self, other):
         return self.getPrefix_Number()[1] < other.getPrefix_Number()[1]
 
-    def str(self):
+    def __str__(self):
         return f"{self.subjID} at {self.dataRoot}"
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -141,15 +132,16 @@ class AbstractSubject(object):
         dO = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
-    def loadSpydcmStudyToSubject(self, dicomData, anonName=None):
+    def loadSpydcmStudyToSubject(self, spydcmData, anonName=None):
         self.initDirectoryStructure()
         self.logger.info(f"LoadDicoms (spydcmtk data ==> {self.getDicomsDir()})")
-        d0, dI = self.countNumberOfDicoms(), dicomData.getNumberOfDicoms()
-        dicomData.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
+        d0, dI = self.countNumberOfDicoms(), spydcmData.getNumberOfDicoms()
+        spydcmData.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
         dO = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
     def postLoadPipeLine(self, *args, **kwargs):
+        # this is an abstract method for implementation by subclasses
         pass
 
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
@@ -169,13 +161,13 @@ class AbstractSubject(object):
         return dd
 
     def getMetaDir(self):
-        return self._getDir([META])
+        return self._getDir([mi_utils.META])
 
     def getRawDir(self):
-        return self._getDir([RAW])
+        return self._getDir([mi_utils.RAW])
     
     def getDicomsDir(self):
-        dirName = self._getDir([RAW, DICOM])
+        dirName = self._getDir([mi_utils.RAW, mi_utils.DICOM])
         return dirName
     
     ### META STUFF -----------------------------------------------------------------------------------------------------
@@ -284,7 +276,7 @@ class AbstractSubject(object):
             dd = spydcm.dcmTools.parseJsonToDictionary(ff)
         return dd
 
-    def getTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
+    def getMetaTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
         try:
             return self.getMetaDict(metaSuffix).get(tag, NOT_FOUND)
         except OSError as e:
@@ -303,6 +295,8 @@ class AbstractSubject(object):
         # this uses pydicom - so tag names are different.
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         ddFull = dcmStudies[0].getStudySummaryDict()
+        ddFull['SubjectID'] = self.subjID
+        ddFull['SubjN'] = self.subjN
         for k1 in range(1, len(dcmStudies)):
             ddFull['Series'] += dcmStudies[k1].getStudySummaryDict()['Series']
         self.updateMetaFile(ddFull)
@@ -381,9 +375,9 @@ class AbstractSubject(object):
         return se
 
     def getStudyID(self):
-        studyID = self.getTagValue("StudyID")
+        studyID = self.getMetaTagValue("StudyID")
         if studyID == "0":
-            studyID = self.getTagValue("ScannerStudyID")
+            studyID = self.getMetaTagValue("ScannerStudyID")
         return studyID
     
     def getSeriesDescriptionsStr(self):
@@ -391,17 +385,17 @@ class AbstractSubject(object):
 
 
     def getStudyDate(self, RETURN_Datetime=False):
-        dos = self.getTagValue('StudyDate')
+        dos = self.getMetaTagValue('StudyDate')
         if RETURN_Datetime:
             spydcm.dcmTools.dbDateToDateTime(dos)
         return dos
 
-    def getInfoStr(self):
+    def getInfoStr(self, extraKeys=[]):
         # Return values_list, info_keys:
         #   list of values for info keys (+ age). 
         #   header keys
-        infoKeys = ['PatientBirthDate', 'PatientID', 'PatientName', 'PatientSex',
-                    'StudyDate', 'StudyDescription', 'StudyInstanceUID', 'StudyID', 'Consent']
+        infoKeys = ['SubjectID', 'SubjN', 'PatientBirthDate', 'PatientID', 'PatientName', 'PatientSex',
+                    'StudyDate', 'StudyDescription', 'StudyInstanceUID', 'StudyID'] + extraKeys
         mm = self.getMetaDict()
         aa = '%5.2f'%(self.getAge())
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa], infoKeys + ['Age']
@@ -412,9 +406,9 @@ class AbstractSubject(object):
     # ------------------------------------------------------------------------------------------
     def getSummary_list(self):
         hh = ["SubjectID","PatientID","Gender","StudyDate","NumberOfSeries","SERIES_DECRIPTIONS"]
-        parts = [self.subjID, self.getTagValue('PatientID'), 
-                self.getTagValue('PatientSex'), self.getTagValue('StudyDate'), 
-                len(self.getTagValue('Series')), self.getSeriesDescriptionsStr()]
+        parts = [self.subjID, self.getMetaTagValue('PatientID'), 
+                self.getMetaTagValue('PatientSex'), self.getMetaTagValue('StudyDate'), 
+                len(self.getMetaTagValue('Series')), self.getSeriesDescriptionsStr()]
         ss = [str(i) for i in parts]
         return hh, ss
 
@@ -446,6 +440,9 @@ class AbstractSubject(object):
         self.logger.info(f'Zipped subject to {zipfileOut}')
         return zipfileOut
 
+    # ------------------------------------------------------------------------------------------------------------------
+    def getSpydcmDicomStudy(self):
+        return spydcm.dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir())
 
 # ====================================================================================================
 #       LIST OF SUBJECTS CLASS
@@ -470,6 +467,9 @@ class SubjectList(list):
     @property
     def subjNs(self):
         return [i.subjN for i in self]
+
+    def __str__(self) -> str:
+        return f"{len(self)} subjects of {self[0].subjID} at {self[0].dataRoot}"
 
     def reduceToExist(self):
         toRemove = []
@@ -550,7 +550,7 @@ class SubjectList(list):
         nameStr_l = nameStr.lower()
         matchList = SubjectList()
         for iSubj in self:
-            iName = iSubj.getTagValue("NAME", UNKNOWN)
+            iName = iSubj.getTagValue("NAME", mi_utils.UNKNOWN)
             if decodePassword is not None:
                 iName = mi_utils.decodeString(iName, decodePassword).lower()
             try:
