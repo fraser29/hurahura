@@ -93,6 +93,34 @@ class MiResearchParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
+ParentAP = MiResearchParser(add_help=False,
+                                   epilog="Written Fraser M. Callaghan. Copyright MRZentrum, University Children's Hospital Zurich")
+
+groupM = ParentAP.add_argument_group('Management Parameters')
+groupM.add_argument('-FORCE', dest='FORCE', help='force action - use with caution',
+                        action='store_true')
+groupM.add_argument('-QUIET', dest='QUIET', help='Suppress progress bars and logging to terminal',
+                        action='store_true')
+groupM.add_argument('-DEBUG', dest='DEBUG', help='Run in DEBUG mode (save intermediate steps, increase log output)',
+                        action='store_true')
+
+SubjectInput = MiResearchParser(add_help=False)
+
+groupS = SubjectInput.add_argument_group('Subject Definition')
+groupS.add_argument('-s', dest='subjNList', help='Subject number', nargs="*", type=int, default=[])
+groupS.add_argument('-sf', dest='subjNListFile', help='Subject numbers in file', type=str, default=None)
+groupS.add_argument('-sR', dest='subjRange', help='Subject range', nargs=2, type=int, default=[])
+groupS.add_argument('-y', dest='dataRoot', 
+                    help='Path of root data directory (where subjects are stored) [default None -> will get from config file]', 
+                    type=str, default=None)
+groupS.add_argument('-sPrefix', dest='subjPrefix', 
+                    help='Subject prefix [default None -> will get from config file]', 
+                    type=str, default=None)
+groupS.add_argument('-anonName', dest='anonName', 
+                    help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 
+                    type=str, default=None)
+
+#==================================================================
 def setNList(args):
     if len(args.subjRange) == 2:
         args.subjNList = args.subjNList+list(range(args.subjRange[0], args.subjRange[1]))
