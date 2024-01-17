@@ -177,7 +177,9 @@ class AbstractSubject(object):
     def getSeriesMetaAsDataFrame(self):
         return pd.read_csv(self.getSeriesMetaCSV(),  encoding="ISO-8859-1")
 
-    def buildSeriesDataMetaCSV(self):
+    def buildSeriesDataMetaCSV(self, FORCE=False):
+        if os.path.isfile(self.getSeriesMetaCSV()) and (not FORCE):
+            return 
         seInfoList = []
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
@@ -621,6 +623,13 @@ def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
         subjectPrefix = guessSubjectPrefix(dataRootDir)
     allDir = os.listdir(dataRootDir)
     subjObjList = [SubjClass(i, dataRoot=dataRootDir) for i in allDir]
+    subjObjList = [i for i in subjObjList if i.exists()]
+    return sorted(subjObjList)
+
+def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
+    if subjectPrefix is None:
+        subjectPrefix = guessSubjectPrefix(dataRootDir)
+    subjObjList = [SubjClass(i, dataRoot=dataRootDir) for i in subjectNList]
     subjObjList = [i for i in subjObjList if i.exists()]
     return sorted(subjObjList)
 
