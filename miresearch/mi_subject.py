@@ -271,6 +271,9 @@ class AbstractSubject(object):
     def setTagValue(self, tag, value, suffix=""):
         self.updateMetaFile({tag:value}, suffix)
 
+    def getTagValue(self, tagName, ifNotFound='Unknown'): # FIXME is this done correctly
+        return self.getMetaDict.get(tagName, ifNotFound)
+
     def getMetaDict(self, suffix=""):
         ff = self.getMetaTagsFile(suffix)
         dd = {}
