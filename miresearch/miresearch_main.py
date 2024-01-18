@@ -39,6 +39,7 @@ def runActions(args):
                                              subjNumber=args.subjNList[0],
                                              anonName=args.anonName,
                                              LOAD_MULTI=args.LoadMulti,
+                                             IGNORE_UIDS=args.LoadMultiForce,
                                              QUIET=args.QUIET)
     ####
         ##
@@ -69,6 +70,9 @@ def parseArgs(args):
                         type=str, default=None)
     groupA.add_argument('-LoadMulti', dest='LoadMulti', 
                         help='Load new subject for each subdirectory under loadPath', 
+                        action='store_true')
+    groupA.add_argument('-LoadMultiForce', dest='LoadMultiForce', 
+                        help='Force to ignore studyIDs and load new ID per subdirectory', 
                         action='store_true')
     groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
                         help='Will watch given directory for new data and load as new study', 
