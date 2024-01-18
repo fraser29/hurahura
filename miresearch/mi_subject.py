@@ -664,8 +664,11 @@ def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubjec
         subjList.reduceToExist()
     return subjList
 
-def __createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjPrefix, anonName, QUIET):
-    newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix)
+def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjPrefix, anonName, QUIET, FORCE_NEW_SUBJ=False):
+    if FORCE_NEW_SUBJ:
+        newSubj = None
+    else:
+        newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix)
     if newSubj is not None:
         if subjNumber is not None:
             if subjNumber != newSubj.subjN:
@@ -699,7 +702,7 @@ def __createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSu
             raise ValueError(f"More than one study in {compressedFile} - can not supply subjNumber")
     newSubjList = []
     for i in listOfSubjects:
-        newSubj = __createSubjectHelper(i, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
+        newSubj = _createSubjectHelper(i, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
                                         subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
         newSubjList.append(newSubj)
     if len(newSubjList) == 1:
@@ -714,8 +717,8 @@ def __subjNumberHelper(dataRoot, subjNumber, subjPrefix):
             raise ValueError("Subject already exists - use loadDicomsToSubject method to add data to existing subject.")
     return subjNumber
 
-def __createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, 
-                     subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
+def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, 
+                     subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, IGNORE_UIDS=False):
     if not os.path.isdir(dicomDirToLoad):
         if os.path.isfile(dicomDirToLoad):
             newSubj = __createNewSubject_Compressed(dicomDirToLoad, dataRoot, SubjClass=SubjClass, subjNumber=subjNumber, 
@@ -726,35 +729,40 @@ def __createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubj
         raise IOError(f"Can not find valid dicoms under {dicomDirToLoad}")
     if not os.path.isdir(dataRoot):
         raise IOError(" Destination does not exist")
-    newSubj = __createSubjectHelper(dicomDirToLoad, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
-                                    subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
+    newSubj = _createSubjectHelper(dicomDirToLoad, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
+                                    subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET, 
+                                    FORCE_NEW_SUBJ=IGNORE_UIDS)
     #
     return newSubj
 
-def __createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot, SubjClass=AbstractSubject, subjPrefix=None, QUIET=False):
+def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot, 
+                                       SubjClass=AbstractSubject, subjPrefix=None, 
+                                       IGNORE_UIDS=False, QUIET=False):
     if not os.path.isdir(multiDicomDirToLoad):
         raise IOError(" Load dir does not exist")
     dirsToLoad = [os.path.join(multiDicomDirToLoad, i) for i in os.listdir(multiDicomDirToLoad)]
     dirsToLoad = [i for i in dirsToLoad if os.path.isdir(i)]
     dirsToLoad_checked = []
+    if not os.path.isdir(dataRoot):
+        raise IOError("Destination does not exist")
     for iDir in dirsToLoad:
         if spydcm.returnFirstDicomFound(iDir) is not None:
             dirsToLoad_checked.append(iDir)
     if len(dirsToLoad_checked) == 0:
         raise IOError(f"Can not find valid dicoms under {multiDicomDirToLoad}")
-    if not os.path.isdir(dataRoot):
-        raise IOError("Destination does not exist")
     newSubjsList = []
     for iDir in dirsToLoad_checked:
-        newSubjsList.append(__createNew_OrAddTo_Subject(iDir, 
+        newSubjsList.append(_createNew_OrAddTo_Subject(iDir, 
                                              dataRoot=dataRoot,
                                              SubjClass=SubjClass,
                                              subjPrefix=subjPrefix,
-                                             QUIET=QUIET))
+                                             QUIET=QUIET,
+                                             IGNORE_UIDS=IGNORE_UIDS))
     return newSubjsList
 
 def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject, 
-                           subjNumber=None, subjPrefix=None, anonName=None, LOAD_MULTI=False, QUIET=False):
+                           subjNumber=None, subjPrefix=None, anonName=None, 
+                           LOAD_MULTI=False, IGNORE_UIDS=False, QUIET=False):
     """Used to create a new subject (or add data to already existing subject) from an input directory (or compressed file).
     Current compressed file tpyes supported: zip, tar, tar.gz
 
@@ -766,6 +774,7 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
         subjPrefix (str, optional): the subject prefix. If not given will attempt to guess from dataRoot. Defaults to None.
         anonName (str, optional): An anonymis name to give to this subject. Defaults to None.
         LOAD_MULTI (bool, optional): If true then each sub-directory in "loadDirectory" will be used to load a new subject. Defaults to False.
+        IGNORE_UIDS (bool, optional): If true then ignore dicom UIDs and each sub-directory in "loadDirectory" will DEFINITLY be a new subject. Defaults to False.
         QUIET (bool, optional): If true will supress output. Defaults to False.
 
     Raises:
@@ -777,13 +786,14 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
     if LOAD_MULTI and ((subjNumber is not None) or (anonName is not None)):
         raise ValueError("Can not pass subjNumber if LOAD_MULTI set True")
     if LOAD_MULTI:
-        return SubjectList(__createNew_OrAddTo_Subjects_Multi(loadDirectory, 
+        return SubjectList(_createNew_OrAddTo_Subjects_Multi(loadDirectory, 
                                        dataRoot=dataRoot, 
                                        SubjClass=SubjClass, 
                                        subjPrefix=subjPrefix, 
+                                       IGNORE_UIDS=IGNORE_UIDS,
                                        QUIET=QUIET))
     else:
-        return SubjectList([__createNew_OrAddTo_Subject(loadDirectory, 
+        return SubjectList([_createNew_OrAddTo_Subject(loadDirectory, 
                                 dataRoot=dataRoot,
                                 SubjClass=SubjClass,
                                 subjNumber=subjNumber,
