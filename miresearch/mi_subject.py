@@ -142,6 +142,7 @@ class AbstractSubject(object):
 
     def postLoadPipeLine(self, *args, **kwargs):
         # this is an abstract method for implementation by subclasses
+        print("This is abstract - implement an override")
         pass
 
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
