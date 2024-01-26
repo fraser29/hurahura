@@ -5,6 +5,7 @@
 
 import os
 import sys
+import datetime
 
 from miresearch import mi_utils
 from miresearch import mi_subject
@@ -41,8 +42,15 @@ def runActions(args):
                                              LOAD_MULTI=args.LoadMulti,
                                              IGNORE_UIDS=args.LoadMultiForce,
                                              QUIET=args.QUIET)
-    ####
-        ##
+    elif args.anonName is not None:
+        for sn in args.subjNList:
+            iSubj = mi_subject.AbstractSubject(sn, args.dataRoot, args.subjPrefix)
+            iSubj.anonymise(args.anonName)
+
+    elif args.SummaryCSV is not None:
+        mi_subject.WriteSubjectStudySummary(args.dataRoot, args.SummaryCSV)
+    
+    ## WATCH DIRECTORY ##
     elif args.WatchDirectory is not None:
 
         MIWatcher = miresearch_watchdog.MIResearch_WatchDog(args.WatchDirectory,
@@ -68,14 +76,17 @@ def parseArgs(args):
     groupA.add_argument('-Load', dest='loadPath', 
                         help='Path to load dicoms from (file / directory / tar / tar.gz / zip)', 
                         type=str, default=None)
-    groupA.add_argument('-LoadMulti', dest='LoadMulti', 
-                        help='Load new subject for each subdirectory under loadPath', 
+    groupA.add_argument('-LOAD_MULTI', dest='LoadMulti', 
+                        help='Combine with "Load": Load new subject for each subdirectory under loadPath', 
                         action='store_true')
-    groupA.add_argument('-LoadMultiForce', dest='LoadMultiForce', 
-                        help='Force to ignore studyIDs and load new ID per subdirectory', 
+    groupA.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
+                        help='Combine with "Load": Force to ignore studyIDs and load new ID per subdirectory', 
                         action='store_true')
     groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
                         help='Will watch given directory for new data and load as new study', 
+                        type=str, default=None)
+    groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
+                        help='Write summary CSV file (give output file name)', 
                         type=str, default=None)
 
     ##

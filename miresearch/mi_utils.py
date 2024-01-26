@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import base64
+import csv
 
 from miresearch import mi_config
 
@@ -182,6 +183,18 @@ def subjFileToSubjN(subjFile):
         first_numeric = tf.index(True)
         return [int(i[0][first_numeric:]) for i in allLines]
 
+
+def writeCsvFile(data, header, csvFile, FIX_NAN=False):
+    with open(csvFile, 'w') as fout:
+        csvWriter = csv.writer(fout, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        #first write column headers
+        if header is not None:
+            csvWriter.writerow(header)
+        for iRow in data:
+            if FIX_NAN:
+                iRow = ['' if i=='nan' else i for i in iRow]
+            csvWriter.writerow(iRow)
+    return csvFile
 
 #==================================================================
 class SubjPrefixError(Exception):

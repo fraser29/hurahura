@@ -406,8 +406,10 @@ class AbstractSubject(object):
         aa = '%5.2f'%(self.getAge())
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa], infoKeys + ['Age']
 
-    def anonymise(self):
-        spydcm.anonymiseInPlace(self.getDicomsDir())
+    def anonymise(self, anonName=None):
+        if len(anonName) == 0:
+            anonName = None # Still anonymise, but let program choose the new anonName
+        spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
         self.buildDicomMeta()
     # ------------------------------------------------------------------------------------------
     def getSummary_list(self):
@@ -568,6 +570,50 @@ class SubjectList(list):
             return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
         return matchList
 
+    def writeSummaryCSV(self, outputFileName_csv):
+        data, header = [], []
+        for isubj in self:
+            ss, hh = isubj.getInfoStr()
+            data.append(ss)
+            header = hh
+        mi_utils.writeCsvFile(data, header, outputFileName_csv)
+
+### ====================================================================================================================
+###  Helper functions for subject list
+### ====================================================================================================================
+def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
+    if subjectPrefix is None:
+        subjectPrefix = guessSubjectPrefix(dataRootDir)
+    allDir = os.listdir(dataRootDir)
+    allDir = [i for i in allDir if os.path.isdir(os.path.join(dataRootDir, i))]
+    subjObjList = []
+    for i in allDir:
+        try:
+            subjObjList.append(SubjClass(i, dataRoot=dataRootDir))
+        except ValueError:
+            print(f"WARNING: {i} at {dataRootDir} not valid subject")
+    subjObjList = [i for i in subjObjList if i.exists()]
+    return sorted(subjObjList)
+
+def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
+    if subjectPrefix is None:
+        subjectPrefix = guessSubjectPrefix(dataRootDir)
+    subjObjList = [SubjClass(i, dataRoot=dataRootDir) for i in subjectNList]
+    subjObjList = [i for i in subjObjList if i.exists()]
+    return sorted(subjObjList)
+
+def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubject, CHECK_EXIST=True):
+    subjList = SubjectList([SubjClass(iN, dataRoot, subjPrefix) for iN in subjNList])
+    if CHECK_EXIST:
+        subjList.reduceToExist()
+    return subjList
+
+def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None):
+    if (summaryFilePath is None) or (len(summaryFilePath) == 0):
+        nowStr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        summaryFilePath = os.path.join(dataRootDir, f'Summary_{nowStr}.csv')
+    misubjList = SubjectList.setByDirectory(dataRootDir)
+    misubjList.writeSummaryCSV(summaryFilePath)
 
 ### ====================================================================================================================
 def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None):
@@ -582,8 +628,6 @@ def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None):
     return SubjList.findSubjMatchingStudyUID(queryUID)
 
 
-### ====================================================================================================================
-### ====================================================================================================================
 ### ====================================================================================================================
 def splitSubjID(s):
     prefix = s.rstrip('0123456789')
@@ -622,21 +666,9 @@ def guessSubjectPrefix(dataRootDir):
         raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous")
     return options[maxCount]
 
-def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
-    if subjectPrefix is None:
-        subjectPrefix = guessSubjectPrefix(dataRootDir)
-    allDir = os.listdir(dataRootDir)
-    subjObjList = [SubjClass(i, dataRoot=dataRootDir) for i in allDir]
-    subjObjList = [i for i in subjObjList if i.exists()]
-    return sorted(subjObjList)
-
-def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
-    if subjectPrefix is None:
-        subjectPrefix = guessSubjectPrefix(dataRootDir)
-    subjObjList = [SubjClass(i, dataRoot=dataRootDir) for i in subjectNList]
-    subjObjList = [i for i in subjObjList if i.exists()]
-    return sorted(subjObjList)
-
+### ====================================================================================================================
+###  Helper functions for building new or adding to subjects
+### ====================================================================================================================
 def buildSubjectID(subjN, subjectPrefix):
     return f"{subjectPrefix}{subjN:06d}"
 
@@ -659,12 +691,6 @@ def getNextSubjID(dataRootDir, subjectPrefix=None):
         subjectPrefix = guessSubjectPrefix(dataRootDir)
     return buildSubjectID(getNextSubjN(dataRootDir, subjectPrefix), subjectPrefix)
 
-def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubject, CHECK_EXIST=True):
-    subjList = SubjectList([SubjClass(iN, dataRoot, subjPrefix) for iN in subjNList])
-    if CHECK_EXIST:
-        subjList.reduceToExist()
-    return subjList
-
 def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjPrefix, anonName, QUIET, FORCE_NEW_SUBJ=False):
     if FORCE_NEW_SUBJ:
         newSubj = None
@@ -676,7 +702,7 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
                 raise ValueError(f"You supplied subject number {subjNumber} but a different subject matching your input dicom study exists at {newSubj.subjN}")
         print(f"Found existing subject {newSubj.subjID} at {dataRoot} - adding to")
     if newSubj is None: 
-        subjNumber = __subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
+        subjNumber = _subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
         newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
     newSubj.QUIET = QUIET
     newSubj.initDirectoryStructure()
@@ -690,7 +716,7 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
     #
     return newSubj
 
-def __createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSubject, 
+def _createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSubject, 
                                 subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
     if compressedFile.endswith('zip'):
         listOfSubjects = spydcm.dcmTK.ListOfDicomStudies.setFromZip(compressedFile, HIDE_PROGRESSBAR=QUIET)
@@ -710,7 +736,7 @@ def __createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSu
         return newSubjList[0]
     return newSubjList
 
-def __subjNumberHelper(dataRoot, subjNumber, subjPrefix):
+def _subjNumberHelper(dataRoot, subjNumber, subjPrefix):
     if subjNumber is None:
         subjNumber = getNextSubjN(dataRoot, subjPrefix)
     else:
@@ -722,7 +748,7 @@ def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubje
                      subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, IGNORE_UIDS=False):
     if not os.path.isdir(dicomDirToLoad):
         if os.path.isfile(dicomDirToLoad):
-            newSubj = __createNewSubject_Compressed(dicomDirToLoad, dataRoot, SubjClass=SubjClass, subjNumber=subjNumber, 
+            newSubj = _createNewSubject_Compressed(dicomDirToLoad, dataRoot, SubjClass=SubjClass, subjNumber=subjNumber, 
                                         subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET)
             return newSubj
         raise IOError(" Load dir does not exist")
@@ -761,6 +787,7 @@ def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot,
                                              IGNORE_UIDS=IGNORE_UIDS))
     return newSubjsList
 
+### ====================================================================================================================
 def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject, 
                            subjNumber=None, subjPrefix=None, anonName=None, 
                            LOAD_MULTI=False, IGNORE_UIDS=False, QUIET=False):
@@ -801,3 +828,6 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
                                 subjPrefix=subjPrefix, 
                                 anonName=anonName, 
                                 QUIET=QUIET)])
+    
+### ====================================================================================================================
+### ====================================================================================================================
