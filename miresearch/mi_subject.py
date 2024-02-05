@@ -407,8 +407,9 @@ class AbstractSubject(object):
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa], infoKeys + ['Age']
 
     def anonymise(self, anonName=None):
-        if len(anonName) == 0:
-            anonName = None # Still anonymise, but let program choose the new anonName
+        if type(anonName) == str:
+            if len(anonName) == 0:  
+                anonName = None # Still anonymise, but let program choose the new anonName
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
         self.buildDicomMeta()
     # ------------------------------------------------------------------------------------------
