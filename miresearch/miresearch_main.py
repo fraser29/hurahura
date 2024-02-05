@@ -24,6 +24,8 @@ def checkArgs(args):
         print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
     if args.loadPath is not None:
         args.loadPath = os.path.abspath(args.loadPath)
+    if args.LoadMultiForce:
+        args.LoadMulti = True
     ## -------------
     mi_utils.setNList(args=args)
 
@@ -80,7 +82,7 @@ def parseArgs(args):
                         help='Combine with "Load": Load new subject for each subdirectory under loadPath', 
                         action='store_true')
     groupA.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
-                        help='Combine with "Load": Force to ignore studyIDs and load new ID per subdirectory', 
+                        help='Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory', 
                         action='store_true')
     groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
                         help='Will watch given directory for new data and load as new study', 

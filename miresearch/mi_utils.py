@@ -112,10 +112,10 @@ groupS.add_argument('-s', dest='subjNList', help='Subject number', nargs="*", ty
 groupS.add_argument('-sf', dest='subjNListFile', help='Subject numbers in file', type=str, default=None)
 groupS.add_argument('-sR', dest='subjRange', help='Subject range', nargs=2, type=int, default=[])
 groupS.add_argument('-y', dest='dataRoot', 
-                    help='Path of root data directory (where subjects are stored) [default None -> will get from config file]', 
+                    help='Path of root data directory (where subjects are stored) [default None -> may be set in config file]', 
                     type=str, default=None)
 groupS.add_argument('-sPrefix', dest='subjPrefix', 
-                    help='Subject prefix [default None -> will get from config file]', 
+                    help='Subject prefix [default None -> will get from dataRoot]', 
                     type=str, default=None)
 groupS.add_argument('-anonName', dest='anonName', 
                     help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 

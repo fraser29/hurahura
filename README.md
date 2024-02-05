@@ -3,7 +3,7 @@ Organisation and automation tools for medical imaging research data
 
 ## About
 
-This is a collection of classes for following OOP principals for organisation of research data for medical imaging research studies. 
+This is a collection of classes for following OOP principles for organisation of research data for medical imaging research studies. 
 
 It takes advantage of the dicom standard and the package [spydcmtk](https://github.com/fraser29/spydcmtk) for automating and generalising many typical steps with the intention of making the researcher's life easier. 
 
@@ -16,8 +16,4 @@ AbstractSubject
 
 
 ## TODO
-
-Load subject - from zip etc
-
-use abstract class
 

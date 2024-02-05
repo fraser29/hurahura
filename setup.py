@@ -17,7 +17,7 @@ DESCRIPTION = 'Medical Imaginging Research structuring and automation'
 URL = 'https://github.com/fraser29/miresearch'
 EMAIL = 'callaghan.fm@gmail.com'
 AUTHOR = 'Fraser M. Callaghan'
-REQUIRES_PYTHON = '>=3.7.0'
+REQUIRES_PYTHON = '>=3.9.0'
 VERSION = '0.0.1'
 KEYWORDS="medical, imaging, mri, ct, dicom"
 
@@ -27,10 +27,6 @@ REQUIRED = [
 ]
 
 
-# The rest you shouldn't have to touch too much :)
-# ------------------------------------------------
-# Except, perhaps the License and Trove Classifiers!
-# If you do change the License, remember to change the Trove Classifier for that!
 
 here = os.path.abspath(os.path.dirname(__file__))
 
