@@ -5,8 +5,8 @@ import os
 import unittest
 import shutil
 
-from miresearch import mi_utils
 from miresearch import mi_subject
+from miresearch.mi_config import MIResearch_config
 
 
 this_dir = os.path.split(os.path.realpath(__file__))[0]
@@ -18,7 +18,7 @@ P4_extra = os.path.join(TEST_DIR, "P4_extra")
 PZip  = os.path.join(TEST_DIR, "P3_4.zip")
 PTar  = os.path.join(TEST_DIR, "P3_4.tar")
 PTarGZ  = os.path.join(TEST_DIR, "P3_4.tar.gz")
-DEBUG = mi_utils.mi_config.DEBUG
+DEBUG = MIResearch_config.DEBUG
 
 class TestSubject(unittest.TestCase):
     @classmethod

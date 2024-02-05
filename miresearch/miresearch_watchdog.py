@@ -6,7 +6,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 #
 from miresearch import mi_subject
-from miresearch import mi_config
+from miresearch.mi_config import MIResearch_config
 
 
 class MIResearch_WatchDog(object):
@@ -59,7 +59,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         self.ignore_pattern = '.WORKING'
         # Polling
         self.pollDelay = 5 # seconds
-        self.pollStable = max([mi_config.stableAge, self.pollDelay+1])
+        self.pollStable = max([MIResearch_config.stable_directory_age_sec, self.pollDelay+1])
         self.pollTimeOut = 10*self.pollStable
 
     def on_created(self, event):

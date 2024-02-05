@@ -4,7 +4,7 @@ import argparse
 import base64
 import csv
 
-from miresearch import mi_config
+from miresearch.mi_config import MIResearch_config
 
 
 
@@ -40,7 +40,7 @@ def getDataRoot():
     Returns:
         str: Path to data root - found from config
     """
-    return mi_config.DataRootDir
+    return MIResearch_config.DataRootDir
 
 #==================================================================
 class DirectoryStructure(object):
@@ -95,12 +95,15 @@ class MiResearchParser(argparse.ArgumentParser):
         sys.exit(2)
 
 ParentAP = MiResearchParser(add_help=False,
-                                   epilog="Written Fraser M. Callaghan. Copyright MRZentrum, University Children's Hospital Zurich")
+                                   epilog="Written Fraser M. Callaghan. MRZentrum, University Children's Hospital Zurich")
 
 groupM = ParentAP.add_argument_group('Management Parameters')
+groupM.add_argument('-config', dest='configFile', help='Path to configuration file to use.', type=str, default=None)
 groupM.add_argument('-FORCE', dest='FORCE', help='force action - use with caution',
                         action='store_true')
 groupM.add_argument('-QUIET', dest='QUIET', help='Suppress progress bars and logging to terminal',
+                        action='store_true')
+groupM.add_argument('-INFO', dest='INFO', help='Provide setup (configuration) info and exit.',
                         action='store_true')
 groupM.add_argument('-DEBUG', dest='DEBUG', help='Run in DEBUG mode (save intermediate steps, increase log output)',
                         action='store_true')

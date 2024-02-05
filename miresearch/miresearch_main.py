@@ -5,17 +5,23 @@
 
 import os
 import sys
-import datetime
 
 from miresearch import mi_utils
 from miresearch import mi_subject
 from miresearch import miresearch_watchdog
+from miresearch.mi_config import MIResearch_config
 
 
 ### ====================================================================================================================
 ##          RUN VIA MAIN
 ### ====================================================================================================================
 def checkArgs(args):
+    # 
+    MIResearch_config.runconfigParser(args.configFile)
+    if args.INFO:
+        MIResearch_config.printInfo()
+        sys.exit(1)
+    #
     if args.dataRoot is not None:
         args.dataRoot = os.path.abspath(args.dataRoot)
     else:
