@@ -50,3 +50,7 @@ Files are read in the above order with each subsequent variable present overwrit
 For information on files found and variables used run:
 
 `miresearch -INFO` 
+
+# Documentation
+
+For full documentation see [wiki](https://github.com/fraser29/miresearch/wiki)
