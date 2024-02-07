@@ -157,6 +157,27 @@ class TestSubjects3(unittest.TestCase):
         if (not DEBUG) or OVERRIDE:
             shutil.rmtree(cls.tmpDir)
         
+class TestArchiveSubject(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestZip')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.subj = mi_subject.createNew_OrAddTo_Subject(TEST_DIR, cls.tmpDir, subjPrefix='MIZ', anonName="SubjectNumber1", QUIET=True)[0]
+
+    def test_SubjZip(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))
+        os.makedirs(os.path.join(self.tmpDir, 'ZIP'))
+        os.makedirs(os.path.join(self.tmpDir, 'ZIP-onheRaw'))
+        self.subj.zipUpSubject(os.path.join(self.tmpDir, 'ZIP'), EXCLUDE_RAW=False)
+        self.subj.zipUpSubject(os.path.join(self.tmpDir, 'ZIP-onheRaw'), EXCLUDE_RAW=True)
+    
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+        
 
 # class TestMisc(unittest.TestCase):
 #     def test_DefaultRootDir(self):

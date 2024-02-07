@@ -13,7 +13,7 @@ Adapted for general use from KMR project.
 
 
 import os
-import shutil
+from zipfile import ZipFile
 import numpy as np
 import datetime
 import pandas as pd
@@ -443,11 +443,20 @@ class AbstractSubject(object):
         return sex.strip().lower() == 'm'
 
     # ------------------------------------------------------------------------------------------------------------------
-    def zipUpSubject(self, outputDirectory):
-        archive_name = os.path.join(outputDirectory, self.subjID)
-        zipfileOut = shutil.make_archive(archive_name, 'zip', root_dir=self.getTopDir())
-        self.logger.info(f'Zipped subject to {zipfileOut}')
-        return zipfileOut
+    def zipUpSubject(self, outputDirectory, EXCLUDE_RAW=False):
+        archive_name = os.path.join(outputDirectory, f"{self.subjID}.zip")
+        with ZipFile(archive_name, 'w') as zipf:
+            for root, dirs, files in os.walk(self.getTopDir()):
+                if EXCLUDE_RAW: # Exclude RAW subdirectory
+                    if 'RAW' in dirs:
+                        dirs.remove('RAW')
+                #
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, self.dataRoot)
+                    zipf.write(file_path, arcname=arcname)
+        self.logger.info(f'Zipped subject to {archive_name}')
+        return archive_name
 
     # ------------------------------------------------------------------------------------------------------------------
     def getSpydcmDicomStudy(self):

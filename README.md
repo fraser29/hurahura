@@ -1,6 +1,13 @@
 # miresearch
 Organisation and automation tools for medical imaging research data
 
+## Installation: 
+
+```bash
+pip install imaging-research
+```
+Note: pypi reported naming conflicts for miresearch
+
 ## About
 
 This is a collection of classes for following OOP principles for organisation of research data for medical imaging research studies. 
@@ -11,9 +18,15 @@ This package may be easily adapted and expanded upon for a high level control ov
 
 ## Class structure
 
-AbstractSubject
-    
+**AbstractSubject**  class is top level class taking inputs:
+- *subjectNumber* : an integer
+- *dataRoot* : the root directory where subjects to be stored             
+- *subjectPrefix* : a prefix to be combined with *subjectNumber* for naming each subject
+    - Optional: will be guessed from subjects already present in *dataRoot* if not given. 
+- *DIRECTORY_STRUCTURE_TREE* : DirectoryStructureTree class to define directory structure for each subject directory (see wiki for construction shortcuts)
+    - Optional: Defaults to **RAW** and **META** directories. 
 
+This is the basic parent class containing fundamental methods for organisation and management. See [wiki](https://github.com/fraser29/miresearch/wiki) for advanced usage, epsecially via inheritance and polymorphism. 
 
 # Exposed commandline tool: miresearch
 
