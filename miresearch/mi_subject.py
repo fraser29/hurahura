@@ -116,33 +116,52 @@ class AbstractSubject(object):
         if os.path.isdir(self.getTopDir()):
             self.logger.info(f"Study participant {self.subjID} exists at {self.getTopDir()}. Updating directory structure")
         os.makedirs(self.getTopDir(), exist_ok=True)
-        self.getDicomsDir()
-        self.getMetaDir()
+        for i in self.DIRECTORY_STRUCTURE_TREE:
+            os.makedirs(os.path.join(self.getTopDir(), i.name), exist_ok=True)
+            for j in i.childrenList:
+                os.makedirs(os.path.join(self.getTopDir(), i.name, j), exist_ok=True)
         self.logger.info(f"Directory structure correct for {self.subjID} at {self.getTopDir()}.")
 
     def getPrefix_Number(self):
         return splitSubjID(self.subjID)
 
     ### LOADING
+    def _checkAnonName(self, anonName, name="", firstNames=""):
+        if anonName == "SOFT":
+            self.setEncodedName(NAME=name, FIRST_NAMES=firstNames)
+            return ""
+        elif anonName == "HARD":
+            return ""
+        return anonName
+
     def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
         self.initDirectoryStructure()
+        patName = str(spydcm.getTag(dicomFolderToLoad, "PatientName")[0])
+        anonName = self._checkAnonName(anonName, patName.split("^")[0], "_".join(patName.split("^")[1:]))
         self.logger.info(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()})")
         d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
-        spydcm.dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
-        dO = self.countNumberOfDicoms()
-        self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
 
-    def loadSpydcmStudyToSubject(self, spydcmData, anonName=None):
+        study = spydcm.dcmTK.DicomStudy.setFromDirectory(dicomFolderToLoad, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
+        res = study.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
+        # spydcm.dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
+        self._finalLoadSteps(d0, dI)
+
+    def loadSpydcmStudyToSubject(self, spydcmData, anonName=None, HIDE_PROGRESSBAR=False):
         self.initDirectoryStructure()
+        patName = spydcmData.getTag("PatientName")
+        self._checkAnonName(anonName, patName.split("^")[0], "_".join(patName.split("^")[1:]))
         self.logger.info(f"LoadDicoms (spydcmtk data ==> {self.getDicomsDir()})")
         d0, dI = self.countNumberOfDicoms(), spydcmData.getNumberOfDicoms()
         spydcmData.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
-        dO = self.countNumberOfDicoms()
-        self.logger.info(f"Initial number of dicoms: {d0}, number to load: {dI}, final number dicoms: {dO}")
+        self._finalLoadSteps(d0, dI)
+    
+    def _finalLoadSteps(self, initNumDicoms, numDicomsToLoad):
+        finalNumDicoms = self.countNumberOfDicoms()
+        self.logger.info(f"Initial number of dicoms: {initNumDicoms}, number to load: {numDicomsToLoad}, final number dicoms: {finalNumDicoms}")
+        self.runPostLoadPipeLine()
 
-    def postLoadPipeLine(self, *args, **kwargs):
+    def runPostLoadPipeLine(self, *args, **kwargs):
         # this is an abstract method for implementation by subclasses
-        print("This is abstract - implement an override")
         pass
 
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
@@ -412,6 +431,25 @@ class AbstractSubject(object):
                 anonName = None # Still anonymise, but let program choose the new anonName
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
         self.buildDicomMeta()
+
+    def setEncodedName(self, NAME, FIRST_NAMES=""):
+        """
+        funct to add name after (will encode)
+        :param NAME:
+        :param FIRST_NAMES:
+        :return:
+        """
+        dd = {'NAME': mi_utils.encodeString(NAME, self.subjID),
+              'FIRST_NAMES': mi_utils.encodeString(FIRST_NAMES, self.subjID)}
+        self.updateMetaFile(dd)
+
+    def getName(self):
+        return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
+
+    def getName_FirstNames(self):
+        return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID), \
+               mi_utils.decodeString(self.getTagValue("FIRST_NAMES", "UNKNOWN"), self.subjID)
+
     # ------------------------------------------------------------------------------------------
     def getSummary_list(self):
         hh = ["SubjectID","PatientID","Gender","StudyDate","NumberOfSeries","SERIES_DECRIPTIONS"]
@@ -765,7 +803,7 @@ def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubje
     if spydcm.returnFirstDicomFound(dicomDirToLoad) is None:
         raise IOError(f"Can not find valid dicoms under {dicomDirToLoad}")
     if not os.path.isdir(dataRoot):
-        raise IOError(" Destination does not exist")
+        raise IOError(f" Destination does not exist: {dataRoot}")
     newSubj = _createSubjectHelper(dicomDirToLoad, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
                                     subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET, 
                                     FORCE_NEW_SUBJ=IGNORE_UIDS)

@@ -17,7 +17,7 @@ from miresearch.mi_config import MIResearch_config
 ### ====================================================================================================================
 def checkArgs(args):
     # 
-    MIResearch_config.runconfigParser(args.configFile)
+    if args.configFile: MIResearch_config.runconfigParser(args.configFile)
     if args.INFO:
         MIResearch_config.printInfo()
         sys.exit(1)
@@ -25,7 +25,11 @@ def checkArgs(args):
     if args.dataRoot is not None:
         args.dataRoot = os.path.abspath(args.dataRoot)
     else:
-        args.dataRoot = mi_utils.getDataRoot()
+        args.dataRoot = MIResearch_config.data_root_dir
+    if args.subjPrefix is None:
+        args.subjPrefix = MIResearch_config.subject_prefix
+    if args.anonName is None:
+        args.anonName = MIResearch_config.anon_level
     if not args.QUIET:
         print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
     if args.loadPath is not None:
@@ -37,6 +41,10 @@ def checkArgs(args):
 
 ##  ========= RUN ACTIONS =========
 def runActions(args):
+    MISubjClass = mi_subject.AbstractSubject
+    if MIResearch_config.class_obj:
+        MISubjClass = MIResearch_config.class_obj
+        
     if args.loadPath is not None:
         if len(args.subjNList) == 0:
             args.subjNList = [None]
@@ -48,11 +56,12 @@ def runActions(args):
                                              subjNumber=args.subjNList[0],
                                              anonName=args.anonName,
                                              LOAD_MULTI=args.LoadMulti,
+                                             SubjClass=MISubjClass,
                                              IGNORE_UIDS=args.LoadMultiForce,
                                              QUIET=args.QUIET)
     elif args.anonName is not None:
         for sn in args.subjNList:
-            iSubj = mi_subject.AbstractSubject(sn, args.dataRoot, args.subjPrefix)
+            iSubj = MISubjClass(sn, args.dataRoot, args.subjPrefix)
             iSubj.anonymise(args.anonName)
 
     elif args.SummaryCSV is not None:
@@ -64,6 +73,7 @@ def runActions(args):
         MIWatcher = miresearch_watchdog.MIResearch_WatchDog(args.WatchDirectory,
                                         args.dataRoot,
                                         args.subjPrefix,
+                                        SubjClass=MISubjClass,
                                         TO_ANONYMISE=(args.anonName is not None))
 
 ### ====================================================================================================================

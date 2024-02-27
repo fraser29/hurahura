@@ -34,57 +34,89 @@ DICOM = "DICOM"
 
 
 #==================================================================
-def getDataRoot():
-    """Function to return data root from configuration. 
-
-    Returns:
-        str: Path to data root - found from config
-    """
-    return MIResearch_config.DataRootDir
 
 #==================================================================
-class DirectoryStructure(object):
+class DirectoryStructure():
     def __init__(self, name, childrenList=[]) -> None:
-        super().__init__()
         self.name = name
         self.childrenList = childrenList
-
-class DirectoryStructureTree():
-    def __init__(self, topList) -> None:
-        self.topList = topList
-
-    def addTopLevelDirectory(self, name):
-        self.topList.append(DirectoryStructure(name))
     
-    def addSecondLevelDirectory(self, nameTopLevel, nameSecondLevel):
-        for i in self.topList:
-            if i.name == nameTopLevel:
-                i.childrenList.append(nameSecondLevel)
+    def __str__(self) -> str:
+        return f"{self.name} with children: {self.childrenList}"
+
+class DirectoryStructureTree(list):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def __str__(self) -> str:
+        ss = ''
+        for i in self:
+            ss += str(i)+'\n'
+        return ss
+
+    def addNewStructure(self, name_or_list):
+        if type(name_or_list) == list:
+            self._addTopLevelDirectory(name_or_list[0])
+            for k1 in range(1, len(name_or_list)):
+                self._addSecondLevelDirectory(name_or_list[0], name_or_list[k1])
+        else:
+            self._addTopLevelDirectory(name_or_list)
+
+    def _addTopLevelDirectory(self, name):
+        if not self.isTopLevelName(name):
+            self.append(DirectoryStructure(name, []))
+    
+    def _addSecondLevelDirectory(self, nameTopLevel, nameSecondLevel):
+        if not self.isSecondLevelName(nameTop=nameTopLevel, nameSecond=nameSecondLevel):
+            for i in self:
+                if i.name == nameTopLevel:
+                    i.childrenList.append(nameSecondLevel)
+
+    def isTopLevelName(self, name):
+        for i in self:
+            if i.name == name:
+                return True
+        return False
+    
+    def isSecondLevelName(self, nameTop, nameSecond):
+        for i in self:
+            if i.name == nameTop:
+                for i2 in i.childrenList:
+                    if i2 == nameSecond:
+                        return True
+        return False
+
 
 def _getDefautDirectoryStructureTree():
-    DEFAULT_DIRECTORY_STRUCTURE_TREE = DirectoryStructureTree([DirectoryStructure(RAW, [DirectoryStructure(DICOM)]),
-                                                                        DirectoryStructure(META)])
+    """This builds a Directory tree structure from the config file input
+
+    Returns:
+        DirectoryStructureTree: class of Directory trees structure used by misubject
+    """
+    DEFAULT_DIRECTORY_STRUCTURE_TREE = DirectoryStructureTree()
+    for i in MIResearch_config.directory_structure:
+        DEFAULT_DIRECTORY_STRUCTURE_TREE.addNewStructure(i)
     return DEFAULT_DIRECTORY_STRUCTURE_TREE
 
 def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
-    """This will build the directory structure for a project using a base structure and any added subfolder names
+    """This will build the directory structure for a project using the structure
+        found in config file and any added subfolder names
 
     Args:
         listOfExtraSubfolders (list): A list of subfolders, if an entry is itself a list, 
                                     then the first item of that entry is the toplevel subfolder 
                                     and the following items are subfolders of that toplevel folder.
-                                    Default: empty list
+                                    Default: empty list                                    
+                                    Note: A default structure is always used of:
+                                    | - META
+                                    | - RAW 
+                                         | - DICOM
     """
     #  first remove any conflists with default list:
-    listOfExtraSubfolders = [i for i in listOfExtraSubfolders if i not in [RAW, META]]
-    baseStructure = _getDefautDirectoryStructureTree()
+    DirectoryTree = _getDefautDirectoryStructureTree()
     for i in listOfExtraSubfolders:
-        if type(i) == list:
-            baseStructure.addTopLevelDirectory(i[0])
-            for k1 in range(1, len(i)):
-                baseStructure.addSecondLevelDirectory(i[k1])
-        else:
-            baseStructure.addTopLevelDirectory(i)
+        DirectoryTree.addNewStructure(i)
+    return DirectoryTree
 
 #==================================================================
 # Override error to show help on argparse error (missing required argument etc)
@@ -118,7 +150,7 @@ groupS.add_argument('-y', dest='dataRoot',
                     help='Path of root data directory (where subjects are stored) [default None -> may be set in config file]', 
                     type=str, default=None)
 groupS.add_argument('-sPrefix', dest='subjPrefix', 
-                    help='Subject prefix [default None -> will get from dataRoot]', 
+                    help='Subject prefix [default None -> will get from config file OR dataRoot]', 
                     type=str, default=None)
 groupS.add_argument('-anonName', dest='anonName', 
                     help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 
