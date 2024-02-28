@@ -429,6 +429,7 @@ class AbstractSubject(object):
         if type(anonName) == str:
             if len(anonName) == 0:  
                 anonName = None # Still anonymise, but let program choose the new anonName
+        self.logger.info('Anonymise in place')
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
         self.buildDicomMeta()
 

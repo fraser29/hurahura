@@ -118,7 +118,9 @@ def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
         DirectoryTree.addNewStructure(i)
     return DirectoryTree
 
-#==================================================================
+### ====================================================================================================================
+##          ARGUEMTENT PARSING AND ACTIONS - RUN VIA MAIN
+### ====================================================================================================================
 # Override error to show help on argparse error (missing required argument etc)
 class MiResearchParser(argparse.ArgumentParser):
     def error(self, message):
@@ -126,8 +128,9 @@ class MiResearchParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
-ParentAP = MiResearchParser(add_help=False,
-                                   epilog="Written Fraser M. Callaghan. MRZentrum, University Children's Hospital Zurich")
+ParentAP = MiResearchParser(epilog="Written Fraser M. Callaghan. MRZentrum, University Children's Hospital Zurich")
+# ParentAP = MiResearchParser(add_help=False,
+#                                    epilog="Written Fraser M. Callaghan. MRZentrum, University Children's Hospital Zurich")
 
 groupM = ParentAP.add_argument_group('Management Parameters')
 groupM.add_argument('-config', dest='configFile', help='Path to configuration file to use.', type=str, default=None)
@@ -140,9 +143,7 @@ groupM.add_argument('-INFO', dest='INFO', help='Provide setup (configuration) in
 groupM.add_argument('-DEBUG', dest='DEBUG', help='Run in DEBUG mode (save intermediate steps, increase log output)',
                         action='store_true')
 
-SubjectInput = MiResearchParser(add_help=False)
-
-groupS = SubjectInput.add_argument_group('Subject Definition')
+groupS = ParentAP.add_argument_group('Subject Definition')
 groupS.add_argument('-s', dest='subjNList', help='Subject number', nargs="*", type=int, default=[])
 groupS.add_argument('-sf', dest='subjNListFile', help='Subject numbers in file', type=str, default=None)
 groupS.add_argument('-sR', dest='subjRange', help='Subject range', nargs=2, type=int, default=[])
@@ -155,6 +156,48 @@ groupS.add_argument('-sPrefix', dest='subjPrefix',
 groupS.add_argument('-anonName', dest='anonName', 
                     help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 
                     type=str, default=None)
+    
+groupA = ParentAP.add_argument_group('Actions')
+groupA.add_argument('-Load', dest='loadPath', 
+                    help='Path to load dicoms from (file / directory / tar / tar.gz / zip)', 
+                    type=str, default=None)
+groupA.add_argument('-LOAD_MULTI', dest='LoadMulti', 
+                    help='Combine with "Load": Load new subject for each subdirectory under loadPath', 
+                    action='store_true')
+groupA.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
+                    help='Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory', 
+                    action='store_true')
+groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
+                    help='Will watch given directory for new data and load as new study', 
+                    type=str, default=None)
+groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
+                    help='Write summary CSV file (give output file name)', 
+                    type=str, default=None)
+
+##  ========= CHECK ARGS =========
+def checkArgs(args):
+    # 
+    if args.configFile: MIResearch_config.runconfigParser(args.configFile)
+    if args.INFO:
+        MIResearch_config.printInfo()
+        sys.exit(1)
+    #
+    if args.dataRoot is not None:
+        args.dataRoot = os.path.abspath(args.dataRoot)
+    else:
+        args.dataRoot = MIResearch_config.data_root_dir
+    if args.subjPrefix is None:
+        args.subjPrefix = MIResearch_config.subject_prefix
+    if args.anonName is None:
+        args.anonName = MIResearch_config.anon_level
+    if not args.QUIET:
+        print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
+    if args.loadPath is not None:
+        args.loadPath = os.path.abspath(args.loadPath)
+    if args.LoadMultiForce:
+        args.LoadMulti = True
+    ## -------------
+    setNList(args=args)
 
 #==================================================================
 def setNList(args):
