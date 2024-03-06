@@ -18,7 +18,7 @@ URL = 'https://github.com/fraser29/miresearch'
 EMAIL = 'callaghan.fm@gmail.com'
 AUTHOR = 'Fraser M. Callaghan'
 REQUIRES_PYTHON = '>=3.9.0'
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 KEYWORDS="medical, imaging, mri, ct, dicom"
 
 # What packages are required for this module to be executed?
@@ -98,12 +98,10 @@ setup(
     url=URL,
     keywords=KEYWORDS,
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
-    # If your package is a single module, use this instead of 'packages':
-    # py_modules=['mypackage'],
     entry_points={
         "console_scripts": ["miresearch=miresearch.miresearch_main:main"],
     },
-    # package_data={NAME: ['spydcmtk.conf', 'ParaViewGlance.html']},
+    package_data={NAME: ['miresearch.conf']},
     install_requires=REQUIRED,
     # extras_require=EXTRAS,
     include_package_data=True,
