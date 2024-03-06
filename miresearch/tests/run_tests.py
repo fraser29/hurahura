@@ -10,14 +10,15 @@ from miresearch.mi_config import MIResearch_config
 
 
 this_dir = os.path.split(os.path.realpath(__file__))[0]
-TEST_DIR = os.path.join(this_dir, 'TEST_DATA')
+TEST_DIR = os.path.join(this_dir, 'TEST_DATA', 'SINGLE')
 P1 = os.path.join(TEST_DIR, 'P1')
 P2 = os.path.join(TEST_DIR, 'P2')
-P3_4 = os.path.join(TEST_DIR, "P3_4")
+P3 = os.path.join(TEST_DIR, "P3")
+P4 = os.path.join(TEST_DIR, "P4")
 P4_extra = os.path.join(TEST_DIR, "P4_extra")
-PZip  = os.path.join(TEST_DIR, "P3_4.zip")
-PTar  = os.path.join(TEST_DIR, "P3_4.tar")
-PTarGZ  = os.path.join(TEST_DIR, "P3_4.tar.gz")
+PZip  = os.path.join(TEST_DIR, "P4.zip")
+PTar  = os.path.join(TEST_DIR, "P3.tar")
+PTarGZ  = os.path.join(TEST_DIR, "P4.tar.gz")
 DEBUG = MIResearch_config.DEBUG
 
 class TestSubject(unittest.TestCase):
@@ -93,7 +94,7 @@ class TestSubjects(unittest.TestCase):
         cls.newSubj2.buildDicomMeta()
         cls.newSubj3 = mi_subject.AbstractSubject(3, subjectPrefix='MI', dataRoot=cls.tmpDir)
         cls.newSubj3.QUIET = True
-        cls.newSubj3.loadDicomsToSubject(P3_4, HIDE_PROGRESSBAR=True)
+        cls.newSubj3.loadDicomsToSubject(P3, HIDE_PROGRESSBAR=True) # Can't do this as multiple subjects - how do i want to handle this
         cls.subjList = mi_subject.SubjectList.setByDirectory(cls.tmpDir)
 
     def test_newSubjs(self):
@@ -125,10 +126,12 @@ class TestSubjects2(unittest.TestCase):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000001')))
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000002')))
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000003')))
-        self.assertFalse(os.path.isdir(os.path.join(self.tmpDir, 'MI22000004'))) # This false as "4" finds subject already exists and adds to 
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000004'))) # This false as "4" finds subject already exists and adds to 
     
     def test_List(self):
-        self.assertEqual(len(self.subjList), 4, "Error making subject list")
+        self.assertEqual(len(self.subjList), 5, "Error making subject list")
+        self.subjList.reduceToSet()
+        self.assertEqual(len(self.subjList), 4, "Error making subject list after reduce")
         
     def test_filterList(self):
         filtList = self.subjList.filterSubjectListByDOS('20111014')
@@ -147,7 +150,7 @@ class TestSubjects3(unittest.TestCase):
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.subj = mi_subject.createNew_OrAddTo_Subject(TEST_DIR, cls.tmpDir, subjPrefix='MI3', anonName="SubjectNumber1", QUIET=True)[0]
+        cls.subj = mi_subject.createNew_OrAddTo_Subject(P3, cls.tmpDir, subjPrefix='MI3', anonName="SubjectNumber1", QUIET=True)[0]
 
     def test_newSubjs(self):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI3000001')))
@@ -164,7 +167,7 @@ class TestArchiveSubject(unittest.TestCase):
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.subj = mi_subject.createNew_OrAddTo_Subject(TEST_DIR, cls.tmpDir, subjPrefix='MIZ', anonName="SubjectNumber1", QUIET=True)[0]
+        cls.subj = mi_subject.createNew_OrAddTo_Subject(P4, cls.tmpDir, subjPrefix='MIZ', anonName="SubjectNumber1", QUIET=True)[0]
 
     def test_SubjZip(self):
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))

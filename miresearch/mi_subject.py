@@ -526,13 +526,21 @@ class SubjectList(list):
         return [i.subjN for i in self]
 
     def __str__(self) -> str:
-        return f"{len(self)} subjects of {self[0].subjID} at {self[0].dataRoot}"
+        return f"{len(self)} subjects of {self[0].subjectPrefix} at {self[0].dataRoot}"
 
     def reduceToExist(self):
         toRemove = []
         for i in self:
             if not i.exists():
                 toRemove.append(i)
+        for i in toRemove:
+            self.remove(i)
+
+    def reduceToSet(self):
+        toRemove = []
+        for k1 in range(len(self)):
+            if self[k1] in self[k1+1:]:
+                toRemove.append(self[k1])
         for i in toRemove:
             self.remove(i)
 
