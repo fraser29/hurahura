@@ -18,7 +18,7 @@ URL = 'https://github.com/fraser29/miresearch'
 EMAIL = 'callaghan.fm@gmail.com'
 AUTHOR = 'Fraser M. Callaghan'
 REQUIRES_PYTHON = '>=3.9.0'
-VERSION = '0.0.5'
+VERSION = '0.0.6'
 KEYWORDS="medical, imaging, mri, ct, dicom"
 
 # What packages are required for this module to be executed?
@@ -101,7 +101,7 @@ setup(
     entry_points={
         "console_scripts": ["miresearch=miresearch.miresearch_main:main"],
     },
-    package_data={NAME: ['miresearch.conf']},
+    package_data={"miresearch": ["miresearch.conf",]},
     install_requires=REQUIRED,
     # extras_require=EXTRAS,
     include_package_data=True,
