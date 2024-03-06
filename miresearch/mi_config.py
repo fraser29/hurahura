@@ -33,14 +33,14 @@ class _MIResearch_config():
         self.config.read(self.all_config_files)
 
         self.DEBUG = self.config.getboolean("app", "debug", fallback=False)
-        self._anon_level = self.config.get("app", "anon_level")
-        self._data_root_dir = self.config.get("app", "data_root_dir")
-        self._subject_prefix = self.config.get("app", "subject_prefix")
-        self.stable_directory_age_sec = self.config.getint("app", "stable_directory_age_sec")
+        self._anon_level = self.config.get("app", "anon_level", fallback='NONE')
+        self._data_root_dir = self.config.get("app", "data_root_dir", fallback="")
+        self._subject_prefix = self.config.get("app", "subject_prefix", fallback="")
+        self.stable_directory_age_sec = self.config.getint("app", "stable_directory_age_sec", fallback=60)
         self.directory_structure = json.loads(self.config.get("app", "directories"))
 
         self.class_obj = None
-        class_path = self.config.get("app", "class_path")
+        class_path = self.config.get("app", "class_path", fallback=None)
         if class_path:
             module_name, class_name = class_path.rsplit('.', 1)
             module = importlib.import_module(module_name)

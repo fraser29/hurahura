@@ -18,7 +18,7 @@ URL = 'https://github.com/fraser29/miresearch'
 EMAIL = 'callaghan.fm@gmail.com'
 AUTHOR = 'Fraser M. Callaghan'
 REQUIRES_PYTHON = '>=3.9.0'
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 KEYWORDS="medical, imaging, mri, ct, dicom"
 
 # What packages are required for this module to be executed?
