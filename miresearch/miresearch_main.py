@@ -15,35 +15,38 @@ from miresearch.mi_config import MIResearch_config
 # ### ====================================================================================================================
 # ##          RUN VIA MAIN
 # ### ====================================================================================================================
-# def checkArgs(args):
-#     # 
-#     if args.configFile: MIResearch_config.runconfigParser(args.configFile)
-#     if args.INFO:
-#         MIResearch_config.printInfo()
-#         sys.exit(1)
-#     #
-#     if args.dataRoot is not None:
-#         args.dataRoot = os.path.abspath(args.dataRoot)
-#     else:
-#         args.dataRoot = MIResearch_config.data_root_dir
-#     if args.subjPrefix is None:
-#         args.subjPrefix = MIResearch_config.subject_prefix
-#     if args.anonName is None:
-#         args.anonName = MIResearch_config.anon_level
-#     if not args.QUIET:
-#         print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
-#     if args.loadPath is not None:
-#         args.loadPath = os.path.abspath(args.loadPath)
-#     if args.LoadMultiForce:
-#         args.LoadMulti = True
-#     ## -------------
-#     mi_utils.setNList(args=args)
-
-# ##  ========= RUN ACTIONS =========
-def runActions(args, extra_runActions=None):
+##  ========= CHECK ARGS =========
+def checkArgs(args):
+    # 
+    if args.configFile: MIResearch_config.runconfigParser(args.configFile)
+    if args.INFO:
+        MIResearch_config.printInfo()
+        sys.exit(1)
+    #
+    if args.dataRoot is not None:
+        args.dataRoot = os.path.abspath(args.dataRoot)
+    else:
+        args.dataRoot = MIResearch_config.data_root_dir
+    if args.subjPrefix is None:
+        args.subjPrefix = MIResearch_config.subject_prefix
+    if args.anonName is None:
+        args.anonName = MIResearch_config.anon_level
+    if not args.QUIET:
+        print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
+    if args.loadPath is not None:
+        args.loadPath = os.path.abspath(args.loadPath)
+    if args.LoadMultiForce:
+        args.LoadMulti = True
+    
     MISubjClass = mi_subject.AbstractSubject
     if MIResearch_config.class_obj:
         MISubjClass = MIResearch_config.class_obj
+    args.MISubjClass = MISubjClass
+    ## -------------
+    mi_utils.setNList(args=args)
+
+# ##  ========= RUN ACTIONS =========
+def runActions(args, extra_runActions=None):
 
     if args.loadPath is not None:
         if len(args.subjNList) == 0:
@@ -56,7 +59,7 @@ def runActions(args, extra_runActions=None):
                                              subjNumber=args.subjNList[0],
                                              anonName=args.anonName,
                                              LOAD_MULTI=args.LoadMulti,
-                                             SubjClass=MISubjClass,
+                                             SubjClass=args.MISubjClass,
                                              IGNORE_UIDS=args.LoadMultiForce,
                                              QUIET=args.QUIET)
     # Subject level actions
@@ -64,19 +67,25 @@ def runActions(args, extra_runActions=None):
         # ANONYMISE
         if args.anonName is not None:
             for sn in args.subjNList:
-                iSubj = MISubjClass(sn, args.dataRoot, args.subjPrefix)
+                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
                 iSubj.anonymise(args.anonName)
 
     elif args.SummaryCSV is not None:
         mi_subject.WriteSubjectStudySummary(args.dataRoot, args.SummaryCSV)
     
+    elif args.RunPost:
+        for sn in args.subjNList:
+            iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
+            iSubj.runPostLoadPipeLine()
+
+
     ## WATCH DIRECTORY ##
     elif args.WatchDirectory is not None:
 
         MIWatcher = miresearch_watchdog.MIResearch_WatchDog(args.WatchDirectory,
                                         args.dataRoot,
                                         args.subjPrefix,
-                                        SubjClass=MISubjClass,
+                                        SubjClass=args.MISubjClass,
                                         TO_ANONYMISE=(args.anonName is not None))
         MIWatcher.run()
 
@@ -88,7 +97,7 @@ def runActions(args, extra_runActions=None):
 # S T A R T
 def main(extra_runActions=None):
     arguments = mi_utils.ParentAP.parse_args()
-    mi_utils.checkArgs(arguments)
+    checkArgs(arguments) # Will substitute from config files if can
     runActions(arguments, extra_runActions)
 
 

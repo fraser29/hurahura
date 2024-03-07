@@ -173,31 +173,9 @@ groupA.add_argument('-WatchDirectory', dest='WatchDirectory',
 groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
                     type=str, default=None)
-
-##  ========= CHECK ARGS =========
-def checkArgs(args):
-    # 
-    if args.configFile: MIResearch_config.runconfigParser(args.configFile)
-    if args.INFO:
-        MIResearch_config.printInfo()
-        sys.exit(1)
-    #
-    if args.dataRoot is not None:
-        args.dataRoot = os.path.abspath(args.dataRoot)
-    else:
-        args.dataRoot = MIResearch_config.data_root_dir
-    if args.subjPrefix is None:
-        args.subjPrefix = MIResearch_config.subject_prefix
-    if args.anonName is None:
-        args.anonName = MIResearch_config.anon_level
-    if not args.QUIET:
-        print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
-    if args.loadPath is not None:
-        args.loadPath = os.path.abspath(args.loadPath)
-    if args.LoadMultiForce:
-        args.LoadMulti = True
-    ## -------------
-    setNList(args=args)
+groupA.add_argument('-RunPost', dest='RunPost', 
+                    help='Run post load pipeline', 
+                    action='store_true')
 
 #==================================================================
 def setNList(args):

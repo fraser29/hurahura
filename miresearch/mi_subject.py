@@ -172,6 +172,8 @@ class AbstractSubject(object):
         return os.path.join(self.dataRoot, self.subjID)
 
     def _getDir(self, listOfDirsBeyondStudyDir, BUILD_IF_NEED=True):
+        if type(listOfDirsBeyondStudyDir) != list:
+            raise ValueError(f"_getDir takes a list as first argument")
         dd = os.path.join(self.getTopDir(), *listOfDirsBeyondStudyDir)
         if not os.path.isdir(dd):
             if BUILD_IF_NEED & self.BUILD_DIR_IF_NEED:
@@ -445,7 +447,10 @@ class AbstractSubject(object):
         self.updateMetaFile(dd)
 
     def getName(self):
-        return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
+        try:
+            return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
+        except:
+            return self.getMetaDict().get('PatientName', 'Name-Unknown')
 
     def getName_FirstNames(self):
         return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID), \
