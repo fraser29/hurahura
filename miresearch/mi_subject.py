@@ -138,12 +138,11 @@ class AbstractSubject(object):
         self.initDirectoryStructure()
         patName = str(spydcm.getTag(dicomFolderToLoad, "PatientName")[0])
         anonName = self._checkAnonName(anonName, patName.split("^")[0], "_".join(patName.split("^")[1:]))
-        self.logger.info(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()})")
+        self.logger.info(f"LoadDicoms to {self.getDicomsDir()}") # Don't log source here as could be identifying
+        # self.logger.info(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()})")
         d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
-
         study = spydcm.dcmTK.DicomStudy.setFromDirectory(dicomFolderToLoad, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
         res = study.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
-        # spydcm.dcmTK.organiseDicoms(dicomFolderToLoad, self.getDicomsDir(), anonName=anonName, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
         self._finalLoadSteps(d0, dI)
 
     def loadSpydcmStudyToSubject(self, spydcmData, anonName=None, HIDE_PROGRESSBAR=False):
