@@ -66,4 +66,4 @@ For information on files found and variables used run:
 
 # Documentation
 
-For full documentation see [wiki](https://github.com/fraser29/miresearch/wiki)
+For full documentation see [read-th-docs](https://miresearch.readthedocs.io/en/latest/#)
