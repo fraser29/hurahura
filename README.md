@@ -66,4 +66,4 @@ For information on files found and variables used run:
 
 # Documentation
 
-For full documentation see [read-th-docs](https://miresearch.readthedocs.io/en/latest/#)
+For full documentation see [read-the-docs](https://miresearch.readthedocs.io/en/latest/#)
