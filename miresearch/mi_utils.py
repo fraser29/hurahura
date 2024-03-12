@@ -158,6 +158,7 @@ groupS.add_argument('-anonName', dest='anonName',
                     type=str, default=None)
     
 groupA = ParentAP.add_argument_group('Actions')
+# LOADING
 groupA.add_argument('-Load', dest='loadPath', 
                     help='Path to load dicoms from (file / directory / tar / tar.gz / zip)', 
                     type=str, default=None)
@@ -167,15 +168,25 @@ groupA.add_argument('-LOAD_MULTI', dest='LoadMulti',
 groupA.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
                     help='Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory', 
                     action='store_true')
-groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
-                    help='Will watch given directory for new data and load as new study', 
-                    type=str, default=None)
+
+# SUBJECT LEVEL
+groupA.add_argument('-RunPost', dest='subjRunPost', 
+                    help='Run post load pipeline', 
+                    action='store_true')
+groupA.add_argument('-SubjInfo', dest='subjInfo', 
+                    help='Print info for each subject', 
+                    action='store_true')
+
+# GROUP ACTIONS
 groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
                     type=str, default=None)
-groupA.add_argument('-RunPost', dest='RunPost', 
-                    help='Run post load pipeline', 
-                    action='store_true')
+
+# WATCH DIRECTORY
+groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
+                    help='Will watch given directory for new data and load as new study', 
+                    type=str, default=None)
+
 
 #==================================================================
 def setNList(args):

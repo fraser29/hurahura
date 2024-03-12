@@ -225,6 +225,10 @@ class AbstractSubject(object):
         df.to_csv(self.getSeriesMetaCSV())
         self.logger.info('buildSeriesDataMetaCSV')
 
+    def info(self):
+        # Print info for this subject
+        print(f"{self.subjID}: {self.getName()} scanned on {self.getStudyDate()}")
+
     def printDicomsInfo(self):
         dicomFolderList = self.getDicomFoldersListStr(False)
         print(str(self))
@@ -800,7 +804,7 @@ def _createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSub
     elif compressedFile.endswith('tar') or compressedFile.endswith('tar.gz'):
         listOfSubjects = spydcm.dcmTK.ListOfDicomStudies.setFromTar(compressedFile, HIDE_PROGRESSBAR=QUIET)
     else: 
-        raise ValueError("Currently only upporting .zip, .tar and .tar.gz compressed files")
+        raise ValueError("Currently only supporting .zip, .tar and .tar.gz compressed files")
     if len(listOfSubjects) > 1:
         if subjNumber is not None:
             raise ValueError(f"More than one study in {compressedFile} - can not supply subjNumber")

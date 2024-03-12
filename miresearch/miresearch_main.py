@@ -62,7 +62,7 @@ def runActions(args, extra_runActions=None):
                                              SubjClass=args.MISubjClass,
                                              IGNORE_UIDS=args.LoadMultiForce,
                                              QUIET=args.QUIET)
-    # Subject level actions
+    # SUBJECT LEVEL actions
     elif len(args.subjNList) > 0:
         # ANONYMISE
         if args.anonName is not None:
@@ -70,13 +70,20 @@ def runActions(args, extra_runActions=None):
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
                 iSubj.anonymise(args.anonName)
 
+        elif args.subjRunPost:
+            for sn in args.subjNList:
+                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
+                iSubj.runPostLoadPipeLine()
+
+        elif args.subjInfo:
+            for sn in args.subjNList:
+                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
+                iSubj.info()
+
+    # SUBJECT GROUP (based on dataRoot) ACTIONS
     elif args.SummaryCSV is not None:
         mi_subject.WriteSubjectStudySummary(args.dataRoot, args.SummaryCSV)
     
-    elif args.RunPost:
-        for sn in args.subjNList:
-            iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
-            iSubj.runPostLoadPipeLine()
 
 
     ## WATCH DIRECTORY ##
