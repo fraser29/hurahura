@@ -37,6 +37,8 @@ class AbstractSubject(object):
                         dataRoot, 
                         subjectPrefix=None,
                         DIRECTORY_STRUCTURE_TREE=mi_utils.buildDirectoryStructureTree()) -> None:
+        if (subjectNumber is None) and (subjectPrefix is None):
+            raise ValueError(f"Give subjectNumber (as int) or subjectPrefix as subjID")
         try:
             self.subjN = int(subjectNumber)
         except ValueError:
@@ -46,6 +48,8 @@ class AbstractSubject(object):
                     raise mi_utils.SubjPrefixError("Subject prefix passed does not match subjectID passed")
             else:
                 subjectPrefix = tSubjPrefix
+        except TypeError: # subjectNumber passed as None - so use subjectPrefix as subjID (already check subjectPrefix not None)
+            self.subjN = None
         self.dataRoot = dataRoot
         if subjectPrefix is None:
             self.subjectPrefix = guessSubjectPrefix(self.dataRoot)
@@ -191,6 +195,17 @@ class AbstractSubject(object):
         dirName = self._getDir([mi_utils.RAW, mi_utils.DICOM])
         return dirName
     
+    def renameSubjID(self, newSubjID):
+        oldID = self.subjID
+        self.logger.warning(f"Changing subjID from {oldID} to {newSubjID}")
+        self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")
+        os.rename(self.getTopDir(), os.path.join(self.dataRoot, newSubjID))
+        self.subjectPrefix = newSubjID
+        self.subjN = None
+        self._logger = None
+        self.logger.warning(f"New logger after subjID changed from {oldID} to {self.subjID}")
+        self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")
+
     ### META STUFF -----------------------------------------------------------------------------------------------------
     def getSeriesMetaCSV(self):
         return os.path.join(self.getMetaDir(), 'ScanSeriesInfo.csv')
@@ -731,6 +746,8 @@ def guessSubjectPrefix(dataRootDir):
 ###  Helper functions for building new or adding to subjects
 ### ====================================================================================================================
 def buildSubjectID(subjN, subjectPrefix):
+    if subjN is None:
+        return subjectPrefix
     return f"{subjectPrefix}{subjN:06d}"
 
 def getNextSubjN(dataRootDir, subjectPrefix=None):
@@ -766,7 +783,6 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
         subjNumber = _subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
         newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
     newSubj.QUIET = QUIET
-    newSubj.initDirectoryStructure()
     try:
         os.path.isdir(dicomDir_orData)
         newSubj.loadDicomsToSubject(dicomDir_orData, anonName=anonName, HIDE_PROGRESSBAR=QUIET)

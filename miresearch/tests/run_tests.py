@@ -78,6 +78,33 @@ class TestSubject2(unittest.TestCase):
             shutil.rmtree(cls.tmpDir)
 
 
+class TestSubject3(unittest.TestCase): # No number in ID
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj3')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MySpecialID', QUIET=True)[0]
+        cls.newSubj.renameSubjID("MySpecialID")
+        cls.newSubj.anonymise()
+
+    def test_newSubj(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MySpecialID')))
+        self.assertEqual(self.newSubj.countNumberOfDicoms(), 2, msg="Incorrect number of dicoms")
+
+        newSubjObj2 = mi_subject.AbstractSubject(subjectNumber=None, dataRoot=self.tmpDir, subjectPrefix="MySpecialID")
+
+        pWeight = int(newSubjObj2.getTagValue('PatientWeight'))
+        self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
+        self.assertEqual(newSubjObj2.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
 class TestSubjects(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
