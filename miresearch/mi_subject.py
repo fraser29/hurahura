@@ -161,6 +161,8 @@ class AbstractSubject(object):
     def _finalLoadSteps(self, initNumDicoms, numDicomsToLoad):
         finalNumDicoms = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {initNumDicoms}, number to load: {numDicomsToLoad}, final number dicoms: {finalNumDicoms}")
+        self.buildDicomMeta()
+        self.buildSeriesDataMetaCSV(FORCE=True)
         self.runPostLoadPipeLine()
 
     def runPostLoadPipeLine(self, *args, **kwargs):
@@ -220,7 +222,12 @@ class AbstractSubject(object):
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             for dcmSE in dcmStudy:
-                seInfoList.append(dcmSE.getSeriesInfoDict())
+                seInfoList.append(dcmSE.getSeriesInfoDict(["SeriesNumber", 
+                                                            "SeriesDescription", 
+                                                            "StudyDate", 
+                                                            "AcquisitionTime",
+                                                            "InPlanePhaseEncodingDirection", 
+                                                            "PixelBandwidth"]))
         df = pd.DataFrame(data=seInfoList)
         df.to_csv(self.getSeriesMetaCSV())
         self.logger.info('buildSeriesDataMetaCSV')
@@ -248,9 +255,14 @@ class AbstractSubject(object):
         NN = self.getListOfSeNums()
         Ns = min(NN)
         Ne = max([i for i in NN if i < 99])
-        return self.getStartTimeForSeriesN_HHMMSS(Ns), self.getStartTimeForSeriesN_HHMMSS(Ne)
+        df = self.getSeriesMetaAsDataFrame()
+        t2 = self.getStartTimeForSeriesN_HHMMSS(Ne, df=df)
+        t2 = datetime.datetime.strptime(str(t2), '%H%M%S.%f')
+        endT = t2 + datetime.timedelta(0, self.getTimeTakenForSeriesN_s(Ne, df=df))
+        endT_HHMMSS = datetime.datetime.strftime(endT, '%H%M%S')
+        return self.getStartTimeForSeriesN_HHMMSS(Ns), endT_HHMMSS
 
-    def getTimeTakenForSeriesN(self, N, df=None):
+    def getTimeTakenForSeriesN_s(self, N, df=None):
         if df is None:
             df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'ScanDuration'])[0]
@@ -263,7 +275,7 @@ class AbstractSubject(object):
     def getStartTimeForSeriesN_HHMMSS(self, N, df=None):
         if df is None:
             df = self.getSeriesMetaAsDataFrame()
-        return list(df.loc[df['SeriesNumber']==N,'StartTime'])[0]
+        return list(df.loc[df['SeriesNumber']==N,'AcquisitionTime'])[0]
 
     def getDifferenceBetweenStartTimesOfTwoScans_s(self, seN1, seN2):
         df = self.getSeriesMetaAsDataFrame()
@@ -273,11 +285,11 @@ class AbstractSubject(object):
         t2 = datetime.datetime.strptime(str(t2), '%H%M%S.%f')
         return (t2-t1).seconds
 
-    def getTotalScanTime(self):
+    def getTotalScanTime_s(self):
         se = self.getListOfSeNums()
         se = [i for i in se if i < 1000]
         s1 = self.getDifferenceBetweenStartTimesOfTwoScans_s(min(se), max(se))
-        s2 = self.getTimeTakenForSeriesN(max(se))
+        s2 = self.getTimeTakenForSeriesN_s(max(se))
         return s1 + s2
 
     def findDicomSeries(self, descriptionStr):
@@ -297,7 +309,7 @@ class AbstractSubject(object):
         :param varName: from : EchoTime FlipAngle HeartRate
                                 InPlanePhaseEncodingDirection InternalPulseSequenceName PulseSequenceName
                                  RepetitionTime ScanDuration SeriesDescription
-                                 SeriesNumber SpacingBetweenSlices StartTime
+                                 SeriesNumber SpacingBetweenSlices AcquisitionTime
                                  dCol dRow dSlice dTime
                                  nCols nRow nSlice nTime
         :return:
@@ -792,8 +804,6 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
         newSubj.loadDicomsToSubject(dicomDir_orData, anonName=anonName, HIDE_PROGRESSBAR=QUIET)
     except TypeError:
         newSubj.loadSpydcmStudyToSubject(dicomDir_orData, anonName=anonName)
-    newSubj.buildDicomMeta()
-    newSubj.buildSeriesDataMetaCSV()
     #
     return newSubj
 
