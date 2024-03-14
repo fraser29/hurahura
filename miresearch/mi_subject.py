@@ -17,6 +17,7 @@ from zipfile import ZipFile
 import numpy as np
 import datetime
 import pandas as pd
+import shutil
 import logging
 ##
 from spydcmtk import spydcm
@@ -112,6 +113,13 @@ class AbstractSubject(object):
                 self._logger.addHandler(logging.StreamHandler())
         return self._logger
 
+    def _removeLogger(self):
+        for handler in self.logger.handlers[:]:  # Copy the list to avoid modification during iteration
+            self.logger.removeHandler(handler)
+        logger_name = self._logger.name
+        logging.getLogger().manager.loggerDict.pop(logger_name, None)
+        del self._logger
+        self._logger = None
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
@@ -201,10 +209,13 @@ class AbstractSubject(object):
         oldID = self.subjID
         self.logger.warning(f"Changing subjID from {oldID} to {newSubjID}")
         self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")
-        os.rename(self.getTopDir(), os.path.join(self.dataRoot, newSubjID))
+        newName = os.path.join(self.dataRoot, newSubjID)
+        if os.path.isdir(newName):
+            shutil.rmtree(newName)
+        os.rename(self.getTopDir(), newName)
         self.subjectPrefix = newSubjID
         self.subjN = None
-        self._logger = None
+        self._removeLogger()
         self.logger.warning(f"New logger after subjID changed from {oldID} to {self.subjID}")
         self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")        
         self.buildDicomMeta()
@@ -491,9 +502,9 @@ class AbstractSubject(object):
             try:
                 return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
             except:
-                return self.getMetaDict().get('PatientName', 'Name-Unknown')
+                return self.getTagValue('PatientName', 'Name-Unknown')
         else:
-            return self.getMetaDict().get('PatientName', 'Name-Unknown')
+            return self.getTagValue('PatientName', 'Name-Unknown')
 
     def getName_FirstNames(self):
         if self.isAnonymised():
