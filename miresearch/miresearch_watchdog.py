@@ -34,10 +34,14 @@ class MIResearch_WatchDog(object):
     def buildWorkingDirectories(self):
         processDir = os.path.join(self.directoryToWatch, 'MIResearch-PROCESSING')
         completeDir = os.path.join(self.directoryToWatch, 'MIResearch-COMPLETE')
-        os.makedirs(processDir)
-        os.makedirs(completeDir)
+        os.makedirs(processDir, exist_ok=True)
+        os.makedirs(completeDir, exist_ok=True)
         self.event_handler.processDir = processDir
         self.event_handler.completeDir = completeDir
+        # If storage dir not exist (but root directory does exist) then make
+        if not os.path.isdir(self.dataStorageRoot): 
+            if os.path.isdir(os.path.split(self.dataStorageRoot)[0]):
+                os.makedirs(self.dataStorageRoot)
 
     def run(self):    
         observer = Observer()

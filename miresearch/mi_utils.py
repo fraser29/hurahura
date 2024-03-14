@@ -3,6 +3,7 @@ import sys
 import argparse
 import base64
 import csv
+import datetime
 
 from miresearch.mi_config import MIResearch_config
 
@@ -263,6 +264,13 @@ def writeCsvFile(data, header, csvFile, FIX_NAN=False):
             csvWriter.writerow(iRow)
     return csvFile
 
+
+def timeToDatetime(timeStr):
+    try:
+        iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S.%f')
+    except ValueError:
+        iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S')
+    return iDatetime
 #==================================================================
 class SubjPrefixError(Exception):
     ''' SubjPrefixError

@@ -206,7 +206,9 @@ class AbstractSubject(object):
         self.subjN = None
         self._logger = None
         self.logger.warning(f"New logger after subjID changed from {oldID} to {self.subjID}")
-        self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")
+        self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")        
+        self.buildDicomMeta()
+        self.buildSeriesDataMetaCSV(FORCE=True)
 
     ### META STUFF -----------------------------------------------------------------------------------------------------
     def getSeriesMetaCSV(self):
@@ -250,14 +252,14 @@ class AbstractSubject(object):
 
     def findDicomSeries(self, descriptionStr, excludeStr=None):
         return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr, excludeStr=excludeStr)
-    
+
     def getStartTime_EndTimeOfExam(self):
         NN = self.getListOfSeNums()
         Ns = min(NN)
         Ne = max([i for i in NN if i < 99])
         df = self.getSeriesMetaAsDataFrame()
         t2 = self.getStartTimeForSeriesN_HHMMSS(Ne, df=df)
-        t2 = datetime.datetime.strptime(str(t2), '%H%M%S.%f')
+        t2 = mi_utils.timeToDatetime(str(t2))
         endT = t2 + datetime.timedelta(0, self.getTimeTakenForSeriesN_s(Ne, df=df))
         endT_HHMMSS = datetime.datetime.strftime(endT, '%H%M%S')
         return self.getStartTimeForSeriesN_HHMMSS(Ns), endT_HHMMSS
@@ -281,8 +283,8 @@ class AbstractSubject(object):
         df = self.getSeriesMetaAsDataFrame()
         t1 = self.getStartTimeForSeriesN_HHMMSS(seN1, df)
         t2 = self.getStartTimeForSeriesN_HHMMSS(seN2, df)
-        t1 = datetime.datetime.strptime(str(t1), '%H%M%S.%f')
-        t2 = datetime.datetime.strptime(str(t2), '%H%M%S.%f')
+        t1 = mi_utils.timeToDatetime(str(t1))
+        t2 = mi_utils.timeToDatetime(str(t2))
         return (t2-t1).seconds
 
     def getTotalScanTime_s(self):
@@ -457,13 +459,21 @@ class AbstractSubject(object):
         aa = '%5.2f'%(self.getAge())
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa], infoKeys + ['Age']
 
+    # ------------------------------------------------------------------------------------------
     def anonymise(self, anonName=None):
         if type(anonName) == str:
             if len(anonName) == 0:  
                 anonName = None # Still anonymise, but let program choose the new anonName
         self.logger.info('Anonymise in place')
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
+        self.setIsAnonymised()
         self.buildDicomMeta()
+
+    def setIsAnonymised(self):
+        self.updateMetaFile({"ANONYMISED": True})
+    
+    def isAnonymised(self):
+        return self.getTagValue("ANONYMISED", False)
 
     def setEncodedName(self, NAME, FIRST_NAMES=""):
         """
@@ -477,14 +487,26 @@ class AbstractSubject(object):
         self.updateMetaFile(dd)
 
     def getName(self):
-        try:
-            return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
-        except:
+        if self.isAnonymised():
+            try:
+                return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
+            except:
+                return self.getMetaDict().get('PatientName', 'Name-Unknown')
+        else:
             return self.getMetaDict().get('PatientName', 'Name-Unknown')
 
     def getName_FirstNames(self):
-        return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID), \
-               mi_utils.decodeString(self.getTagValue("FIRST_NAMES", "UNKNOWN"), self.subjID)
+        if self.isAnonymised():
+            return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID), \
+                mi_utils.decodeString(self.getTagValue("FIRST_NAMES", "UNKNOWN"), self.subjID)
+        else:
+            name = self.getName()
+            name = name.replace(" ","_")
+            name = name.replace("^","_")
+            while "__" in name:
+                name = name.replace("__","_")
+            return name
+
 
     # ------------------------------------------------------------------------------------------
     def getSummary_list(self):
