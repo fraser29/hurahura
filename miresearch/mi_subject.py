@@ -114,7 +114,7 @@ class AbstractSubject(object):
         return self._logger
 
     def _removeLogger(self):
-        for handler in self.logger.handlers[:]:  # Copy the list to avoid modification during iteration
+        for handler in self.logger.handlers[:]:  
             self.logger.removeHandler(handler)
         logger_name = self._logger.name
         logging.getLogger().manager.loggerDict.pop(logger_name, None)
