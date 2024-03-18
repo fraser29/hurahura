@@ -236,6 +236,34 @@ class TestArchiveSubject(unittest.TestCase):
     def tearDownClass(cls, OVERRIDE=False):
         if (not DEBUG) or OVERRIDE:
             shutil.rmtree(cls.tmpDir)
+                
+class TestRenameSubject(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestRename')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.subj1 = mi_subject.createNew_OrAddTo_Subject(P3, cls.tmpDir, subjPrefix='MIZ', anonName="SubjectNumber1", QUIET=True)[0]
+        cls.subj2 = mi_subject.createNew_OrAddTo_Subject(P4, cls.tmpDir, subjPrefix='MIZ', anonName="SubjectNumber2", QUIET=True)[0]
+
+    def test_SubjRename(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))
+        self.subj1.renameSubjID('Subject1')
+        self.subj2.renameSubjID('Subject2')
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'Subject2')))
+        # self.subjList = mi_subject.SubjectList.setByDirectory(self.tmpDir)
+        # print(self.subjList)
+        # self.assertEqual(len(self.subjList), 2, "Error subject list wrong size")
+        # sorted(self.subjList)
+
+
+
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
         
 
 # class TestMisc(unittest.TestCase):
