@@ -3,6 +3,7 @@ import sys
 import argparse
 import base64
 import csv
+import datetime
 
 from miresearch.mi_config import MIResearch_config
 
@@ -104,13 +105,13 @@ def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
 
     Args:
         listOfExtraSubfolders (list): A list of subfolders, if an entry is itself a list, 
-                                    then the first item of that entry is the toplevel subfolder 
-                                    and the following items are subfolders of that toplevel folder.
-                                    Default: empty list                                    
-                                    Note: A default structure is always used of:
-                                    | - META
-                                    | - RAW 
-                                         | - DICOM
+            then the first item of that entry is the toplevel subfolder 
+            and the following items are subfolders of that toplevel folder.
+            Default: empty list                                    
+            Note: A default structure is always used of:
+            | - META
+            | - RAW 
+                    | - DICOM
     """
     #  first remove any conflists with default list:
     DirectoryTree = _getDefautDirectoryStructureTree()
@@ -158,6 +159,7 @@ groupS.add_argument('-anonName', dest='anonName',
                     type=str, default=None)
     
 groupA = ParentAP.add_argument_group('Actions')
+# LOADING
 groupA.add_argument('-Load', dest='loadPath', 
                     help='Path to load dicoms from (file / directory / tar / tar.gz / zip)', 
                     type=str, default=None)
@@ -167,15 +169,25 @@ groupA.add_argument('-LOAD_MULTI', dest='LoadMulti',
 groupA.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
                     help='Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory', 
                     action='store_true')
-groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
-                    help='Will watch given directory for new data and load as new study', 
-                    type=str, default=None)
+
+# SUBJECT LEVEL
+groupA.add_argument('-RunPost', dest='subjRunPost', 
+                    help='Run post load pipeline', 
+                    action='store_true')
+groupA.add_argument('-SubjInfo', dest='subjInfo', 
+                    help='Print info for each subject', 
+                    action='store_true')
+
+# GROUP ACTIONS
 groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
                     type=str, default=None)
-groupA.add_argument('-RunPost', dest='RunPost', 
-                    help='Run post load pipeline', 
-                    action='store_true')
+
+# WATCH DIRECTORY
+groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
+                    help='Will watch given directory for new data and load as new study', 
+                    type=str, default=None)
+
 
 #==================================================================
 def setNList(args):
@@ -252,6 +264,13 @@ def writeCsvFile(data, header, csvFile, FIX_NAN=False):
             csvWriter.writerow(iRow)
     return csvFile
 
+
+def timeToDatetime(timeStr):
+    try:
+        iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S.%f')
+    except ValueError:
+        iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S')
+    return iDatetime
 #==================================================================
 class SubjPrefixError(Exception):
     ''' SubjPrefixError

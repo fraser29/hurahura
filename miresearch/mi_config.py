@@ -43,7 +43,10 @@ class _MIResearch_config():
         class_path = self.config.get("app", "class_path", fallback=None)
         if class_path:
             module_name, class_name = class_path.rsplit('.', 1)
-            module = importlib.import_module(module_name)
+            try:
+                module = importlib.import_module(module_name)
+            except ModuleNotFoundError as e:
+                raise ModuleNotFoundError(f"*** is {module_name} found in PYTHONPATH? ***") from e
             self.class_obj = getattr(module, class_name)
 
         ## All parameters: 

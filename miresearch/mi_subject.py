@@ -17,6 +17,7 @@ from zipfile import ZipFile
 import numpy as np
 import datetime
 import pandas as pd
+import shutil
 import logging
 ##
 from spydcmtk import spydcm
@@ -37,6 +38,8 @@ class AbstractSubject(object):
                         dataRoot, 
                         subjectPrefix=None,
                         DIRECTORY_STRUCTURE_TREE=mi_utils.buildDirectoryStructureTree()) -> None:
+        if (subjectNumber is None) and (subjectPrefix is None):
+            raise ValueError(f"Give subjectNumber (as int) or subjectPrefix as subjID")
         try:
             self.subjN = int(subjectNumber)
         except ValueError:
@@ -46,6 +49,8 @@ class AbstractSubject(object):
                     raise mi_utils.SubjPrefixError("Subject prefix passed does not match subjectID passed")
             else:
                 subjectPrefix = tSubjPrefix
+        except TypeError: # subjectNumber passed as None - so use subjectPrefix as subjID (already check subjectPrefix not None)
+            self.subjN = None
         self.dataRoot = dataRoot
         if subjectPrefix is None:
             self.subjectPrefix = guessSubjectPrefix(self.dataRoot)
@@ -108,6 +113,13 @@ class AbstractSubject(object):
                 self._logger.addHandler(logging.StreamHandler())
         return self._logger
 
+    def _removeLogger(self):
+        for handler in self.logger.handlers[:]:  
+            self.logger.removeHandler(handler)
+        logger_name = self._logger.name
+        logging.getLogger().manager.loggerDict.pop(logger_name, None)
+        del self._logger
+        self._logger = None
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
@@ -157,6 +169,8 @@ class AbstractSubject(object):
     def _finalLoadSteps(self, initNumDicoms, numDicomsToLoad):
         finalNumDicoms = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {initNumDicoms}, number to load: {numDicomsToLoad}, final number dicoms: {finalNumDicoms}")
+        self.buildDicomMeta()
+        self.buildSeriesDataMetaCSV(FORCE=True)
         self.runPostLoadPipeLine()
 
     def runPostLoadPipeLine(self, *args, **kwargs):
@@ -191,6 +205,22 @@ class AbstractSubject(object):
         dirName = self._getDir([mi_utils.RAW, mi_utils.DICOM])
         return dirName
     
+    def renameSubjID(self, newSubjID):
+        oldID = self.subjID
+        self.logger.warning(f"Changing subjID from {oldID} to {newSubjID}")
+        self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")
+        newName = os.path.join(self.dataRoot, newSubjID)
+        if os.path.isdir(newName):
+            shutil.rmtree(newName)
+        os.rename(self.getTopDir(), newName)
+        self.subjectPrefix = newSubjID
+        self.subjN = None
+        self._removeLogger()
+        self.logger.warning(f"New logger after subjID changed from {oldID} to {self.subjID}")
+        self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")        
+        self.buildDicomMeta()
+        self.buildSeriesDataMetaCSV(FORCE=True)
+
     ### META STUFF -----------------------------------------------------------------------------------------------------
     def getSeriesMetaCSV(self):
         return os.path.join(self.getMetaDir(), 'ScanSeriesInfo.csv')
@@ -205,10 +235,19 @@ class AbstractSubject(object):
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             for dcmSE in dcmStudy:
-                seInfoList.append(dcmSE.getSeriesInfoDict())
+                seInfoList.append(dcmSE.getSeriesInfoDict(["SeriesNumber", 
+                                                            "SeriesDescription", 
+                                                            "StudyDate", 
+                                                            "AcquisitionTime",
+                                                            "InPlanePhaseEncodingDirection", 
+                                                            "PixelBandwidth"]))
         df = pd.DataFrame(data=seInfoList)
         df.to_csv(self.getSeriesMetaCSV())
         self.logger.info('buildSeriesDataMetaCSV')
+
+    def info(self):
+        # Print info for this subject
+        print(f"{self.subjID}: {self.getName()} scanned on {self.getStudyDate()}")
 
     def printDicomsInfo(self):
         dicomFolderList = self.getDicomFoldersListStr(False)
@@ -224,14 +263,19 @@ class AbstractSubject(object):
 
     def findDicomSeries(self, descriptionStr, excludeStr=None):
         return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr, excludeStr=excludeStr)
-    
+
     def getStartTime_EndTimeOfExam(self):
         NN = self.getListOfSeNums()
         Ns = min(NN)
         Ne = max([i for i in NN if i < 99])
-        return self.getStartTimeForSeriesN_HHMMSS(Ns), self.getStartTimeForSeriesN_HHMMSS(Ne)
+        df = self.getSeriesMetaAsDataFrame()
+        t2 = self.getStartTimeForSeriesN_HHMMSS(Ne, df=df)
+        t2 = mi_utils.timeToDatetime(str(t2))
+        endT = t2 + datetime.timedelta(0, self.getTimeTakenForSeriesN_s(Ne, df=df))
+        endT_HHMMSS = datetime.datetime.strftime(endT, '%H%M%S')
+        return self.getStartTimeForSeriesN_HHMMSS(Ns), endT_HHMMSS
 
-    def getTimeTakenForSeriesN(self, N, df=None):
+    def getTimeTakenForSeriesN_s(self, N, df=None):
         if df is None:
             df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'ScanDuration'])[0]
@@ -244,21 +288,21 @@ class AbstractSubject(object):
     def getStartTimeForSeriesN_HHMMSS(self, N, df=None):
         if df is None:
             df = self.getSeriesMetaAsDataFrame()
-        return list(df.loc[df['SeriesNumber']==N,'StartTime'])[0]
+        return list(df.loc[df['SeriesNumber']==N,'AcquisitionTime'])[0]
 
     def getDifferenceBetweenStartTimesOfTwoScans_s(self, seN1, seN2):
         df = self.getSeriesMetaAsDataFrame()
         t1 = self.getStartTimeForSeriesN_HHMMSS(seN1, df)
         t2 = self.getStartTimeForSeriesN_HHMMSS(seN2, df)
-        t1 = datetime.datetime.strptime(str(t1), '%H%M%S.%f')
-        t2 = datetime.datetime.strptime(str(t2), '%H%M%S.%f')
+        t1 = mi_utils.timeToDatetime(str(t1))
+        t2 = mi_utils.timeToDatetime(str(t2))
         return (t2-t1).seconds
 
-    def getTotalScanTime(self):
+    def getTotalScanTime_s(self):
         se = self.getListOfSeNums()
         se = [i for i in se if i < 1000]
         s1 = self.getDifferenceBetweenStartTimesOfTwoScans_s(min(se), max(se))
-        s2 = self.getTimeTakenForSeriesN(max(se))
+        s2 = self.getTimeTakenForSeriesN_s(max(se))
         return s1 + s2
 
     def findDicomSeries(self, descriptionStr):
@@ -273,15 +317,19 @@ class AbstractSubject(object):
         return dOut
 
     def getSeriesMetaValue(self, seNum, varName):
-        """
-        :param seNum:
-        :param varName: from : EchoTime FlipAngle HeartRate
-                                InPlanePhaseEncodingDirection InternalPulseSequenceName PulseSequenceName
-                                 RepetitionTime ScanDuration SeriesDescription
-                                 SeriesNumber SpacingBetweenSlices StartTime
-                                 dCol dRow dSlice dTime
-                                 nCols nRow nSlice nTime
-        :return:
+        """Get meta value for given series naumber
+
+        Args:
+            seNum (int): series number
+            varName (str): tag name, from: EchoTime FlipAngle HeartRate
+                InPlanePhaseEncodingDirection InternalPulseSequenceName PulseSequenceName
+                RepetitionTime ScanDuration SeriesDescription
+                SeriesNumber SpacingBetweenSlices StartTime
+                dCol dRow dSlice dTime
+                nCols nRow nSlice nTime
+
+        Returns:
+            ANY: tag value
         """
         df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber'] == seNum, varName])[0]
@@ -296,6 +344,14 @@ class AbstractSubject(object):
         return self.getMetaDict().get(tagName, ifNotFound)
 
     def getMetaDict(self, suffix=""):
+        """Get meta json file as dictionary
+
+        Args:
+            suffix (str, optional): Suffix of json file. Defaults to "".
+
+        Returns:
+            dict: Meta json file 
+        """
         ff = self.getMetaTagsFile(suffix)
         dd = {}
         if os.path.isfile(ff):
@@ -303,6 +359,19 @@ class AbstractSubject(object):
         return dd
 
     def getMetaTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
+        """Get specific tag from meta json file
+
+        Args:
+            tag (str): Name of tag to return
+            NOT_FOUND (ANY, optional): A default value to return if "tag" not found. Defaults to None.
+            metaSuffix (str, optional): Suffix of json file. Defaults to "".
+
+        Raises:
+            e: OSError if meta json file not found
+
+        Returns:
+            ANY: tag value from json file
+        """
         try:
             return self.getMetaDict(metaSuffix).get(tag, NOT_FOUND)
         except OSError as e:
@@ -312,6 +381,12 @@ class AbstractSubject(object):
                 raise e
 
     def updateMetaFile(self, metaDict, metasuffix=""):
+        """Update the meta json file
+
+        Args:
+            metaDict (dict): dictionary with key value pairs to update
+            metasuffix (str, optional): Suffix of json file. Defaults to "".
+        """
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
         spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
@@ -426,13 +501,21 @@ class AbstractSubject(object):
         aa = '%5.2f'%(self.getAge())
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa], infoKeys + ['Age']
 
+    # ------------------------------------------------------------------------------------------
     def anonymise(self, anonName=None):
         if type(anonName) == str:
             if len(anonName) == 0:  
                 anonName = None # Still anonymise, but let program choose the new anonName
         self.logger.info('Anonymise in place')
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
+        self.setIsAnonymised()
         self.buildDicomMeta()
+
+    def setIsAnonymised(self):
+        self.updateMetaFile({"ANONYMISED": True})
+    
+    def isAnonymised(self):
+        return self.getTagValue("ANONYMISED", False)
 
     def setEncodedName(self, NAME, FIRST_NAMES=""):
         """
@@ -446,14 +529,26 @@ class AbstractSubject(object):
         self.updateMetaFile(dd)
 
     def getName(self):
-        try:
-            return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
-        except:
-            return self.getMetaDict().get('PatientName', 'Name-Unknown')
+        if self.isAnonymised():
+            try:
+                return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
+            except:
+                return self.getTagValue('PatientName', 'Name-Unknown')
+        else:
+            return self.getTagValue('PatientName', 'Name-Unknown')
 
     def getName_FirstNames(self):
-        return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID), \
-               mi_utils.decodeString(self.getTagValue("FIRST_NAMES", "UNKNOWN"), self.subjID)
+        if self.isAnonymised():
+            return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID), \
+                mi_utils.decodeString(self.getTagValue("FIRST_NAMES", "UNKNOWN"), self.subjID)
+        else:
+            name = self.getName()
+            name = name.replace(" ","_")
+            name = name.replace("^","_")
+            while "__" in name:
+                name = name.replace("__","_")
+            return name
+
 
     # ------------------------------------------------------------------------------------------
     def getSummary_list(self):
@@ -731,6 +826,8 @@ def guessSubjectPrefix(dataRootDir):
 ###  Helper functions for building new or adding to subjects
 ### ====================================================================================================================
 def buildSubjectID(subjN, subjectPrefix):
+    if subjN is None:
+        return subjectPrefix
     return f"{subjectPrefix}{subjN:06d}"
 
 def getNextSubjN(dataRootDir, subjectPrefix=None):
@@ -766,14 +863,11 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
         subjNumber = _subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
         newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
     newSubj.QUIET = QUIET
-    newSubj.initDirectoryStructure()
     try:
         os.path.isdir(dicomDir_orData)
         newSubj.loadDicomsToSubject(dicomDir_orData, anonName=anonName, HIDE_PROGRESSBAR=QUIET)
     except TypeError:
         newSubj.loadSpydcmStudyToSubject(dicomDir_orData, anonName=anonName)
-    newSubj.buildDicomMeta()
-    newSubj.buildSeriesDataMetaCSV()
     #
     return newSubj
 
@@ -784,7 +878,7 @@ def _createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSub
     elif compressedFile.endswith('tar') or compressedFile.endswith('tar.gz'):
         listOfSubjects = spydcm.dcmTK.ListOfDicomStudies.setFromTar(compressedFile, HIDE_PROGRESSBAR=QUIET)
     else: 
-        raise ValueError("Currently only upporting .zip, .tar and .tar.gz compressed files")
+        raise ValueError("Currently only supporting .zip, .tar and .tar.gz compressed files")
     if len(listOfSubjects) > 1:
         if subjNumber is not None:
             raise ValueError(f"More than one study in {compressedFile} - can not supply subjNumber")

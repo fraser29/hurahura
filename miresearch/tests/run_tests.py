@@ -78,6 +78,62 @@ class TestSubject2(unittest.TestCase):
             shutil.rmtree(cls.tmpDir)
 
 
+class TestSubject3(unittest.TestCase): # No number in ID
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj3')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MySpecialID', QUIET=True)[0]
+        cls.newSubj.renameSubjID("MySpecialID")
+        cls.newSubj.anonymise()
+
+    def test_newSubj(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MySpecialID')))
+        self.assertEqual(self.newSubj.countNumberOfDicoms(), 2, msg="Incorrect number of dicoms")
+
+        newSubjObj2 = mi_subject.AbstractSubject(subjectNumber=None, dataRoot=self.tmpDir, subjectPrefix="MySpecialID")
+
+        pWeight = int(newSubjObj2.getTagValue('PatientWeight'))
+        self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
+        self.assertEqual(newSubjObj2.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
+class TestSubject4(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj4')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MI4', QUIET=True)[0]
+        cls.newSubj.anonymise()
+
+    def test_newSubj(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI4000001')))
+        tStart, tEnd = self.newSubj.getStartTime_EndTimeOfExam()
+        tTotal = self.newSubj.getTotalScanTime_s()
+        self.assertEqual(tStart, 94627.4875)
+        self.assertEqual(tEnd, '094627')
+        self.assertEqual(tTotal, 0.0)
+        self.assertEqual(self.newSubj.countNumberOfDicoms(), 2, msg="Incorrect number of dicoms")
+
+        pWeight = int(self.newSubj.getTagValue('PatientWeight'))
+        self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
+        self.assertEqual(self.newSubj.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
 class TestSubjects(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -176,6 +232,34 @@ class TestArchiveSubject(unittest.TestCase):
         self.subj.zipUpSubject(os.path.join(self.tmpDir, 'ZIP'), EXCLUDE_RAW=False)
         self.subj.zipUpSubject(os.path.join(self.tmpDir, 'ZIP-onheRaw'), EXCLUDE_RAW=True)
     
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+                
+class TestRenameSubject(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'tmpTestRename')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.subj1 = mi_subject.createNew_OrAddTo_Subject(P3, cls.tmpDir, subjPrefix='MIZ', anonName="SubjectNumber1", QUIET=True)[0]
+        cls.subj2 = mi_subject.createNew_OrAddTo_Subject(P4, cls.tmpDir, subjPrefix='MIZ', anonName="SubjectNumber2", QUIET=True)[0]
+
+    def test_SubjRename(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))
+        self.subj1.renameSubjID('Subject1')
+        self.subj2.renameSubjID('Subject2')
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'Subject2')))
+        # self.subjList = mi_subject.SubjectList.setByDirectory(self.tmpDir)
+        # print(self.subjList)
+        # self.assertEqual(len(self.subjList), 2, "Error subject list wrong size")
+        # sorted(self.subjList)
+
+
+
+
     @classmethod
     def tearDownClass(cls, OVERRIDE=False):
         if (not DEBUG) or OVERRIDE:

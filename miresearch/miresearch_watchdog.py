@@ -34,10 +34,14 @@ class MIResearch_WatchDog(object):
     def buildWorkingDirectories(self):
         processDir = os.path.join(self.directoryToWatch, 'MIResearch-PROCESSING')
         completeDir = os.path.join(self.directoryToWatch, 'MIResearch-COMPLETE')
-        os.makedirs(processDir)
-        os.makedirs(completeDir)
+        os.makedirs(processDir, exist_ok=True)
+        os.makedirs(completeDir, exist_ok=True)
         self.event_handler.processDir = processDir
         self.event_handler.completeDir = completeDir
+        # If storage dir not exist (but root directory does exist) then make
+        if not os.path.isdir(self.dataStorageRoot): 
+            if os.path.isdir(os.path.split(self.dataStorageRoot)[0]):
+                os.makedirs(self.dataStorageRoot)
 
     def run(self):    
         observer = Observer()
@@ -106,6 +110,16 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             pass
 
     def is_stable(self, directory_path):
+        """Check if this new directory is stable (no change in modified time)
+        and is not already being processed - if hit timeout and still being processed then
+        throw erro as something went wrong and will go wrong again. 
+
+        Args:
+            directory_path (str): the directory to check for stability
+
+        Returns:
+            bool: True if stable AND not already being processed. 
+        """
         start_time = time.time()
         stable_start_time = None
 
@@ -113,16 +127,23 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             current_time = time.time()
             # Check if the timeout has been reached
             if (current_time - start_time) > (self.pollTimeOut): # TODO do i want this???
-                print(f"Timeout reached ({self.pollTimeOut} seconds). Returning True.")
-                return True
+                if os.path.isdir(os.path.join(self.processDir, os.path.split(directory_path)[1])):
+                    print(f"Timeout reached ({self.pollTimeOut} seconds). Raising error as exists in {self.processDir}.")
+                    raise MIResearchWatchDogError(f"Trying to process {directory_path}\nBut already being processed and timeout reached")
+                else:
+                    return True
             if stable_start_time is None:
                 # Initialize stable_start_time on the first iteration
                 stable_start_time = current_time
             modified_time = get_directory_modified_time(directory_path)
             if modified_time > stable_start_time: stable_start_time = modified_time
             if current_time - stable_start_time >= self.pollStable:
-                print(f"Directory has remained stable for {self.pollStable} seconds.")
-                return True
+                # Now check if being processed
+                if os.path.isdir(os.path.join(self.processDir, os.path.split(directory_path)[1])):
+                    print(f"Directory stable but exists in {self.processDir}. Will wait.")    
+                else:
+                    print(f"Directory has remained stable for {self.pollStable} seconds.")
+                    return True
             time.sleep(self.pollDelay)
         return False
 
@@ -142,7 +163,17 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         if self.TO_ANONYMISE:
             for iNewSubj in newSubjList:
                 iNewSubj.anonymise()
+        finalCompleteDir = os.path.join(self.completeDir, os.path.split(directoryToLoad_process)[1])
+        if os.path.isdir(finalCompleteDir):
+            print(f"{finalCompleteDir} exists - will delete befor moving {directoryToLoad_process}")
+            shutil.rmtree(finalCompleteDir)
         shutil.move(directoryToLoad_process, self.completeDir)
 
 
 ### ====================================================================================================================
+class MIResearchWatchDogError(Exception):
+    """A custom error class."""
+
+    def __init__(self, message="An error occurred"):
+        super().__init__(message)
+        self.message = message
