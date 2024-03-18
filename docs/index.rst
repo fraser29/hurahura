@@ -12,7 +12,7 @@ MIResearch is a python library for organising Medical Imaging Research projects.
    :maxdepth: 2
    :caption: Contents:
 
-   overview
+   introduction
 
    modules
 
