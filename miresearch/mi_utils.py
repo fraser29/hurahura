@@ -105,13 +105,13 @@ def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
 
     Args:
         listOfExtraSubfolders (list): A list of subfolders, if an entry is itself a list, 
-                                    then the first item of that entry is the toplevel subfolder 
-                                    and the following items are subfolders of that toplevel folder.
-                                    Default: empty list                                    
-                                    Note: A default structure is always used of:
-                                    | - META
-                                    | - RAW 
-                                         | - DICOM
+            then the first item of that entry is the toplevel subfolder 
+            and the following items are subfolders of that toplevel folder.
+            Default: empty list                                    
+            Note: A default structure is always used of:
+            | - META
+            | - RAW 
+                    | - DICOM
     """
     #  first remove any conflists with default list:
     DirectoryTree = _getDefautDirectoryStructureTree()

@@ -317,15 +317,19 @@ class AbstractSubject(object):
         return dOut
 
     def getSeriesMetaValue(self, seNum, varName):
-        """
-        :param seNum:
-        :param varName: from : EchoTime FlipAngle HeartRate
-                                InPlanePhaseEncodingDirection InternalPulseSequenceName PulseSequenceName
-                                 RepetitionTime ScanDuration SeriesDescription
-                                 SeriesNumber SpacingBetweenSlices AcquisitionTime
-                                 dCol dRow dSlice dTime
-                                 nCols nRow nSlice nTime
-        :return:
+        """Get meta value for given series naumber
+
+        Args:
+            seNum (int): series number
+            varName (str): tag name, from: EchoTime FlipAngle HeartRate
+                InPlanePhaseEncodingDirection InternalPulseSequenceName PulseSequenceName
+                RepetitionTime ScanDuration SeriesDescription
+                SeriesNumber SpacingBetweenSlices StartTime
+                dCol dRow dSlice dTime
+                nCols nRow nSlice nTime
+
+        Returns:
+            ANY: tag value
         """
         df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber'] == seNum, varName])[0]
@@ -340,6 +344,14 @@ class AbstractSubject(object):
         return self.getMetaDict().get(tagName, ifNotFound)
 
     def getMetaDict(self, suffix=""):
+        """Get meta json file as dictionary
+
+        Args:
+            suffix (str, optional): Suffix of json file. Defaults to "".
+
+        Returns:
+            dict: Meta json file 
+        """
         ff = self.getMetaTagsFile(suffix)
         dd = {}
         if os.path.isfile(ff):
@@ -347,6 +359,19 @@ class AbstractSubject(object):
         return dd
 
     def getMetaTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
+        """Get specific tag from meta json file
+
+        Args:
+            tag (str): Name of tag to return
+            NOT_FOUND (ANY, optional): A default value to return if "tag" not found. Defaults to None.
+            metaSuffix (str, optional): Suffix of json file. Defaults to "".
+
+        Raises:
+            e: OSError if meta json file not found
+
+        Returns:
+            ANY: tag value from json file
+        """
         try:
             return self.getMetaDict(metaSuffix).get(tag, NOT_FOUND)
         except OSError as e:
@@ -356,6 +381,12 @@ class AbstractSubject(object):
                 raise e
 
     def updateMetaFile(self, metaDict, metasuffix=""):
+        """Update the meta json file
+
+        Args:
+            metaDict (dict): dictionary with key value pairs to update
+            metasuffix (str, optional): Suffix of json file. Defaults to "".
+        """
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
         spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)

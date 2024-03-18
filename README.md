@@ -26,23 +26,45 @@ This package may be easily adapted and expanded upon for a high level control ov
 - *DIRECTORY_STRUCTURE_TREE* : DirectoryStructureTree class to define directory structure for each subject directory (see wiki for construction shortcuts)
     - Optional: Defaults to **RAW** and **META** directories. 
 
-This is the basic parent class containing fundamental methods for organisation and management. See [wiki](https://github.com/fraser29/miresearch/wiki) for advanced usage, epsecially via inheritance and polymorphism. 
+This is the basic parent class containing fundamental methods for organisation and management. See  [miresearch docs](https://fraser29.github.io/miresearch/) for advanced usage, epsecially via inheritance and polymorphism. 
 
 # Exposed commandline tool: miresearch
 
 ```bash
 
 miresearch -h
-usage:  ... 
+usage: miresearch [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-anonName ANONNAME]
+                  [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SummaryCSV SUMMARYCSV] [-WatchDirectory WATCHDIRECTORY]
+
+options:
+  -h, --help            show this help message and exit
+
+Management Parameters:
+  -config CONFIGFILE    Path to configuration file to use.
+  -FORCE                force action - use with caution
+  -QUIET                Suppress progress bars and logging to terminal
+  -INFO                 Provide setup (configuration) info and exit.
+  -DEBUG                Run in DEBUG mode (save intermediate steps, increase log output)
+
+Subject Definition:
+  -s [SUBJNLIST ...]    Subject number
+  -sf SUBJNLISTFILE     Subject numbers in file
+  -sR SUBJRANGE SUBJRANGE
+                        Subject range
+  -y DATAROOT           Path of root data directory (where subjects are stored) [default None -> may be set in config file]
+  -sPrefix SUBJPREFIX   Subject prefix [default None -> will get from config file OR dataRoot]
+  -anonName ANONNAME    Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]
 
 Actions:
   -Load LOADPATH        Path to load dicoms from (file / directory / tar / tar.gz / zip)
   -LOAD_MULTI           Combine with "Load": Load new subject for each subdirectory under loadPath
   -LOAD_MULTI_FORCE     Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory
-  -WatchDirectory WATCHDIRECTORY
-                        Will watch given directory for new data and load as new study
+  -RunPost              Run post load pipeline
+  -SubjInfo             Print info for each subject
   -SummaryCSV SUMMARYCSV
                         Write summary CSV file (give output file name)
+  -WatchDirectory WATCHDIRECTORY
+                        Will watch given directory for new data and load as new study
 
 ```
 
@@ -66,4 +88,4 @@ For information on files found and variables used run:
 
 # Documentation
 
-For full documentation see [read-the-docs](https://miresearch.readthedocs.io/en/latest/#)
+For full documentation see [miresearch docs](https://fraser29.github.io/miresearch/)
