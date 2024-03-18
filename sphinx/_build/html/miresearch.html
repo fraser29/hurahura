@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>miresearch package &#8212; MIResearch 0.0.13 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=f72dd004" />
+    <script src="_static/documentation_options.js?v=9fc46840"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="miresearch" href="modules.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="miresearch"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MIResearch 0.0.13 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">miresearch</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">miresearch package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="miresearch-package">
+<h1>miresearch package<a class="headerlink" href="#miresearch-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-miresearch.mi_config">
+<span id="miresearch-mi-config-module"></span><h2>miresearch.mi_config module<a class="headerlink" href="#module-miresearch.mi_config" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-miresearch.mi_subject">
+<span id="miresearch-mi-subject-module"></span><h2>miresearch.mi_subject module<a class="headerlink" href="#module-miresearch.mi_subject" title="Link to this heading">¶</a></h2>
+<p>Created on Thu Apr 26 10:59:36 2018</p>
+<p>&#64;author: Fraser M Callaghan</p>
+<p>Classes for building standardised imaging projects. 
+Adapted for general use from KMR project.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">AbstractSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">subjectNumber,</span> <span class="pre">dataRoot,</span> <span class="pre">subjectPrefix=None,</span> <span class="pre">DIRECTORY_STRUCTURE_TREE=[&lt;miresearch.mi_utils.DirectoryStructure</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;miresearch.mi_utils.DirectoryStructure</span> <span class="pre">object&gt;]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An abstract subject controlling most basic structure</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.anonymise">
+<span class="sig-name descname"><span class="pre">anonymise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anonName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.anonymise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.anonymise" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.askUserForDicomSeriesNumber">
+<span class="sig-name descname"><span class="pre">askUserForDicomSeriesNumber</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.askUserForDicomSeriesNumber"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.askUserForDicomSeriesNumber" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.buildDicomMeta">
+<span class="sig-name descname"><span class="pre">buildDicomMeta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.buildDicomMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.buildDicomMeta" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.buildSeriesDataMetaCSV">
+<span class="sig-name descname"><span class="pre">buildSeriesDataMetaCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FORCE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.buildSeriesDataMetaCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.buildSeriesDataMetaCSV" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.countNumberOfDicoms">
+<span class="sig-name descname"><span class="pre">countNumberOfDicoms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.countNumberOfDicoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.countNumberOfDicoms" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.exists" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.findDicomSeries">
+<span class="sig-name descname"><span class="pre">findDicomSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptionStr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.findDicomSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.findDicomSeries" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getAge">
+<span class="sig-name descname"><span class="pre">getAge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getAge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getAge" title="Link to this definition">¶</a></dt>
+<dd><p>This returns a float, and is slightly wrong in account of leap years.
+This is intentional.
+:return: years - float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getDicomFile">
+<span class="sig-name descname"><span class="pre">getDicomFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seriesNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instanceNum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getDicomFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getDicomFile" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getDicomFoldersListStr">
+<span class="sig-name descname"><span class="pre">getDicomFoldersListStr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FULL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludeSeNums</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getDicomFoldersListStr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getDicomFoldersListStr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getDicomSeriesDir">
+<span class="sig-name descname"><span class="pre">getDicomSeriesDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seriesNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seriesUID</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getDicomSeriesDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getDicomSeriesDir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getDicomSeriesDir_Description">
+<span class="sig-name descname"><span class="pre">getDicomSeriesDir_Description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seriesDescription</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getDicomSeriesDir_Description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getDicomSeriesDir_Description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getDicomsDir">
+<span class="sig-name descname"><span class="pre">getDicomsDir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getDicomsDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getDicomsDir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getDifferenceBetweenStartTimesOfTwoScans_s">
+<span class="sig-name descname"><span class="pre">getDifferenceBetweenStartTimesOfTwoScans_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seN1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seN2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getDifferenceBetweenStartTimesOfTwoScans_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getDifferenceBetweenStartTimesOfTwoScans_s" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getGender">
+<span class="sig-name descname"><span class="pre">getGender</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getGender"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getGender" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getHRForSeriesN">
+<span class="sig-name descname"><span class="pre">getHRForSeriesN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getHRForSeriesN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getHRForSeriesN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getInfoStr">
+<span class="sig-name descname"><span class="pre">getInfoStr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extraKeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getInfoStr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getInfoStr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getListOfSeNums">
+<span class="sig-name descname"><span class="pre">getListOfSeNums</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getListOfSeNums"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getListOfSeNums" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getMetaDict">
+<span class="sig-name descname"><span class="pre">getMetaDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getMetaDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getMetaDict" title="Link to this definition">¶</a></dt>
+<dd><p>Get meta json file as dictionary</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>suffix (str, optional): Suffix of json file. Defaults to “”.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Meta json file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getMetaDir">
+<span class="sig-name descname"><span class="pre">getMetaDir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getMetaDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getMetaDir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getMetaTagValue">
+<span class="sig-name descname"><span class="pre">getMetaTagValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NOT_FOUND</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metaSuffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getMetaTagValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getMetaTagValue" title="Link to this definition">¶</a></dt>
+<dd><p>Get specific tag from meta json file</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tag (str): Name of tag to return
+NOT_FOUND (ANY, optional): A default value to return if “tag” not found. Defaults to None.
+metaSuffix (str, optional): Suffix of json file. Defaults to “”.</p>
+</dd>
+<dt>Raises:</dt><dd><p>e: OSError if meta json file not found</p>
+</dd>
+<dt>Returns:</dt><dd><p>ANY: tag value from json file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getMetaTagsFile">
+<span class="sig-name descname"><span class="pre">getMetaTagsFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getMetaTagsFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getMetaTagsFile" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getName">
+<span class="sig-name descname"><span class="pre">getName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getName_FirstNames">
+<span class="sig-name descname"><span class="pre">getName_FirstNames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getName_FirstNames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getName_FirstNames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getPrefix_Number">
+<span class="sig-name descname"><span class="pre">getPrefix_Number</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getPrefix_Number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getPrefix_Number" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getRawDir">
+<span class="sig-name descname"><span class="pre">getRawDir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getRawDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getRawDir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getSeriesDescriptionsStr">
+<span class="sig-name descname"><span class="pre">getSeriesDescriptionsStr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getSeriesDescriptionsStr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getSeriesDescriptionsStr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getSeriesMetaAsDataFrame">
+<span class="sig-name descname"><span class="pre">getSeriesMetaAsDataFrame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getSeriesMetaAsDataFrame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getSeriesMetaAsDataFrame" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getSeriesMetaCSV">
+<span class="sig-name descname"><span class="pre">getSeriesMetaCSV</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getSeriesMetaCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getSeriesMetaCSV" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getSeriesMetaValue">
+<span class="sig-name descname"><span class="pre">getSeriesMetaValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">varName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getSeriesMetaValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getSeriesMetaValue" title="Link to this definition">¶</a></dt>
+<dd><p>Get meta value for given series naumber</p>
+<dl>
+<dt>Args:</dt><dd><p>seNum (int): series number
+varName (str): tag name, from: EchoTime FlipAngle HeartRate</p>
+<blockquote>
+<div><p>InPlanePhaseEncodingDirection InternalPulseSequenceName PulseSequenceName
+RepetitionTime ScanDuration SeriesDescription
+SeriesNumber SpacingBetweenSlices StartTime
+dCol dRow dSlice dTime
+nCols nRow nSlice nTime</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>ANY: tag value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getSeriesNumbersMatchingDescriptionStr">
+<span class="sig-name descname"><span class="pre">getSeriesNumbersMatchingDescriptionStr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptionStr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getSeriesNumbersMatchingDescriptionStr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getSeriesNumbersMatchingDescriptionStr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getSpydcmDicomStudy">
+<span class="sig-name descname"><span class="pre">getSpydcmDicomStudy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getSpydcmDicomStudy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getSpydcmDicomStudy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getStartTimeForSeriesN_HHMMSS">
+<span class="sig-name descname"><span class="pre">getStartTimeForSeriesN_HHMMSS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getStartTimeForSeriesN_HHMMSS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getStartTimeForSeriesN_HHMMSS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getStartTime_EndTimeOfExam">
+<span class="sig-name descname"><span class="pre">getStartTime_EndTimeOfExam</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getStartTime_EndTimeOfExam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getStartTime_EndTimeOfExam" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getStudyDate">
+<span class="sig-name descname"><span class="pre">getStudyDate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">RETURN_Datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getStudyDate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getStudyDate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getStudyID">
+<span class="sig-name descname"><span class="pre">getStudyID</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getStudyID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getStudyID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getSummary_list">
+<span class="sig-name descname"><span class="pre">getSummary_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getSummary_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getSummary_list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getTagValue">
+<span class="sig-name descname"><span class="pre">getTagValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tagName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ifNotFound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getTagValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getTagValue" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getTimeTakenForSeriesN_s">
+<span class="sig-name descname"><span class="pre">getTimeTakenForSeriesN_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getTimeTakenForSeriesN_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getTimeTakenForSeriesN_s" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getTopDir">
+<span class="sig-name descname"><span class="pre">getTopDir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getTopDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getTopDir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.getTotalScanTime_s">
+<span class="sig-name descname"><span class="pre">getTotalScanTime_s</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.getTotalScanTime_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.getTotalScanTime_s" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.info" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.initDirectoryStructure">
+<span class="sig-name descname"><span class="pre">initDirectoryStructure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.initDirectoryStructure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.initDirectoryStructure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.isAnonymised">
+<span class="sig-name descname"><span class="pre">isAnonymised</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.isAnonymised"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.isAnonymised" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.isMale">
+<span class="sig-name descname"><span class="pre">isMale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.isMale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.isMale" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.loadDicomsToSubject">
+<span class="sig-name descname"><span class="pre">loadDicomsToSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dicomFolderToLoad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anonName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HIDE_PROGRESSBAR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.loadDicomsToSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.loadDicomsToSubject" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.loadSpydcmStudyToSubject">
+<span class="sig-name descname"><span class="pre">loadSpydcmStudyToSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spydcmData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anonName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HIDE_PROGRESSBAR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.loadSpydcmStudyToSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.loadSpydcmStudyToSubject" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.logger">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.printDicomsInfo">
+<span class="sig-name descname"><span class="pre">printDicomsInfo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.printDicomsInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.printDicomsInfo" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.renameSubjID">
+<span class="sig-name descname"><span class="pre">renameSubjID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newSubjID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.renameSubjID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.renameSubjID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.runPostLoadPipeLine">
+<span class="sig-name descname"><span class="pre">runPostLoadPipeLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.runPostLoadPipeLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.runPostLoadPipeLine" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.setEncodedName">
+<span class="sig-name descname"><span class="pre">setEncodedName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">NAME</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FIRST_NAMES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.setEncodedName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.setEncodedName" title="Link to this definition">¶</a></dt>
+<dd><p>funct to add name after (will encode)
+:param NAME:
+:param FIRST_NAMES:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.setIsAnonymised">
+<span class="sig-name descname"><span class="pre">setIsAnonymised</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.setIsAnonymised"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.setIsAnonymised" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.setTagValue">
+<span class="sig-name descname"><span class="pre">setTagValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.setTagValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.setTagValue" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.subjID">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subjID</span></span><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.subjID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.updateMetaFile">
+<span class="sig-name descname"><span class="pre">updateMetaFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metaDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metasuffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.updateMetaFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.updateMetaFile" title="Link to this definition">¶</a></dt>
+<dd><p>Update the meta json file</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>metaDict (dict): dictionary with key value pairs to update
+metasuffix (str, optional): Suffix of json file. Defaults to “”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.AbstractSubject.zipUpSubject">
+<span class="sig-name descname"><span class="pre">zipUpSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputDirectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EXCLUDE_RAW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#AbstractSubject.zipUpSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.AbstractSubject.zipUpSubject" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">SubjectList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>Container for a list of subjects</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.filterSubjectListByDOS">
+<span class="sig-name descname"><span class="pre">filterSubjectListByDOS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dateOfScan_YYYYMMDD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateEnd_YYYYMMDD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.filterSubjectListByDOS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.filterSubjectListByDOS" title="Link to this definition">¶</a></dt>
+<dd><p>Take list, return only those that match DOS or between start and end (inclusive) if dateEnd given
+:param subjList:
+:param dateOfScan_YYYYMMDD: str
+:param dateEnd_YYYYMMDD: str - optional 
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.findSubjMatchingName">
+<span class="sig-name descname"><span class="pre">findSubjMatchingName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nameStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateOfScan_YYYYMMDD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decodePassword</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.findSubjMatchingName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.findSubjMatchingName" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nameStr</strong> – </p></li>
+<li><p><strong>dateOfScan_YYYYMMDD</strong> – if given will use to filter list matching name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>SubjectList</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.findSubjMatchingPatientID">
+<span class="sig-name descname"><span class="pre">findSubjMatchingPatientID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patientID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateOfScan_YYYYMMDD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.findSubjMatchingPatientID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.findSubjMatchingPatientID" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>patientID</strong> – </p></li>
+<li><p><strong>dateOfScan_YYYY_MM_DD</strong> – list of ints for DOS to fix ambiguity</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>SubjectList</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.findSubjMatchingStudyID">
+<span class="sig-name descname"><span class="pre">findSubjMatchingStudyID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">studyID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.findSubjMatchingStudyID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.findSubjMatchingStudyID" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>examID</strong><strong>)</strong> (<em>studyID</em><em> (</em><em>or</em>) – int</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>mi_subject</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.findSubjMatchingStudyUID">
+<span class="sig-name descname"><span class="pre">findSubjMatchingStudyUID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">studyUID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.findSubjMatchingStudyUID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.findSubjMatchingStudyUID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.reduceToExist">
+<span class="sig-name descname"><span class="pre">reduceToExist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.reduceToExist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.reduceToExist" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.reduceToSet">
+<span class="sig-name descname"><span class="pre">reduceToSet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.reduceToSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.reduceToSet" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.setByDirectory">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setByDirectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataRoot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.setByDirectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.setByDirectory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.subjIDs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subjIDs</span></span><a class="headerlink" href="#miresearch.mi_subject.SubjectList.subjIDs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.subjNs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subjNs</span></span><a class="headerlink" href="#miresearch.mi_subject.SubjectList.subjNs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_subject.SubjectList.writeSummaryCSV">
+<span class="sig-name descname"><span class="pre">writeSummaryCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputFileName_csv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#SubjectList.writeSummaryCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.SubjectList.writeSummaryCSV" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.WriteSubjectStudySummary">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">WriteSubjectStudySummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataRootDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summaryFilePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjPrefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#WriteSubjectStudySummary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.WriteSubjectStudySummary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.buildSubjectID">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">buildSubjectID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjN</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#buildSubjectID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.buildSubjectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.createNew_OrAddTo_Subject">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">createNew_OrAddTo_Subject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loadDirectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataRoot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SubjClass=&lt;class</span> <span class="pre">'miresearch.mi_subject.AbstractSubject'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjNumber=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjPrefix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anonName=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LOAD_MULTI=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IGNORE_UIDS=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">QUIET=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#createNew_OrAddTo_Subject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.createNew_OrAddTo_Subject" title="Link to this definition">¶</a></dt>
+<dd><p>Used to create a new subject (or add data to already existing subject) from an input directory (or compressed file).
+Current compressed file tpyes supported: zip, tar, tar.gz</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>loadDirectory (str): the directory from which data to be loaded
+dataRoot (str): the root directory where subjects are stored
+SubjClass (subclass of AbstractClass, optional): subclass of AbstractClass. Defaults to AbstractSubject.
+subjNumber (int, optional): subject number to create or load to. Will take next available number if none given. Defaults to None.
+subjPrefix (str, optional): the subject prefix. If not given will attempt to guess from dataRoot. Defaults to None.
+anonName (str, optional): An anonymis name to give to this subject. Defaults to None.
+LOAD_MULTI (bool, optional): If true then each sub-directory in “loadDirectory” will be used to load a new subject. Defaults to False.
+IGNORE_UIDS (bool, optional): If true then ignore dicom UIDs and each sub-directory in “loadDirectory” will DEFINITLY be a new subject. Defaults to False.
+QUIET (bool, optional): If true will supress output. Defaults to False.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If incompatible arguments given (can not give subjNumber if LOAD_MULTI is given)</p>
+</dd>
+<dt>Returns:</dt><dd><p>list: list of Subject Objects added to or created</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.doesSubjectExist">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">doesSubjectExist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjN</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataRootDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#doesSubjectExist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.doesSubjectExist" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.findSubjMatchingDicomStudyUID">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">findSubjMatchingDicomStudyUID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dicomDir_OrData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataRoot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjPrefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#findSubjMatchingDicomStudyUID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.findSubjMatchingDicomStudyUID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.getAllSubjects">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">getAllSubjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataRootDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SubjClass=&lt;class</span> <span class="pre">'miresearch.mi_subject.AbstractSubject'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#getAllSubjects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.getAllSubjects" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.getNextSubjID">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">getNextSubjID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataRootDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#getNextSubjID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.getNextSubjID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.getNextSubjN">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">getNextSubjN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataRootDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#getNextSubjN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.getNextSubjN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.getNumberFromSubjID">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">getNumberFromSubjID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#getNumberFromSubjID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.getNumberFromSubjID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.getSubjects">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">getSubjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjectNList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataRootDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SubjClass=&lt;class</span> <span class="pre">'miresearch.mi_subject.AbstractSubject'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#getSubjects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.getSubjects" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.guessSubjectPrefix">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">guessSubjectPrefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataRootDir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#guessSubjectPrefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.guessSubjectPrefix" title="Link to this definition">¶</a></dt>
+<dd><p>Guess the subject prefix by looking for common names in the dataRootDir</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dataRootDir (str): path to root directory of subject filesystem database</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: subject prefix string</p>
+</dd>
+<dt>Exception:</dt><dd><p>mi_utils.SubjPrefixError: is ambiguous</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.splitSubjID">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">splitSubjID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#splitSubjID"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.splitSubjID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_subject.subjNListToSubjObj">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_subject.</span></span><span class="sig-name descname"><span class="pre">subjNListToSubjObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjNList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataRoot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjPrefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SubjClass=&lt;class</span> <span class="pre">'miresearch.mi_subject.AbstractSubject'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CHECK_EXIST=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_subject.html#subjNListToSubjObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_subject.subjNListToSubjObj" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-miresearch.mi_utils">
+<span id="miresearch-mi-utils-module"></span><h2>miresearch.mi_utils module<a class="headerlink" href="#module-miresearch.mi_utils" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="miresearch.mi_utils.DirectoryStructure">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">DirectoryStructure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">childrenList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#DirectoryStructure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.DirectoryStructure" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="miresearch.mi_utils.DirectoryStructureTree">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">DirectoryStructureTree</span></span><a class="reference internal" href="_modules/miresearch/mi_utils.html#DirectoryStructureTree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.DirectoryStructureTree" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_utils.DirectoryStructureTree.addNewStructure">
+<span class="sig-name descname"><span class="pre">addNewStructure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_or_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#DirectoryStructureTree.addNewStructure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.DirectoryStructureTree.addNewStructure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_utils.DirectoryStructureTree.isSecondLevelName">
+<span class="sig-name descname"><span class="pre">isSecondLevelName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nameTop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nameSecond</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#DirectoryStructureTree.isSecondLevelName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.DirectoryStructureTree.isSecondLevelName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_utils.DirectoryStructureTree.isTopLevelName">
+<span class="sig-name descname"><span class="pre">isTopLevelName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#DirectoryStructureTree.isTopLevelName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.DirectoryStructureTree.isTopLevelName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="miresearch.mi_utils.MiResearchParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">MiResearchParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prog=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usage=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epilog=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parents=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter_class=&lt;class</span> <span class="pre">'argparse.HelpFormatter'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_chars='-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fromfile_prefix_chars=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argument_default=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflict_handler='error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_help=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_abbrev=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exit_on_error=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#MiResearchParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.MiResearchParser" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentParser</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.mi_utils.MiResearchParser.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#MiResearchParser.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.MiResearchParser.error" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a usage message incorporating the message to stderr and
+exits.</p>
+<p>If you override this in a subclass, it should not return – it
+should either exit or raise an exception.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="miresearch.mi_utils.SubjPrefixError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">SubjPrefixError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#SubjPrefixError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.SubjPrefixError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>If errors to do with the subject prefix</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.buildDirectoryStructureTree">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">buildDirectoryStructureTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listOfExtraSubfolders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#buildDirectoryStructureTree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.buildDirectoryStructureTree" title="Link to this definition">¶</a></dt>
+<dd><dl>
+<dt>This will build the directory structure for a project using the structure</dt><dd><p>found in config file and any added subfolder names</p>
+</dd>
+<dt>Args:</dt><dd><dl>
+<dt>listOfExtraSubfolders (list): A list of subfolders, if an entry is itself a list, </dt><dd><p>then the first item of that entry is the toplevel subfolder 
+and the following items are subfolders of that toplevel folder.
+Default: empty list                                    
+Note: A default structure is always used of:
+| - META
+| - RAW</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">- DICOM</div>
+</div>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.countFilesInDir">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">countFilesInDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dirName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#countFilesInDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.countFilesInDir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.datetimeToStrTime">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">datetimeToStrTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dateTimeVal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strFormat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%H%M%S'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#datetimeToStrTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.datetimeToStrTime" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.decodeString">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">decodeString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passcode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#decodeString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.decodeString" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.encodeString">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">encodeString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strIn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passcode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#encodeString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.encodeString" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.readFileToListOfLines">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">readFileToListOfLines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commentSymbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#readFileToListOfLines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.readFileToListOfLines" title="Link to this definition">¶</a></dt>
+<dd><p>Read file - return list - elements made up of each line
+Will split on “,” if present
+Will skip starting with #</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.setNList">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">setNList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#setNList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.setNList" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.subjFileToSubjN">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">subjFileToSubjN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subjFile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#subjFileToSubjN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.subjFileToSubjN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.timeToDatetime">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">timeToDatetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeStr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#timeToDatetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.timeToDatetime" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.mi_utils.writeCsvFile">
+<span class="sig-prename descclassname"><span class="pre">miresearch.mi_utils.</span></span><span class="sig-name descname"><span class="pre">writeCsvFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csvFile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FIX_NAN</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/mi_utils.html#writeCsvFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.mi_utils.writeCsvFile" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-miresearch.miresearch_main">
+<span id="miresearch-miresearch-main-module"></span><h2>miresearch.miresearch_main module<a class="headerlink" href="#module-miresearch.miresearch_main" title="Link to this heading">¶</a></h2>
+<p>Module that exposes the routines and utilities making up MIRESEARCH</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.miresearch_main.checkArgs">
+<span class="sig-prename descclassname"><span class="pre">miresearch.miresearch_main.</span></span><span class="sig-name descname"><span class="pre">checkArgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_main.html#checkArgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_main.checkArgs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.miresearch_main.main">
+<span class="sig-prename descclassname"><span class="pre">miresearch.miresearch_main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extra_runActions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_main.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_main.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.miresearch_main.runActions">
+<span class="sig-prename descclassname"><span class="pre">miresearch.miresearch_main.</span></span><span class="sig-name descname"><span class="pre">runActions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_runActions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_main.html#runActions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_main.runActions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-miresearch.miresearch_watchdog">
+<span id="miresearch-miresearch-watchdog-module"></span><h2>miresearch.miresearch_watchdog module<a class="headerlink" href="#module-miresearch.miresearch_watchdog" title="Link to this heading">¶</a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearchWatchDogError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.miresearch_watchdog.</span></span><span class="sig-name descname"><span class="pre">MIResearchWatchDogError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'An</span> <span class="pre">error</span> <span class="pre">occurred'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearchWatchDogError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearchWatchDogError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>A custom error class.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.miresearch_watchdog.</span></span><span class="sig-name descname"><span class="pre">MIResearch_SubdirectoryHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directoryToWatch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataStorageRoot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SubjClass=&lt;class</span> <span class="pre">'miresearch.mi_subject.AbstractSubject'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TO_ANONYMISE=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_SubdirectoryHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FileSystemEventHandler</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.execute_loadDirectory">
+<span class="sig-name descname"><span class="pre">execute_loadDirectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directoryToLoad</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_SubdirectoryHandler.execute_loadDirectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.execute_loadDirectory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.is_stable">
+<span class="sig-name descname"><span class="pre">is_stable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_SubdirectoryHandler.is_stable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.is_stable" title="Link to this definition">¶</a></dt>
+<dd><p>Check if this new directory is stable (no change in modified time)
+and is not already being processed - if hit timeout and still being processed then
+throw erro as something went wrong and will go wrong again.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory_path (str): the directory to check for stability</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if stable AND not already being processed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.matches_ignore_pattern">
+<span class="sig-name descname"><span class="pre">matches_ignore_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subdirectory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_SubdirectoryHandler.matches_ignore_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.matches_ignore_pattern" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_created">
+<span class="sig-name descname"><span class="pre">on_created</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_SubdirectoryHandler.on_created"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_created" title="Link to this definition">¶</a></dt>
+<dd><p>Called when a file or directory is created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DirCreatedEvent</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">FileCreatedEvent</span></code>) – Event representing file/directory creation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_deleted">
+<span class="sig-name descname"><span class="pre">on_deleted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_SubdirectoryHandler.on_deleted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_deleted" title="Link to this definition">¶</a></dt>
+<dd><p>Called when a file or directory is deleted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DirDeletedEvent</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">FileDeletedEvent</span></code>) – Event representing file/directory deletion.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_WatchDog">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">miresearch.miresearch_watchdog.</span></span><span class="sig-name descname"><span class="pre">MIResearch_WatchDog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directoryToWatch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataStorageRoot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjectPrefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SubjClass=&lt;class</span> <span class="pre">'miresearch.mi_subject.AbstractSubject'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TO_ANONYMISE=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_WatchDog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_WatchDog" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A watchdog for MI Research built off watchdog
+Will watch a directory and load new subjects as they arrive</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_WatchDog.buildWorkingDirectories">
+<span class="sig-name descname"><span class="pre">buildWorkingDirectories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_WatchDog.buildWorkingDirectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_WatchDog.buildWorkingDirectories" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.MIResearch_WatchDog.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#MIResearch_WatchDog.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.MIResearch_WatchDog.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miresearch.miresearch_watchdog.get_directory_modified_time">
+<span class="sig-prename descclassname"><span class="pre">miresearch.miresearch_watchdog.</span></span><span class="sig-name descname"><span class="pre">get_directory_modified_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miresearch/miresearch_watchdog.html#get_directory_modified_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#miresearch.miresearch_watchdog.get_directory_modified_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-miresearch">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-miresearch" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">miresearch package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-miresearch.mi_config">miresearch.mi_config module</a></li>
+<li><a class="reference internal" href="#module-miresearch.mi_subject">miresearch.mi_subject module</a><ul>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject"><code class="docutils literal notranslate"><span class="pre">AbstractSubject</span></code></a><ul>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.anonymise"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.anonymise()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.askUserForDicomSeriesNumber"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.askUserForDicomSeriesNumber()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.buildDicomMeta"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.buildDicomMeta()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.buildSeriesDataMetaCSV"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.buildSeriesDataMetaCSV()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.countNumberOfDicoms"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.countNumberOfDicoms()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.exists"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.exists()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.findDicomSeries"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.findDicomSeries()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getAge"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getAge()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getDicomFile"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getDicomFile()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getDicomFoldersListStr"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getDicomFoldersListStr()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getDicomSeriesDir"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getDicomSeriesDir()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getDicomSeriesDir_Description"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getDicomSeriesDir_Description()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getDicomsDir"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getDicomsDir()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getDifferenceBetweenStartTimesOfTwoScans_s"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getDifferenceBetweenStartTimesOfTwoScans_s()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getGender"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getGender()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getHRForSeriesN"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getHRForSeriesN()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getInfoStr"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getInfoStr()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getListOfSeNums"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getListOfSeNums()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getMetaDict"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getMetaDict()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getMetaDir"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getMetaDir()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getMetaTagValue"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getMetaTagValue()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getMetaTagsFile"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getMetaTagsFile()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getName"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getName()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getName_FirstNames"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getName_FirstNames()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getPrefix_Number"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getPrefix_Number()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getRawDir"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getRawDir()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getSeriesDescriptionsStr"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getSeriesDescriptionsStr()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getSeriesMetaAsDataFrame"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getSeriesMetaAsDataFrame()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getSeriesMetaCSV"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getSeriesMetaCSV()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getSeriesMetaValue"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getSeriesMetaValue()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getSeriesNumbersMatchingDescriptionStr"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getSeriesNumbersMatchingDescriptionStr()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getSpydcmDicomStudy"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getSpydcmDicomStudy()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getStartTimeForSeriesN_HHMMSS"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getStartTimeForSeriesN_HHMMSS()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getStartTime_EndTimeOfExam"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getStartTime_EndTimeOfExam()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getStudyDate"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getStudyDate()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getStudyID"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getStudyID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getSummary_list"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getSummary_list()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getTagValue"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getTagValue()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getTimeTakenForSeriesN_s"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getTimeTakenForSeriesN_s()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getTopDir"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getTopDir()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.getTotalScanTime_s"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.getTotalScanTime_s()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.info"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.info()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.initDirectoryStructure"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.initDirectoryStructure()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.isAnonymised"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.isAnonymised()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.isMale"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.isMale()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.loadDicomsToSubject"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.loadDicomsToSubject()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.loadSpydcmStudyToSubject"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.loadSpydcmStudyToSubject()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.logger"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.logger</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.printDicomsInfo"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.printDicomsInfo()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.renameSubjID"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.renameSubjID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.runPostLoadPipeLine"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.runPostLoadPipeLine()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.setEncodedName"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.setEncodedName()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.setIsAnonymised"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.setIsAnonymised()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.setTagValue"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.setTagValue()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.subjID"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.subjID</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.updateMetaFile"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.updateMetaFile()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.AbstractSubject.zipUpSubject"><code class="docutils literal notranslate"><span class="pre">AbstractSubject.zipUpSubject()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList"><code class="docutils literal notranslate"><span class="pre">SubjectList</span></code></a><ul>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.filterSubjectListByDOS"><code class="docutils literal notranslate"><span class="pre">SubjectList.filterSubjectListByDOS()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.findSubjMatchingName"><code class="docutils literal notranslate"><span class="pre">SubjectList.findSubjMatchingName()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.findSubjMatchingPatientID"><code class="docutils literal notranslate"><span class="pre">SubjectList.findSubjMatchingPatientID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.findSubjMatchingStudyID"><code class="docutils literal notranslate"><span class="pre">SubjectList.findSubjMatchingStudyID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.findSubjMatchingStudyUID"><code class="docutils literal notranslate"><span class="pre">SubjectList.findSubjMatchingStudyUID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.reduceToExist"><code class="docutils literal notranslate"><span class="pre">SubjectList.reduceToExist()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.reduceToSet"><code class="docutils literal notranslate"><span class="pre">SubjectList.reduceToSet()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.setByDirectory"><code class="docutils literal notranslate"><span class="pre">SubjectList.setByDirectory()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.subjIDs"><code class="docutils literal notranslate"><span class="pre">SubjectList.subjIDs</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.subjNs"><code class="docutils literal notranslate"><span class="pre">SubjectList.subjNs</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.SubjectList.writeSummaryCSV"><code class="docutils literal notranslate"><span class="pre">SubjectList.writeSummaryCSV()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miresearch.mi_subject.WriteSubjectStudySummary"><code class="docutils literal notranslate"><span class="pre">WriteSubjectStudySummary()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.buildSubjectID"><code class="docutils literal notranslate"><span class="pre">buildSubjectID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.createNew_OrAddTo_Subject"><code class="docutils literal notranslate"><span class="pre">createNew_OrAddTo_Subject()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.doesSubjectExist"><code class="docutils literal notranslate"><span class="pre">doesSubjectExist()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.findSubjMatchingDicomStudyUID"><code class="docutils literal notranslate"><span class="pre">findSubjMatchingDicomStudyUID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.getAllSubjects"><code class="docutils literal notranslate"><span class="pre">getAllSubjects()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.getNextSubjID"><code class="docutils literal notranslate"><span class="pre">getNextSubjID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.getNextSubjN"><code class="docutils literal notranslate"><span class="pre">getNextSubjN()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.getNumberFromSubjID"><code class="docutils literal notranslate"><span class="pre">getNumberFromSubjID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.getSubjects"><code class="docutils literal notranslate"><span class="pre">getSubjects()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.guessSubjectPrefix"><code class="docutils literal notranslate"><span class="pre">guessSubjectPrefix()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.splitSubjID"><code class="docutils literal notranslate"><span class="pre">splitSubjID()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_subject.subjNListToSubjObj"><code class="docutils literal notranslate"><span class="pre">subjNListToSubjObj()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-miresearch.mi_utils">miresearch.mi_utils module</a><ul>
+<li><a class="reference internal" href="#miresearch.mi_utils.DirectoryStructure"><code class="docutils literal notranslate"><span class="pre">DirectoryStructure</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.DirectoryStructureTree"><code class="docutils literal notranslate"><span class="pre">DirectoryStructureTree</span></code></a><ul>
+<li><a class="reference internal" href="#miresearch.mi_utils.DirectoryStructureTree.addNewStructure"><code class="docutils literal notranslate"><span class="pre">DirectoryStructureTree.addNewStructure()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.DirectoryStructureTree.isSecondLevelName"><code class="docutils literal notranslate"><span class="pre">DirectoryStructureTree.isSecondLevelName()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.DirectoryStructureTree.isTopLevelName"><code class="docutils literal notranslate"><span class="pre">DirectoryStructureTree.isTopLevelName()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miresearch.mi_utils.MiResearchParser"><code class="docutils literal notranslate"><span class="pre">MiResearchParser</span></code></a><ul>
+<li><a class="reference internal" href="#miresearch.mi_utils.MiResearchParser.error"><code class="docutils literal notranslate"><span class="pre">MiResearchParser.error()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miresearch.mi_utils.SubjPrefixError"><code class="docutils literal notranslate"><span class="pre">SubjPrefixError</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.buildDirectoryStructureTree"><code class="docutils literal notranslate"><span class="pre">buildDirectoryStructureTree()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.countFilesInDir"><code class="docutils literal notranslate"><span class="pre">countFilesInDir()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.datetimeToStrTime"><code class="docutils literal notranslate"><span class="pre">datetimeToStrTime()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.decodeString"><code class="docutils literal notranslate"><span class="pre">decodeString()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.encodeString"><code class="docutils literal notranslate"><span class="pre">encodeString()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.readFileToListOfLines"><code class="docutils literal notranslate"><span class="pre">readFileToListOfLines()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.setNList"><code class="docutils literal notranslate"><span class="pre">setNList()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.subjFileToSubjN"><code class="docutils literal notranslate"><span class="pre">subjFileToSubjN()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.timeToDatetime"><code class="docutils literal notranslate"><span class="pre">timeToDatetime()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.mi_utils.writeCsvFile"><code class="docutils literal notranslate"><span class="pre">writeCsvFile()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-miresearch.miresearch_main">miresearch.miresearch_main module</a><ul>
+<li><a class="reference internal" href="#miresearch.miresearch_main.checkArgs"><code class="docutils literal notranslate"><span class="pre">checkArgs()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_main.runActions"><code class="docutils literal notranslate"><span class="pre">runActions()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-miresearch.miresearch_watchdog">miresearch.miresearch_watchdog module</a><ul>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearchWatchDogError"><code class="docutils literal notranslate"><span class="pre">MIResearchWatchDogError</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler"><code class="docutils literal notranslate"><span class="pre">MIResearch_SubdirectoryHandler</span></code></a><ul>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.execute_loadDirectory"><code class="docutils literal notranslate"><span class="pre">MIResearch_SubdirectoryHandler.execute_loadDirectory()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.is_stable"><code class="docutils literal notranslate"><span class="pre">MIResearch_SubdirectoryHandler.is_stable()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.matches_ignore_pattern"><code class="docutils literal notranslate"><span class="pre">MIResearch_SubdirectoryHandler.matches_ignore_pattern()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_created"><code class="docutils literal notranslate"><span class="pre">MIResearch_SubdirectoryHandler.on_created()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_deleted"><code class="docutils literal notranslate"><span class="pre">MIResearch_SubdirectoryHandler.on_deleted()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_WatchDog"><code class="docutils literal notranslate"><span class="pre">MIResearch_WatchDog</span></code></a><ul>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_WatchDog.buildWorkingDirectories"><code class="docutils literal notranslate"><span class="pre">MIResearch_WatchDog.buildWorkingDirectories()</span></code></a></li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.MIResearch_WatchDog.run"><code class="docutils literal notranslate"><span class="pre">MIResearch_WatchDog.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miresearch.miresearch_watchdog.get_directory_modified_time"><code class="docutils literal notranslate"><span class="pre">get_directory_modified_time()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-miresearch">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="modules.html"
+                          title="previous chapter">miresearch</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/miresearch.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="miresearch"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MIResearch 0.0.13 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >miresearch</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">miresearch package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Fraser M. Callaghan.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

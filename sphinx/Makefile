@@ -14,7 +14,7 @@ help:
 
 
 copy-docs:
-	cp -r _build/html ../
+	cp -r _build/html/* ../docs
 
 .PHONY: help Makefile
 
