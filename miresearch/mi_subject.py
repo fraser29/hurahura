@@ -62,6 +62,7 @@ class AbstractSubject(object):
         self.QUIET = False
         #
         self._logger = None
+        self._loggerFH = None
 
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -106,20 +107,26 @@ class AbstractSubject(object):
             rr = os.path.split(self.dataRoot)[1]
             self._logger = logging.getLogger(f"{rr}/{self.subjID}")
             self._logger.setLevel(logging.INFO)
-            fh = logging.FileHandler(os.path.join(self.getMetaDir(), f'{self.subjID}.log'))
-            fh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
-            self._logger.addHandler(fh)
+            self._loggerFH = logging.FileHandler(self.logfileName)
+            self._loggerFH.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+            self._logger.addHandler(self._loggerFH)
             if not self.QUIET:
                 self._logger.addHandler(logging.StreamHandler())
         return self._logger
 
-    def _removeLogger(self):
-        for handler in self.logger.handlers[:]:  
-            self.logger.removeHandler(handler)
-        logger_name = self._logger.name
-        logging.getLogger().manager.loggerDict.pop(logger_name, None)
-        del self._logger
-        self._logger = None
+    @property
+    def logfileName(self):
+        return os.path.join(self.getMetaDir(), f'{self.subjID}.log')
+
+    def _renameLogger(self):
+        """Rename the logger - is run from method renameSubjID
+        """
+        self._loggerFH.close()
+        self.logger.removeHandler(self._loggerFH)
+        self._loggerFH = None
+        self._loggerFH = logging.FileHandler(self.logfileName, mode='a')
+        self._loggerFH.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+        self._logger.addHandler(self._loggerFH)
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
@@ -215,7 +222,7 @@ class AbstractSubject(object):
         os.rename(self.getTopDir(), newName)
         self.subjectPrefix = newSubjID
         self.subjN = None
-        self._removeLogger()
+        self._renameLogger()
         self.logger.warning(f"New logger after subjID changed from {oldID} to {self.subjID}")
         self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")        
         self.buildDicomMeta()
@@ -567,11 +574,23 @@ class AbstractSubject(object):
         """
         dd = self.getMetaDict()
         try:
-            birth = dd["PatientBirthDate"]
-            study = dd["StudyDate"]
-            return (spydcm.dcmTools.dbDateToDateTime(study) - spydcm.dcmTools.dbDateToDateTime(birth)).days / 365.0
-        except (KeyError, ValueError):
-            return np.nan
+            ageStr = dd['PatientAge']
+        except KeyError:
+            try:
+                birth = dd["PatientBirthDate"]
+                study = dd["StudyDate"]
+                return (spydcm.dcmTools.dbDateToDateTime(study) - spydcm.dcmTools.dbDateToDateTime(birth)).days / 365.0
+            except (KeyError, ValueError):
+                return np.nan
+        age = np.nan
+        try:
+            age = int(ageStr)
+        except ValueError:
+            try:
+                age = int(ageStr.lower().replace('y', ''))
+            except ValueError:
+                pass
+        return age
 
     def getGender(self):
         return self.getMetaDict()['PatientSex']
