@@ -214,6 +214,9 @@ class AbstractSubject(object):
     
     def renameSubjID(self, newSubjID):
         oldID = self.subjID
+        if newSubjID == oldID:
+            self.logger.error(f"Can not rename from {oldID} to {newSubjID}")
+            return
         self.logger.warning(f"Changing subjID from {oldID} to {newSubjID}")
         self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")
         newName = os.path.join(self.dataRoot, newSubjID)
