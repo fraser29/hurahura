@@ -808,6 +808,14 @@ def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None):
 
 ### ====================================================================================================================
 def splitSubjID(s):
+    """Strip a subject ID to prefix and number
+
+    Args:
+        s (str): subject ID
+
+    Returns:
+        tuple: prefix: str, number: int
+    """
     prefix = s.rstrip('0123456789')
     number = int(s[len(prefix):])
     return prefix, number
