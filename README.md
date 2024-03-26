@@ -8,6 +8,9 @@ pip install imaging-research
 ```
 Note: pypi reported naming conflicts for miresearch
 
+> [!IMPORTANT]  
+> This package is currently undergoing frequent development and testing. PLease check back reguarly for version updates.
+
 ## About
 
 This is a collection of classes for following OOP principles for organisation of research data for medical imaging research studies. 
@@ -33,7 +36,7 @@ This is the basic parent class containing fundamental methods for organisation a
 ```bash
 
 miresearch -h
-usage: miresearch [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-anonName ANONNAME]
+usage: miresearch [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-anonName ANONNAME]CODE
                   [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SummaryCSV SUMMARYCSV] [-WatchDirectory WATCHDIRECTORY]
 
 options:

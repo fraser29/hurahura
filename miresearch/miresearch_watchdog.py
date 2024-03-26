@@ -103,7 +103,12 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
 
             if self.is_stable(new_subdirectory):
                 print(f"New subdirectory detected: {new_subdirectory}")
-                self.execute_loadDirectory(new_subdirectory)
+                try: 
+                    self.execute_loadDirectory(new_subdirectory)
+                except Exception as e:
+                    # catch all exception - if permission error then should retry automatically
+                    #  - else need a way to force retry
+                    print(f"An error occurred: {str(e)} ")
 
     def on_deleted(self, event):
         if event.is_directory:
