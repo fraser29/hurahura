@@ -37,6 +37,7 @@ class _MIResearch_config():
         self._data_root_dir = self.config.get("app", "data_root_dir", fallback="")
         self._subject_prefix = self.config.get("app", "subject_prefix", fallback="")
         self.stable_directory_age_sec = self.config.getint("app", "stable_directory_age_sec", fallback=60)
+        self.default_pad_zeros = self.config.getint("app", "default_pad_zeros", fallback=6)
         self.directory_structure = json.loads(self.config.get("app", "directories"))
 
         self.class_obj = None
