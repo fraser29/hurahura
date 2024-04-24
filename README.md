@@ -9,7 +9,7 @@ pip install imaging-research
 Note: pypi reported naming conflicts for miresearch
 
 > [!IMPORTANT]  
-> This package is currently undergoing frequent development and testing. PLease check back reguarly for version updates.
+> This package is currently undergoing frequent development and testing. Please check back regularly for version updates.
 
 ## About
 
@@ -18,6 +18,10 @@ This is a collection of classes for following OOP principles for organisation of
 It takes advantage of the dicom standard and the package [spydcmtk](https://github.com/fraser29/spydcmtk) for automating and generalising many typical steps with the intention of making the researcher's life easier. 
 
 This package may be easily adapted and expanded upon for a high level control over your research data. Or, it may be used as is for basic structure and organisation of data and automation of common tasks. 
+
+> [!NOTE]  
+> Version 0.1.0 release: Greater flexibility in subject ID naming and stability improvements to miresearch_watchdog.
+
 
 ## Class structure
 
