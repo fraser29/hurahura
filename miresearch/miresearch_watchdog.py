@@ -116,7 +116,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
 
     def on_moved(self, event):
         if event.is_directory:
-            self.logger.info(f"Direcetory moved/renamed: {event.dest_path}")
+            self.logger.info(f"Directory moved/renamed: {event.dest_path}")
             try:
                 self._action(event.dest_path)
             except Exception as e:
