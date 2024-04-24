@@ -13,6 +13,7 @@ Adapted for general use from KMR project.
 
 
 import os
+import re
 from zipfile import ZipFile
 import numpy as np
 import datetime
@@ -26,7 +27,6 @@ from miresearch import mi_utils
 # ====================================================================================================
 # ====================================================================================================
 
-
 # ====================================================================================================
 #       ABSTRACT SUBJECT CLASS
 # ====================================================================================================
@@ -37,25 +37,38 @@ class AbstractSubject(object):
     def __init__(self, subjectNumber, 
                         dataRoot, 
                         subjectPrefix=None,
-                        DIRECTORY_STRUCTURE_TREE=mi_utils.buildDirectoryStructureTree()) -> None:
-        if (subjectNumber is None) and (subjectPrefix is None):
-            raise ValueError(f"Give subjectNumber (as int) or subjectPrefix as subjID")
-        try:
-            self.subjN = int(subjectNumber)
-        except ValueError:
-            tSubjPrefix, self.subjN = splitSubjID(subjectNumber)
-            if subjectPrefix is not None:
-                if subjectPrefix != tSubjPrefix:
-                    raise mi_utils.SubjPrefixError("Subject prefix passed does not match subjectID passed")
-            else:
-                subjectPrefix = tSubjPrefix
-        except TypeError: # subjectNumber passed as None - so use subjectPrefix as subjID (already check subjectPrefix not None)
-            self.subjN = None
+                        DIRECTORY_STRUCTURE_TREE=mi_utils.buildDirectoryStructureTree(),
+                        padZeros=mi_utils.MIResearch_config.default_pad_zeros,
+                        suffix="") -> None:
+        # -- CHECK REQUIRED INPUT --
+        if subjectNumber is None:
+            raise ValueError(f"Give subjectNumber (as int) or as subjID")
         self.dataRoot = dataRoot
-        if subjectPrefix is None:
-            self.subjectPrefix = guessSubjectPrefix(self.dataRoot)
-        else:
+        self._subjID = None
+        if not os.path.isdir(self.dataRoot):
+            raise ValueError(f"'dataRoot' must be a directory and must exist: Not found: {self.dataRoot}")
+        # -- PROCESS INPUT ##
+        # A) subjectNumber is an int
+        try:
+            self._subjN = int(subjectNumber)
+            if subjectPrefix is None:
+                # not given - guess from others in dataRoot
+                subjectPrefix = guessSubjectPrefix(self.dataRoot) # will raise mi_utils.SubjPrefixError if not obvious
             self.subjectPrefix = subjectPrefix
+        except ValueError: # fail on int 
+            # B) subjectNumber not an int - then treat as subjectID
+            #       first check if can split to prefix, N, suffix
+            try:
+                prefix_N_suffix = splitSubjID(subjectNumber)
+                self.subjectPrefix = prefix_N_suffix[0]
+                self._subjN = prefix_N_suffix[1]
+                if len(prefix_N_suffix) == 3:
+                    suffix = prefix_N_suffix[2]
+            except IndexError: 
+                self._subjID = subjectNumber
+
+        self.suffix = suffix
+        self.padZeros = padZeros
         self.DIRECTORY_STRUCTURE_TREE = DIRECTORY_STRUCTURE_TREE
         self.BUILD_DIR_IF_NEED = True
         self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
@@ -96,8 +109,13 @@ class AbstractSubject(object):
     ### ----------------------------------------------------------------------------------------------------------------
     @property
     def subjID(self):
-        return buildSubjectID(self.subjN, self.subjectPrefix)
+        if self._subjID is not None:
+            return self._subjID
+        return buildSubjectID(self._subjN, self.subjectPrefix, padZeros=self.padZeros, suffix=self.suffix)
 
+    @property
+    def subjN(self):
+        return splitSubjID(self.subjID)[1]
     ### ----------------------------------------------------------------------------------------------------------------
     ### Logging
     ### ----------------------------------------------------------------------------------------------------------------
@@ -224,7 +242,7 @@ class AbstractSubject(object):
             shutil.rmtree(newName)
         os.rename(self.getTopDir(), newName)
         self.subjectPrefix = newSubjID
-        self.subjN = None
+        self._subjN = None
         self._renameLogger()
         self.logger.warning(f"New logger after subjID changed from {oldID} to {self.subjID}")
         self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")        
@@ -407,7 +425,7 @@ class AbstractSubject(object):
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         ddFull = dcmStudies[0].getStudySummaryDict()
         ddFull['SubjectID'] = self.subjID
-        ddFull['SubjN'] = self.subjN
+        ddFull['SubjN'] = self._subjN
         for k1 in range(1, len(dcmStudies)):
             ddFull['Series'] += dcmStudies[k1].getStudySummaryDict()['Series']
         self.updateMetaFile(ddFull)
@@ -814,14 +832,24 @@ def splitSubjID(s):
         s (str): subject ID
 
     Returns:
-        tuple: prefix: str, number: int
+        tuple: prefix: str, number: int (if len 3 - then also suffix: str)
     """
-    prefix = s.rstrip('0123456789')
-    number = int(s[len(prefix):])
-    return prefix, number
+    parts = re.split(r'(\d+)', s)  # Split the string on one or more digits
+    parts = [part for part in parts if part]  # Filter out empty parts
+    if len(parts) >= 3:
+        return parts[0], int(parts[1]), ''.join(parts[2:])
+    return parts[0], int(parts[1])
 
 def getNumberFromSubjID(subjID):
     return splitSubjID(subjID)[1]
+
+def findZeroPadding(subjID):
+    match = re.search(r'\d+', subjID) # first seq of numbers
+    if match:
+        number = match.group()  # group numbers
+        return len(number)# 
+    else:
+        return 0  # If no number found, return 0
 
 def guessSubjectPrefix(dataRootDir):
     """Guess the subject prefix by looking for common names in the dataRootDir
@@ -839,40 +867,42 @@ def guessSubjectPrefix(dataRootDir):
     allDir_subj = {}
     for i in allDir:
         try:
-            prefix, N = splitSubjID(i)
+            prefix_N_suffix = splitSubjID(i)
+            prefix = prefix_N_suffix[0]
+            N = prefix_N_suffix[1]
         except ValueError: 
             continue # directory not correct format - could not split to integer
         allDir_subj.setdefault(prefix, []).append(N)
     options = list(allDir_subj.keys())
     if len(options) == 0:
-        raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous")
+        raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous - please provide")
     counts = [len(allDir_subj[i]) for i in options]
     maxCount = np.argmax(counts)
     if options.count(options[maxCount]) != 1:
-        raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous")
+        raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous - please provide")
     return options[maxCount]
 
 ### ====================================================================================================================
 ###  Helper functions for building new or adding to subjects
 ### ====================================================================================================================
-def buildSubjectID(subjN, subjectPrefix):
+def buildSubjectID(subjN, subjectPrefix, padZeros=mi_utils.MIResearch_config.default_pad_zeros, suffix=''):
     if subjN is None:
         return subjectPrefix
-    return f"{subjectPrefix}{subjN:06d}"
+    return f"{subjectPrefix}{subjN:0{padZeros}d}{suffix}"
 
 def getNextSubjN(dataRootDir, subjectPrefix=None):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
-    allNums = [int(i[len(subjectPrefix):]) for i in os.listdir(dataRootDir) if (os.path.isdir(os.path.join(dataRootDir, i)) and  i.startswith(subjectPrefix))]
+    allNums = [getNumberFromSubjID(i) for i in os.listdir(dataRootDir) if (os.path.isdir(os.path.join(dataRootDir, i)) and  i.startswith(subjectPrefix))]
     try:
         return max(allNums)+1
     except ValueError:
         return 1
 
-def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None):
+def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None, padZeros=mi_utils.MIResearch_config.default_pad_zeros, suffix=""):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
-    return os.path.isdir(os.path.join(dataRootDir, buildSubjectID(subjN, subjectPrefix)))
+    return os.path.isdir(os.path.join(dataRootDir, buildSubjectID(subjN, subjectPrefix, padZeros=padZeros, suffix=suffix)))
 
 def getNextSubjID(dataRootDir, subjectPrefix=None):
     if subjectPrefix is None:
