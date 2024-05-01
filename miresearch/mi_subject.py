@@ -639,6 +639,10 @@ class AbstractSubject(object):
     # ------------------------------------------------------------------------------------------------------------------
     def getSpydcmDicomStudy(self):
         return spydcm.dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir())
+    
+    def getSpydcmDicomSeries(self, seNumber):
+        dcmdir = self.getDicomSeriesDir(seNumber)
+        return spydcm.dcmTK.DicomSeries.setFromDirectory(dcmdir)
 
 # ====================================================================================================
 #       LIST OF SUBJECTS CLASS
