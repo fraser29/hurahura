@@ -162,36 +162,27 @@ class AbstractSubject(object):
     def getPrefix_Number(self):
         return splitSubjID(self.subjID)
 
-    ### LOADING
-    def _checkAnonName(self, anonName, name="", firstNames=""):
-        if anonName == "SOFT":
-            self.setEncodedName(NAME=name, FIRST_NAMES=firstNames)
-            return ""
-        elif anonName == "HARD":
-            return ""
-        return anonName
-
+    ### LOADING -------------------------------------------------------------------------------------------------------
     def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
         self.initDirectoryStructure()
-        patName = str(spydcm.getTag(dicomFolderToLoad, "PatientName")[0])
-        anonName = self._checkAnonName(anonName, patName.split("^")[0], "_".join(patName.split("^")[1:]))
         self.logger.info(f"LoadDicoms to {self.getDicomsDir()}") # Don't log source here as could be identifying
-        # self.logger.info(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()})")
+        self.logger.info(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()}) & anon={anonName}") # FIXME - debug only
         d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
         study = spydcm.dcmTK.DicomStudy.setFromDirectory(dicomFolderToLoad, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
-        res = study.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
-        self._finalLoadSteps(d0, dI)
+        res = study.writeToOrganisedFileStructure(self.getDicomsDir())
+        self._finalLoadSteps(d0, dI, anonName)
 
-    def loadSpydcmStudyToSubject(self, spydcmData, anonName=None, HIDE_PROGRESSBAR=False):
+    def loadSpydcmStudyToSubject(self, spydcmData, anonName=None):
         self.initDirectoryStructure()
-        patName = spydcmData.getTag("PatientName")
-        self._checkAnonName(anonName, patName.split("^")[0], "_".join(patName.split("^")[1:]))
         self.logger.info(f"LoadDicoms (spydcmtk data ==> {self.getDicomsDir()})")
         d0, dI = self.countNumberOfDicoms(), spydcmData.getNumberOfDicoms()
-        spydcmData.writeToOrganisedFileStructure(self.getDicomsDir(), anonName=anonName)
-        self._finalLoadSteps(d0, dI)
+        spydcmData.writeToOrganisedFileStructure(self.getDicomsDir())
+        self._finalLoadSteps(d0, dI, anonName=anonName)
     
-    def _finalLoadSteps(self, initNumDicoms, numDicomsToLoad):
+    def _finalLoadSteps(self, initNumDicoms, numDicomsToLoad, anonName=None):
+        self.buildDicomMeta()
+        if anonName is not None:
+            self.anonymise(anonName=anonName)
         finalNumDicoms = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {initNumDicoms}, number to load: {numDicomsToLoad}, final number dicoms: {finalNumDicoms}")
         self.buildDicomMeta()
@@ -531,6 +522,10 @@ class AbstractSubject(object):
 
     # ------------------------------------------------------------------------------------------
     def anonymise(self, anonName=None):
+        self.logger.info(f'Anonymise in place to {anonName}')
+        name, firstNames = self.getName_FirstNames()
+        anonName = self._checkAnonName(anonName, name, firstNames)
+        # anonName = self._checkAnonName(anonName, patName.split("^")[0], "_".join(patName.split("^")[1:]))
         if type(anonName) == str:
             if len(anonName) == 0:  
                 anonName = None # Still anonymise, but let program choose the new anonName
@@ -539,6 +534,16 @@ class AbstractSubject(object):
         self.setIsAnonymised()
         self.buildDicomMeta()
 
+    def _checkAnonName(self, anonName, name="", firstNames=""):
+        self.logger.info(f'_checkAnonName args: {anonName}, name={name}, firstnames={firstNames}') # FIXME debug
+        if anonName == "SOFT":
+            self.setEncodedName(NAME=name, FIRST_NAMES=firstNames)
+            return ""
+        elif anonName == "HARD":
+            self.setEncodedName(NAME='Name-Unknown', FIRST_NAMES='FirstNames-Unknown')
+            return ""
+        return anonName
+    
     def setIsAnonymised(self):
         self.updateMetaFile({"ANONYMISED": True})
     
@@ -546,12 +551,7 @@ class AbstractSubject(object):
         return self.getTagValue("ANONYMISED", False)
 
     def setEncodedName(self, NAME, FIRST_NAMES=""):
-        """
-        funct to add name after (will encode)
-        :param NAME:
-        :param FIRST_NAMES:
-        :return:
-        """
+        self.logger.info(f"Adding encoded name {NAME} & {FIRST_NAMES} -- {mi_utils.encodeString('Name-Unknown', self.subjID)}") # FIXME THIS IS DEBUG - REMOVE ME
         dd = {'NAME': mi_utils.encodeString(NAME, self.subjID),
               'FIRST_NAMES': mi_utils.encodeString(FIRST_NAMES, self.subjID)}
         self.updateMetaFile(dd)
@@ -559,7 +559,7 @@ class AbstractSubject(object):
     def getName(self):
         if self.isAnonymised():
             try:
-                return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID)
+                return mi_utils.decodeString(self.getTagValue("NAME", None), self.subjID)
             except:
                 return self.getTagValue('PatientName', 'Name-Unknown')
         else:
@@ -567,15 +567,20 @@ class AbstractSubject(object):
 
     def getName_FirstNames(self):
         if self.isAnonymised():
-            return mi_utils.decodeString(self.getTagValue("NAME", "UNKNOWN"), self.subjID), \
-                mi_utils.decodeString(self.getTagValue("FIRST_NAMES", "UNKNOWN"), self.subjID)
-        else:
-            name = self.getName()
-            name = name.replace(" ","_")
-            name = name.replace("^","_")
-            while "__" in name:
-                name = name.replace("__","_")
-            return name
+            try:
+                return mi_utils.decodeString(self.getTagValue("NAME", None), self.subjID), \
+                    mi_utils.decodeString(self.getTagValue("FIRST_NAMES", None), self.subjID)
+            except TypeError:
+                pass
+            
+        name = self.getName()
+        self.logger.info(f"got name {name}") # FIXME THIS IS DEBUG - REMOVE ME
+        parts = name.split("^")
+        if len(parts) == 1:
+            return parts[0], ""
+        name = parts[0]
+        firstNames = "_".join(parts[1:])
+        return spydcm.dcmTools.cleanString(name), spydcm.dcmTools.cleanString(firstNames)
 
 
     # ------------------------------------------------------------------------------------------
@@ -917,16 +922,22 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
     if FORCE_NEW_SUBJ:
         newSubj = None
     else:
+        # Check if a subject already exists with dicom data matching input
         newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix)
     if newSubj is not None:
+        # Subject exists - so check nothing conflicting from inputs
         if subjNumber is not None:
             if subjNumber != newSubj.subjN:
                 raise ValueError(f"You supplied subject number {subjNumber} but a different subject matching your input dicom study exists at {newSubj.subjN}")
         print(f"Found existing subject {newSubj.subjID} at {dataRoot} - adding to")
+    
+    # If no subject exists matching the inputs - define a new subject (increment subjN from current in root directory)
     if newSubj is None: 
         subjNumber = _subjNumberHelper(dataRoot=dataRoot, subjNumber=subjNumber, subjPrefix=subjPrefix)
         newSubj = SubjClass(subjNumber, dataRoot, subjectPrefix=subjPrefix)
     newSubj.QUIET = QUIET
+
+    # Now have a subject - either newly created or existing and matching dicom data - load dicoms to subject:
     try:
         os.path.isdir(dicomDir_orData)
         newSubj.loadDicomsToSubject(dicomDir_orData, anonName=anonName, HIDE_PROGRESSBAR=QUIET)

@@ -148,7 +148,7 @@ def encodeString(strIn, passcode):
 
 def decodeString(encStr, passcode):
     dec = []
-    enc = base64.urlsafe_b64decode(encStr).decode()
+    enc = base64.urlsafe_b64decode(encStr+'==').decode()
     for i in range(len(enc)):
         key_c = passcode[i % len(passcode)]
         dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
