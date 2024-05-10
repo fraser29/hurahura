@@ -790,6 +790,7 @@ def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
     allDir = os.listdir(dataRootDir)
+    allDir = [i for i in allDir if i.startswith(subjectPrefix)]
     allDir = [i for i in allDir if os.path.isdir(os.path.join(dataRootDir, i))]
     subjObjList = []
     for i in allDir:

@@ -40,6 +40,15 @@ class _MIResearch_config():
         self.default_pad_zeros = self.config.getint("app", "default_pad_zeros", fallback=6)
         self.directory_structure = json.loads(self.config.get("app", "directories"))
 
+        ## All parameters: 
+        self.params = {}
+        for section in self.config.sections():
+            if section.lower() == 'parameters':
+                self.params[section] = {}
+                for option in self.config.options(section):
+                    self.params[section][option] = self.config.get(section, option)
+
+        # Class objects - want to do last so have access to parameters
         self.class_obj = None
         class_path = self.config.get("app", "class_path", fallback=None)
         if class_path:
@@ -49,14 +58,6 @@ class _MIResearch_config():
             except ModuleNotFoundError as e:
                 raise ModuleNotFoundError(f"*** is {module_name} found in PYTHONPATH? ***") from e
             self.class_obj = getattr(module, class_name)
-
-        ## All parameters: 
-        self.params = {}
-        for section in self.config.sections():
-            if section.lower() == 'parameters':
-                self.params[section] = {}
-                for option in self.config.options(section):
-                    self.params[section][option] = self.config.get(section, option)
 
     @property
     def data_root_dir(self):
