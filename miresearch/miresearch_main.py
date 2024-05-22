@@ -46,6 +46,9 @@ groupS.add_argument('-y', dest='dataRoot',
 groupS.add_argument('-sPrefix', dest='subjPrefix', 
                     help='Subject prefix [default None -> will get from config file OR dataRoot]', 
                     type=str, default=None)
+groupS.add_argument('-sSuffix', dest='subjSuffix', 
+                    help='Subject suffix [default None]', 
+                    type=str, default=None)
 groupS.add_argument('-anonName', dest='anonName', 
                     help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 
                     type=str, default=None)
@@ -138,21 +141,21 @@ def runActions(args, extra_runActions=None):
         # --- ANONYMISE ---
         if args.anonName is not None:
             for sn in args.subjNList:
-                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
+                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
                     iSubj.anonymise(args.anonName)
 
         # --- POST LOAD PIPELINE ---
         elif args.subjRunPost:
             for sn in args.subjNList:
-                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
+                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
                     iSubj.runPostLoadPipeLine()
 
         # --- PRINT INFO ---
         elif args.subjInfo:
             for sn in args.subjNList:
-                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
+                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
                     iSubj.info()
 
