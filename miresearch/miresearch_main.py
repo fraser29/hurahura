@@ -162,7 +162,6 @@ def runActions(args, extra_runActions=None):
         elif args.subjInfo:
             for sn in args.subjNList:
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
-                print(iSubj.exists())
                 if iSubj.exists():
                     if args.DEBUG:
                         print(f"Info: {iSubj.subjID}...")
