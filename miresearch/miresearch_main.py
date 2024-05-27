@@ -138,11 +138,15 @@ def runActions(args, extra_runActions=None):
                                              QUIET=args.QUIET)
     # SUBJECT LEVEL actions
     elif len(args.subjNList) > 0:
+        if args.DEBUG:
+            print(f"SubjList provided is: {args.subjNList}")
         # --- ANONYMISE ---
         if args.anonName is not None:
             for sn in args.subjNList:
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
+                    if args.DEBUG:
+                        print(f"Anonymise: {iSubj.subjID}...")
                     iSubj.anonymise(args.anonName)
 
         # --- POST LOAD PIPELINE ---
@@ -150,6 +154,8 @@ def runActions(args, extra_runActions=None):
             for sn in args.subjNList:
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
+                    if args.DEBUG:
+                        print(f"Post load pipeline: {iSubj.subjID}...")
                     iSubj.runPostLoadPipeLine()
 
         # --- PRINT INFO ---
@@ -157,6 +163,8 @@ def runActions(args, extra_runActions=None):
             for sn in args.subjNList:
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
+                    if args.DEBUG:
+                        print(f"Info: {iSubj.subjID}...")
                     iSubj.info()
 
     # SUBJECT GROUP (based on dataRoot) ACTIONS
