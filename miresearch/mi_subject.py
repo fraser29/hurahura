@@ -413,12 +413,15 @@ class AbstractSubject(object):
 
     def buildDicomMeta(self):
         # this uses pydicom - so tag names are different.
+        ddFull = {'SubjectID': self.subjID, 'SubjN': self._subjN}
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
-        ddFull = dcmStudies[0].getStudySummaryDict()
-        ddFull['SubjectID'] = self.subjID
-        ddFull['SubjN'] = self._subjN
-        for k1 in range(1, len(dcmStudies)):
-            ddFull['Series'] += dcmStudies[k1].getStudySummaryDict()['Series']
+        try:
+            dcmDict = dcmStudies[0].getStudySummaryDict()
+            ddFull.update(dcmDict)
+            for k1 in range(1, len(dcmStudies)):
+                ddFull['Series'] += dcmStudies[k1].getStudySummaryDict()['Series']
+        except IndexError:
+            pass # Found no Dicoms
         self.updateMetaFile(ddFull)
 
     def countNumberOfDicoms(self):
@@ -880,7 +883,7 @@ def guessSubjectPrefix(dataRootDir):
             prefix_N_suffix = splitSubjID(i)
             prefix = prefix_N_suffix[0]
             N = prefix_N_suffix[1]
-        except ValueError: 
+        except (ValueError, IndexError): 
             continue # directory not correct format - could not split to integer
         allDir_subj.setdefault(prefix, []).append(N)
     options = list(allDir_subj.keys())
