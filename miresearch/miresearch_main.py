@@ -47,8 +47,8 @@ groupS.add_argument('-sPrefix', dest='subjPrefix',
                     help='Subject prefix [default None -> will get from config file OR dataRoot]', 
                     type=str, default=None)
 groupS.add_argument('-sSuffix', dest='subjSuffix', 
-                    help='Subject suffix [default None]', 
-                    type=str, default=None)
+                    help='Subject suffix [default ""]', 
+                    type=str, default="")
 groupS.add_argument('-anonName', dest='anonName', 
                     help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 
                     type=str, default=None)
@@ -162,6 +162,7 @@ def runActions(args, extra_runActions=None):
         elif args.subjInfo:
             for sn in args.subjNList:
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
+                print(iSubj.exists())
                 if iSubj.exists():
                     if args.DEBUG:
                         print(f"Info: {iSubj.subjID}...")
