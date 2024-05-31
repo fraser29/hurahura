@@ -64,6 +64,7 @@ class AbstractSubject(object):
                 self._subjN = prefix_N_suffix[1]
                 if len(prefix_N_suffix) == 3:
                     suffix = prefix_N_suffix[2]
+                padZeros = findZeroPadding(subjectNumber)
             except IndexError: 
                 self._subjID = subjectNumber
 
@@ -664,8 +665,8 @@ class SubjectList(list):
 
 
     @classmethod
-    def setByDirectory(cls, dataRoot, subjectPrefix=None):
-        listOfSubjects = getAllSubjects(dataRoot, subjectPrefix)
+    def setByDirectory(cls, dataRoot, subjectPrefix=None, SubjClass=AbstractSubject):
+        listOfSubjects = getAllSubjects(dataRoot, subjectPrefix, SubjClass=SubjClass)
         return cls(listOfSubjects)
 
     @property
@@ -716,6 +717,20 @@ class SubjectList(list):
             except ValueError: # maybe don't have tag, or wrong format
                 continue
         return SubjectList(filteredMatchList)
+
+    def findSubjMatching_SubjN(self, subjN):
+        """
+        :param studyID (or examID): int
+        :return: mi_subject
+        """
+        for iSubj in self:
+            try:
+                if int(iSubj._subjN) == subjN:
+                    return iSubj
+            except ValueError:
+                pass
+        return None
+    
 
     def findSubjMatchingStudyID(self, studyID):
         """
@@ -792,16 +807,20 @@ class SubjectList(list):
 def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
+        print(f"subjectPrefix, {subjectPrefix}")
     allDir = os.listdir(dataRootDir)
     allDir = [i for i in allDir if i.startswith(subjectPrefix)]
     allDir = [i for i in allDir if os.path.isdir(os.path.join(dataRootDir, i))]
     subjObjList = []
     for i in allDir:
         try:
-            subjObjList.append(SubjClass(i, dataRoot=dataRootDir))
+            iSubjObj = SubjClass(i, dataRoot=dataRootDir)
         except ValueError:
             print(f"WARNING: {i} at {dataRootDir} not valid subject")
-    subjObjList = [i for i in subjObjList if i.exists()]
+        if iSubjObj.exists():
+            subjObjList.append(iSubjObj)
+        else:
+            print(f"WARNING: {i} at {dataRootDir} not valid subject")
     return sorted(subjObjList)
 
 def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
