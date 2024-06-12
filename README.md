@@ -40,8 +40,8 @@ This is the basic parent class containing fundamental methods for organisation a
 ```bash
 
 miresearch -h
-usage: miresearch [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-anonName ANONNAME]CODE
-                  [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SummaryCSV SUMMARYCSV] [-WatchDirectory WATCHDIRECTORY]
+usage: miresearch [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-sSuffix SUBJSUFFIX]
+                  [-anonName ANONNAME] [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SummaryCSV SUMMARYCSV] [-WatchDirectory WATCHDIRECTORY]
 
 options:
   -h, --help            show this help message and exit
@@ -60,6 +60,7 @@ Subject Definition:
                         Subject range
   -y DATAROOT           Path of root data directory (where subjects are stored) [default None -> may be set in config file]
   -sPrefix SUBJPREFIX   Subject prefix [default None -> will get from config file OR dataRoot]
+  -sSuffix SUBJSUFFIX   Subject suffix [default ""]
   -anonName ANONNAME    Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]
 
 Actions:

@@ -521,8 +521,9 @@ class AbstractSubject(object):
         infoKeys = ['SubjectID', 'SubjN', 'PatientBirthDate', 'PatientID', 'PatientName', 'PatientSex',
                     'StudyDate', 'StudyDescription', 'StudyInstanceUID', 'StudyID'] + extraKeys
         mm = self.getMetaDict()
-        aa = '%5.2f'%(self.getAge())
-        return [mm.get(i, "Unknown") for i in infoKeys]+[aa], infoKeys + ['Age']
+        aa = f"{self.getAge():5.2f}"
+        nDCM = f"{self.countNumberOfDicoms()}"
+        return [mm.get(i, "Unknown") for i in infoKeys]+[aa, nDCM], infoKeys + ['Age', 'TotalDicoms']
 
     # ------------------------------------------------------------------------------------------
     def anonymise(self, anonName=None):

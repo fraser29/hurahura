@@ -121,6 +121,13 @@ def checkArgs(args):
 ### ====================================================================================================================
 def runActions(args, extra_runActions=None):
 
+
+    # SUBJECT GROUP (based on dataRoot) ACTIONS
+    if args.SummaryCSV is not None:
+        if not args.QUIET:
+            print(f"Info: writting summary for {args.dataRoot} to {args.SummaryCSV}")
+        mi_subject.WriteSubjectStudySummary(args.dataRoot, args.SummaryCSV)
+
     # --- LOAD ---
     if args.loadPath is not None:
         if len(args.subjNList) == 0:
@@ -145,7 +152,7 @@ def runActions(args, extra_runActions=None):
             for sn in args.subjNList:
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
-                    if args.DEBUG:
+                    if not args.QUIET:
                         print(f"Anonymise: {iSubj.subjID}...")
                     iSubj.anonymise(args.anonName)
 
@@ -154,7 +161,7 @@ def runActions(args, extra_runActions=None):
             for sn in args.subjNList:
                 iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
                 if iSubj.exists():
-                    if args.DEBUG:
+                    if not args.QUIET:
                         print(f"Post load pipeline: {iSubj.subjID}...")
                     iSubj.runPostLoadPipeLine()
 
@@ -166,10 +173,6 @@ def runActions(args, extra_runActions=None):
                     if args.DEBUG:
                         print(f"Info: {iSubj.subjID}...")
                     iSubj.info()
-
-    # SUBJECT GROUP (based on dataRoot) ACTIONS
-    elif args.SummaryCSV is not None:
-        mi_subject.WriteSubjectStudySummary(args.dataRoot, args.SummaryCSV)
     
 
 
