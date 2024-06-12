@@ -631,8 +631,22 @@ class AbstractSubject(object):
         return sex.strip().lower() == 'm'
 
     # ------------------------------------------------------------------------------------------------------------------
-    def zipUpSubject(self, outputDirectory, EXCLUDE_RAW=False):
-        archive_name = os.path.join(outputDirectory, f"{self.subjID}.zip")
+    def zipUpSubject(self, outputDirectory, fileName=None, EXCLUDE_RAW=False):
+        """Will zip a subject and place in given output directory
+
+        Args:
+            outputDirectory (str): path to output directory
+            fileName (str, optional): If given then this is zip filename, if not given then use subjID. Defaults to None.
+            EXCLUDE_RAW (bool, optional): Set true to exclude RAW data - helpful for sharing. Defaults to False.
+
+        Returns:
+            str: the results full archive name
+        """
+        if fileName is None:
+            fileName = self.subjID
+        if not fileName.endswith(".zip"):
+            fileName += ".zip"
+        archive_name = os.path.join(outputDirectory, fileName)
         with ZipFile(archive_name, 'w') as zipf:
             for root, dirs, files in os.walk(self.getTopDir()):
                 if EXCLUDE_RAW: # Exclude RAW subdirectory
