@@ -53,7 +53,7 @@ class AbstractSubject(object):
             self._subjN = int(subjectNumber)
             if subjectPrefix is None:
                 # not given - guess from others in dataRoot
-                subjectPrefix = guessSubjectPrefix(self.dataRoot) # will raise mi_utils.SubjPrefixError if not obvious
+                subjectPrefix = guessSubjectPrefix(self.dataRoot, QUIET=True) # will raise mi_utils.SubjPrefixError if not obvious
             self.subjectPrefix = subjectPrefix
         except ValueError: # fail on int 
             # B) subjectNumber not an int - then treat as subjectID
@@ -167,7 +167,7 @@ class AbstractSubject(object):
     def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
         self.initDirectoryStructure()
         self.logger.info(f"LoadDicoms to {self.getDicomsDir()}") # Don't log source here as could be identifying
-        self.logger.info(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()}) & anon={anonName}") # FIXME - debug only
+        self.logger.debug(f"LoadDicoms ({dicomFolderToLoad} ==> {self.getDicomsDir()}) & anon={anonName}") 
         d0, dI = self.countNumberOfDicoms(), mi_utils.countFilesInDir(dicomFolderToLoad)
         study = spydcm.dcmTK.DicomStudy.setFromDirectory(dicomFolderToLoad, HIDE_PROGRESSBAR=HIDE_PROGRESSBAR)
         res = study.writeToOrganisedFileStructure(self.getDicomsDir())
@@ -354,6 +354,20 @@ class AbstractSubject(object):
         df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber'] == seNum, varName])[0]
 
+    def getDicomSeriesMetaList(self):
+        return self.getMetaDict()['Series']
+
+    def getDicomSeriesMeta(self, seriesNumber=None, seriesDescription=None):
+        if (seriesNumber is None) and (seriesDescription is None):
+            raise ValueError("parameter seriesNumber OR seriesDescription must be given")
+        allSeries = self.getDicomSeriesMetaList()
+        if seriesNumber is not None:
+            thisSeries = [i for i in allSeries if i['SeriesNumber']==seriesNumber]
+        else:
+            seD = seriesDescription.lower()
+            thisSeries = [i for i in allSeries if seD in i['SeriesDescription'].lower()]
+        return thisSeries
+
     def getMetaTagsFile(self, suffix=""):
         return os.path.join(self.getMetaDir(), f"{self.subjID}Tags{suffix}.json")
 
@@ -413,14 +427,33 @@ class AbstractSubject(object):
         self.logger.info('updateMetaFile')
 
     def buildDicomMeta(self):
+        """Builds a JSON file comprised of DICOM tags and some derived values. 
+        All data is taken from DICOM files - StudyDate, PatientID, MagneticFieldStrength etc
+        A 'Series' tag is populated with a list of all series with series information (same as found in ScanSeriesInfo.csv)
+
+        NOTE: miresearch expects one study (scanner exam instance) per subjectID. 
+        There are occasions where multiple studies occur but should be treated as one study. 
+        E.g.: the subject got off the table and then resummed the study later. 
+        miresearch will account for this by recording tags from the first found 'study' at the study level and 
+        from ALL found series to populate the list of series. 
+        """
         # this uses pydicom - so tag names are different.
-        ddFull = {'SubjectID': self.subjID, 'SubjN': self._subjN}
+        ddFull = {'SubjectID': self.subjID, 'SubjN': self._subjN, 'Series': []}
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         try:
             dcmDict = dcmStudies[0].getStudySummaryDict()
+            dcmDict.pop('Series') # Get more detailed series information
             ddFull.update(dcmDict)
-            for k1 in range(1, len(dcmStudies)):
-                ddFull['Series'] += dcmStudies[k1].getStudySummaryDict()['Series']
+            # 
+            for iDcmStudy in dcmStudies:
+                for iSeries in iDcmStudy:
+                    serDict = iSeries.getSeriesInfoDict(["SeriesNumber", 
+                                                                "SeriesDescription", 
+                                                                "StudyDate", 
+                                                                "AcquisitionTime",
+                                                                "InPlanePhaseEncodingDirection", 
+                                                                "PixelBandwidth"])
+                    ddFull['Series'].append(serDict)
         except IndexError:
             pass # Found no Dicoms
         self.updateMetaFile(ddFull)
@@ -808,21 +841,30 @@ class SubjectList(list):
             return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
         return matchList
 
-    def writeSummaryCSV(self, outputFileName_csv):
+    def writeSummaryCSV(self, outputFileName_csv, extra_series_tags=[]):
         data, header = [], []
-        for isubj in self:
+        for k0, isubj in enumerate(self):
             ss, hh = isubj.getInfoStr()
+            if k0 == 0:
+                header = hh
+            for k1, iSeriesTag in enumerate(extra_series_tags):
+                seList = isubj.getDicomSeriesMeta(seriesDescription=iSeriesTag)
+                for seDict in seList:
+                    if k1 == 0:
+                        kkS = sorted(seDict.keys())
+                    hh2 = [f"{iSeriesTag}_{kk}" for kk in kkS]
+                    if k0 == 0:
+                        header += hh2
+                    ss += [seDict[i] for i in kkS]
             data.append(ss)
-            header = hh
         mi_utils.writeCsvFile(data, header, outputFileName_csv)
 
 ### ====================================================================================================================
 ###  Helper functions for subject list
 ### ====================================================================================================================
-def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
+def _getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject, RETURN_N=False):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
-        print(f"subjectPrefix, {subjectPrefix}")
     allDir = os.listdir(dataRootDir)
     allDir = [i for i in allDir if i.startswith(subjectPrefix)]
     allDir = [i for i in allDir if os.path.isdir(os.path.join(dataRootDir, i))]
@@ -833,10 +875,19 @@ def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
         except ValueError:
             print(f"WARNING: {i} at {dataRootDir} not valid subject")
         if iSubjObj.exists():
-            subjObjList.append(iSubjObj)
+            if RETURN_N:
+                subjObjList.append(iSubjObj.subjN)
+            else:
+                subjObjList.append(iSubjObj)
         else:
             print(f"WARNING: {i} at {dataRootDir} not valid subject")
     return sorted(subjObjList)
+
+def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
+    return _getAllSubjects(dataRootDir, subjectPrefix, SubjClass)
+
+def getAllSubjectsN(dataRootDir, subjectPrefix=None):
+    return _getAllSubjects(dataRootDir, subjectPrefix, RETURN_N=True)
 
 def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
     if subjectPrefix is None:
@@ -898,11 +949,12 @@ def findZeroPadding(subjID):
     else:
         return 0  # If no number found, return 0
 
-def guessSubjectPrefix(dataRootDir):
+def guessSubjectPrefix(dataRootDir, QUIET=False):
     """Guess the subject prefix by looking for common names in the dataRootDir
 
     Args:
         dataRootDir (str): path to root directory of subject filesystem database
+        QUIET      (bool): Set True to suppress output (default False)
 
     Returns:
         str: subject prefix string
@@ -927,7 +979,10 @@ def guessSubjectPrefix(dataRootDir):
     maxCount = np.argmax(counts)
     if options.count(options[maxCount]) != 1:
         raise mi_utils.SubjPrefixError("Error guessing subject prefix - ambiguous - please provide")
-    return options[maxCount]
+    res = options[maxCount]
+    if not QUIET:
+        print(f"subjectPrefix determined from {dataRootDir} = {res}")
+    return res
 
 ### ====================================================================================================================
 ###  Helper functions for building new or adding to subjects

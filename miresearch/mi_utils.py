@@ -118,13 +118,6 @@ def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
     return DirectoryTree
 
 #==================================================================
-def setNList(args):
-    if len(args.subjRange) == 2:
-        args.subjNList = args.subjNList+list(range(args.subjRange[0], args.subjRange[1]))
-    if args.subjNListFile:
-        args.subjNList = args.subjNList+subjFileToSubjN(args.subjNListFile)
-    # args.subjNList = sorted(list(set(args.subjNList)))
-    
 #==================================================================
 def countFilesInDir(dirName):
     files = []

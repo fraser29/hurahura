@@ -130,6 +130,15 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             except Exception as e:
                 self.logger.warning(f"    _action processing interrupted - probably OK: {e}")
 
+        elif event.src_path.endswith('.zip') or \
+                event.src_path.endswith('.tar') or \
+                event.src_path.endswith('.tar.gz'):
+            self.logger.info(f"Archive created: {event.src_path}")
+            try:
+                self._action(event.src_path)
+            except Exception as e:
+                self.logger.warning(f"    _action processing interrupted - probably OK: {e}")
+
     def on_deleted(self, event):
         self.logger.info(f"deleted: {event.src_path}")
         pass

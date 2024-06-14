@@ -37,7 +37,8 @@ groupM.add_argument('-DEBUG', dest='DEBUG', help='Run in DEBUG mode (save interm
                         action='store_true')
 
 groupS = ParentAP.add_argument_group('Subject Definition')
-groupS.add_argument('-s', dest='subjNList', help='Subject number', nargs="*", type=int, default=[])
+groupS.add_argument('-s', dest='subjNList', help='Subject number(s)', nargs="*", type=int, default=[])
+groupS.add_argument('-sA', dest='AllSubjs', help='All subjects', action='store_true')
 groupS.add_argument('-sf', dest='subjNListFile', help='Subject numbers in file', type=str, default=None)
 groupS.add_argument('-sR', dest='subjRange', help='Subject range', nargs=2, type=int, default=[])
 groupS.add_argument('-y', dest='dataRoot', 
@@ -76,7 +77,7 @@ groupA.add_argument('-SubjInfo', dest='subjInfo',
 # GROUP ACTIONS
 groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
-                    type=str, default=None)
+                    type=str, nargs="*", default=None)
 
 # WATCH DIRECTORY
 groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
@@ -87,6 +88,17 @@ groupA.add_argument('-WatchDirectory', dest='WatchDirectory',
 ### ====================================================================================================================
 #           CHECK ARGS
 ### ====================================================================================================================
+
+def setNList(args):
+    if args.AllSubjs:
+        args.subjNList = mi_subject.getAllSubjectsN(args.dataRoot, args.subjPrefix)
+    else:
+        if len(args.subjRange) == 2:
+            args.subjNList = args.subjNList+list(range(args.subjRange[0], args.subjRange[1]))
+        if args.subjNListFile:
+            args.subjNList = args.subjNList+mi_utils.subjFileToSubjN(args.subjNListFile)
+    # args.subjNList = sorted(list(set(args.subjNList)))
+
 def checkArgs(args):
     # 
     if args.configFile: MIResearch_config.runconfigParser(args.configFile)
@@ -114,19 +126,12 @@ def checkArgs(args):
         MISubjClass = MIResearch_config.class_obj
     args.MISubjClass = MISubjClass
     ## -------------
-    mi_utils.setNList(args=args)
+    setNList(args=args)
 
 ### ====================================================================================================================
 #           RUN ACTIONS
 ### ====================================================================================================================
 def runActions(args, extra_runActions=None):
-
-
-    # SUBJECT GROUP (based on dataRoot) ACTIONS
-    if args.SummaryCSV is not None:
-        if not args.QUIET:
-            print(f"Info: writting summary for {args.dataRoot} to {args.SummaryCSV}")
-        mi_subject.WriteSubjectStudySummary(args.dataRoot, args.SummaryCSV)
 
     # --- LOAD ---
     if args.loadPath is not None:
@@ -147,10 +152,10 @@ def runActions(args, extra_runActions=None):
     elif len(args.subjNList) > 0:
         if args.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
+        subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
         # --- ANONYMISE ---
         if args.anonName is not None:
-            for sn in args.subjNList:
-                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
+            for iSubj in subjList:
                 if iSubj.exists():
                     if not args.QUIET:
                         print(f"Anonymise: {iSubj.subjID}...")
@@ -158,8 +163,7 @@ def runActions(args, extra_runActions=None):
 
         # --- POST LOAD PIPELINE ---
         elif args.subjRunPost:
-            for sn in args.subjNList:
-                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
+            for iSubj in subjList:
                 if iSubj.exists():
                     if not args.QUIET:
                         print(f"Post load pipeline: {iSubj.subjID}...")
@@ -167,13 +171,20 @@ def runActions(args, extra_runActions=None):
 
         # --- PRINT INFO ---
         elif args.subjInfo:
-            for sn in args.subjNList:
-                iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix)
+            for iSubj in subjList:
                 if iSubj.exists():
                     if args.DEBUG:
                         print(f"Info: {iSubj.subjID}...")
                     iSubj.info()
-    
+
+        # === SUBJECT GROUP ACTIONS ===
+        # --- SummaryCSV ---
+        elif args.SummaryCSV is not None:
+            if not args.QUIET:
+                print(f"Info: writting summary for {len(args.subjNList)} subjects at {args.dataRoot} to {args.SummaryCSV[0]}")
+                if len(args.SummaryCSV) > 1:
+                    print(f"  With tags: {args.SummaryCSV[1:]}")
+            subjList.writeSummaryCSV(args.SummaryCSV[0], extra_series_tags=args.SummaryCSV[1:])
 
 
     ## WATCH DIRECTORY ##
