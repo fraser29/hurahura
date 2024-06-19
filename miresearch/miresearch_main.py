@@ -194,7 +194,8 @@ def runActions(args, extra_runActions=None):
                                         args.dataRoot,
                                         args.subjPrefix,
                                         SubjClass=args.MISubjClass,
-                                        TO_ANONYMISE=(args.anonName is not None))
+                                        TO_ANONYMISE=(args.anonName is not None),
+                                        DEBUG=args.DEBUG)
         MIWatcher.run()
 
     if extra_runActions is not None:

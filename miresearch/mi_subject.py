@@ -255,19 +255,21 @@ class AbstractSubject(object):
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             for dcmSE in dcmStudy:
-                seInfoList.append(dcmSE.getSeriesInfoDict(["SeriesNumber", 
+                iSerDict = dcmSE.getSeriesInfoDict(["SeriesNumber", 
                                                             "SeriesDescription", 
                                                             "StudyDate", 
                                                             "AcquisitionTime",
                                                             "InPlanePhaseEncodingDirection", 
-                                                            "PixelBandwidth"]))
+                                                            "PixelBandwidth",
+                                                            ])
+                seInfoList.append(iSerDict)
         df = pd.DataFrame(data=seInfoList)
         df.to_csv(self.getSeriesMetaCSV())
         self.logger.info('buildSeriesDataMetaCSV')
 
     def info(self):
         # Print info for this subject
-        print(f"{self.subjID}: {self.getName()} scanned on {self.getStudyDate()}")
+        return f"{self.subjID}: {self.getName()} scanned on {self.getStudyDate()}"
 
     def printDicomsInfo(self):
         dicomFolderList = self.getDicomFoldersListStr(False)
@@ -453,6 +455,7 @@ class AbstractSubject(object):
                                                                 "AcquisitionTime",
                                                                 "InPlanePhaseEncodingDirection", 
                                                                 "PixelBandwidth"])
+                    serDict['DicomFileName'] = iSeries.getDicomFullFileName().replace(self.getTopDir(), "")
                     ddFull['Series'].append(serDict)
         except IndexError:
             pass # Found no Dicoms
@@ -1031,10 +1034,9 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
     newSubj.QUIET = QUIET
 
     # Now have a subject - either newly created or existing and matching dicom data - load dicoms to subject:
-    try:
-        os.path.isdir(dicomDir_orData)
+    if os.path.isdir(dicomDir_orData):
         newSubj.loadDicomsToSubject(dicomDir_orData, anonName=anonName, HIDE_PROGRESSBAR=QUIET)
-    except TypeError:
+    else:
         newSubj.loadSpydcmStudyToSubject(dicomDir_orData, anonName=anonName)
     #
     return newSubj

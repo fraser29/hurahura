@@ -13,9 +13,12 @@ from miresearch.mi_config import MIResearch_config
 
 # ====================================================================================================
 # ====================================================================================================
-def getLogger(id, logfileName):
+def getLogger(id, logfileName, DEBUG=False):
     logger = logging.getLogger(id)
-    logger.setLevel(logging.INFO)
+    if DEBUG:
+       logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
     fh = logging.FileHandler(logfileName, encoding='utf-8')
     fh.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', 
                                     datefmt='%d-%b-%y %H:%M:%S'))
@@ -33,13 +36,15 @@ class MIResearch_WatchDog(object):
                  dataStorageRoot,
                  subjectPrefix,
                  SubjClass=mi_subject.AbstractSubject,
-                 TO_ANONYMISE=False) -> None:
+                 TO_ANONYMISE=False,
+                 DEBUG=False) -> None:
         self.directoryToWatch = directoryToWatch
         self.dataStorageRoot = dataStorageRoot
         self.subjectPrefix = subjectPrefix
         self.SubjClass = SubjClass
         self.TO_ANONYMISE = TO_ANONYMISE
         self.recursive = False
+        self.DEBUG = DEBUG
         #
         self.processDir = os.path.join(self.directoryToWatch, 'MIResearch-PROCESSING')
         self.completeDir = os.path.join(self.directoryToWatch, 'MIResearch-COMPLETE')
@@ -50,14 +55,15 @@ class MIResearch_WatchDog(object):
             if os.path.isdir(os.path.split(self.dataStorageRoot)[0]):
                 os.makedirs(self.dataStorageRoot)
         #
-        self.logger = getLogger(subjectPrefix, os.path.join(self.processDir, "mi_watcher.log"))
+        self.logger = getLogger(subjectPrefix, os.path.join(self.processDir, "mi_watcher.log"), self.DEBUG)
         # 
         self.event_handler = MIResearch_SubdirectoryHandler(self.directoryToWatch,
                                                             self.dataStorageRoot,
                                                             self.subjectPrefix,
                                                             self.logger,
                                                             self.SubjClass,
-                                                            self.TO_ANONYMISE)
+                                                            self.TO_ANONYMISE,
+                                                            self.DEBUG)
         self.event_handler.processDir = self.processDir
         self.event_handler.completeDir = self.completeDir
 
@@ -71,6 +77,7 @@ class MIResearch_WatchDog(object):
         self.logger.info(f" subject prefix: {self.subjectPrefix}")
         self.logger.info(f" anonymise: {self.TO_ANONYMISE}")
         self.logger.info(f" SubjectClass: {self.SubjClass}")
+        self.logger.debug(f" RUNNING IN DEBUG MODE")
         observer.start()
         self.logger.info(f" -------------- OBSERVER STARTED --------------")
         try:
@@ -99,7 +106,8 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                  subjectPrefix,
                  logger,
                  SubjClass=mi_subject.AbstractSubject,
-                 TO_ANONYMISE=False) -> None:
+                 TO_ANONYMISE=False,
+                 DEBUG=False) -> None:
         super(MIResearch_SubdirectoryHandler, self).__init__()
         self.directoryToWatch = directoryToWatch
         self.dataStorageRoot = dataStorageRoot
@@ -107,6 +115,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         self.logger = logger
         self.SubjClass = SubjClass
         self.TO_ANONYMISE = TO_ANONYMISE
+        self.DEBUG = DEBUG
         #
         self.ignore_pattern = ['.WORKING', 'MIResearch-']
         # Polling
@@ -120,7 +129,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             try:
                 self._action(event.dest_path)
             except Exception as e:
-                self.logger.warning(f"    _action processing interrupted - probably OK: {e}")
+                self.logger.error(f"    _action processing interrupted : {e}")
 
     def on_created(self, event):
         if event.is_directory:
@@ -128,7 +137,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             try:
                 self._action(event.src_path)
             except Exception as e:
-                self.logger.warning(f"    _action processing interrupted - probably OK: {e}")
+                self.logger.error(f"    _action processing interrupted : {e}")
 
         elif event.src_path.endswith('.zip') or \
                 event.src_path.endswith('.tar') or \
@@ -137,7 +146,9 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             try:
                 self._action(event.src_path)
             except Exception as e:
-                self.logger.warning(f"    _action processing interrupted - probably OK: {e}")
+                if self.DEBUG:
+                    raise e
+                self.logger.error(f"    _action processing interrupted : {e}")
 
     def on_deleted(self, event):
         self.logger.info(f"deleted: {event.src_path}")
@@ -168,12 +179,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                     except Exception as e:
                         self.logger.error(f"An error occurred: {e}")
             ## 
-            try: 
-                self.execute_loadDirectory(new_subdirectory_full)
-            except Exception as e:
-                # catch all exception - if permission error then should retry automatically
-                #  - else need a way to force retry
-                self.logger.error(f"An error occurred: {str(e)} ")
+            self.execute_loadDirectory(new_subdirectory_full)
 
 
     def findMatchingProcessingDirs(self, src_path):
@@ -224,18 +230,30 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         uid = uuid.uuid4().hex
         src_path = os.path.split(directoryToLoad)[1]
         directoryToLoad_process = shutil.move(directoryToLoad, os.path.join(self.processDir, uid+"_"+src_path))
-        newSubjList = mi_subject.createNew_OrAddTo_Subject(directoryToLoad_process,
-                                             dataRoot=self.dataStorageRoot,
-                                             SubjClass=self.SubjClass,
-                                             subjPrefix=self.subjectPrefix)
+        try:
+            self.logger.info(f"*** BEGIN PROCESSING {directoryToLoad_process} ***")
+            newSubjList = mi_subject.createNew_OrAddTo_Subject(directoryToLoad_process,
+                                                dataRoot=self.dataStorageRoot,
+                                                SubjClass=self.SubjClass,
+                                                subjPrefix=self.subjectPrefix)
+        except Exception as e:
+            if self.DEBUG:
+                raise e
+            self.logger.error(f"An error occurred while loading subject: {str(e)} ")
         if self.TO_ANONYMISE:
-            for iNewSubj in newSubjList:
-                iNewSubj.anonymise()
+                for iNewSubj in newSubjList:
+                    try:
+                        iNewSubj.anonymise()
+                    except Exception as e:
+                        if self.DEBUG:
+                            raise e
+                        self.logger.error(f"An error occurred while anonymising {iNewSubj}: {str(e)} ")
         finalCompleteDir = os.path.join(self.completeDir, os.path.split(directoryToLoad_process)[1])
         if os.path.isdir(finalCompleteDir):
             self.logger.warning(f"{finalCompleteDir} exists - will delete before moving {directoryToLoad_process}")
             shutil.rmtree(finalCompleteDir)
         shutil.move(directoryToLoad_process, self.completeDir)
+        self.logger.info(f"=== FINISHED PROCESSING {directoryToLoad_process} ===")
 
 
 ### ====================================================================================================================
