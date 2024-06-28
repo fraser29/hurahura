@@ -73,11 +73,17 @@ groupA.add_argument('-RunPost', dest='subjRunPost',
 groupA.add_argument('-SubjInfo', dest='subjInfo', 
                     help='Print info for each subject', 
                     action='store_true')
+groupA.add_argument('-SubjInfoFull', dest='subjInfoFull', 
+                    help='Print full info for each subject', 
+                    action='store_true')
 
 # GROUP ACTIONS
 groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
                     type=str, nargs="*", default=None)
+groupA.add_argument('-Summary', dest='Summary', 
+                    help='Print summary of provided subjects to commandline (best with -sA option)', 
+                    action='store_true')
 
 # WATCH DIRECTORY
 groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
@@ -175,7 +181,13 @@ def runActions(args, extra_runActions=None):
                 if iSubj.exists():
                     if args.DEBUG:
                         print(f"Info: {iSubj.subjID}...")
-                    iSubj.info()
+                    print(iSubj.info())
+        elif args.subjInfoFull:
+            for iSubj in subjList:
+                if iSubj.exists():
+                    if args.DEBUG:
+                        print(f"Info: {iSubj.subjID}...")
+                    iSubj.infoFull()
 
         # === SUBJECT GROUP ACTIONS ===
         # --- SummaryCSV ---
@@ -185,7 +197,12 @@ def runActions(args, extra_runActions=None):
                 if len(args.SummaryCSV) > 1:
                     print(f"  With tags: {args.SummaryCSV[1:]}")
             subjList.writeSummaryCSV(args.SummaryCSV[0], extra_series_tags=args.SummaryCSV[1:])
-
+        
+        # --- Summary ---
+        elif args.Summary:
+            if not args.QUIET:
+                print(f"Info: summary for {len(args.subjNList)} subjects at {args.dataRoot}")
+            print(subjList)
 
     ## WATCH DIRECTORY ##
     elif args.WatchDirectory is not None:
