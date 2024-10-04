@@ -147,6 +147,14 @@ class AbstractSubject(object):
         self._loggerFH.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
         self._logger.addHandler(self._loggerFH)
 
+    def setLoggerDebug(self):
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.propagate = False
+
+    def setLoggerInfo(self):
+        self.logger.setLevel(logging.INFO)
+        self.logger.propagate = False
+
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
     ### ----------------------------------------------------------------------------------------------------------------
@@ -269,8 +277,14 @@ class AbstractSubject(object):
         df.to_csv(self.getSeriesMetaCSV())
         self.logger.info('buildSeriesDataMetaCSV')
 
+    def infoFull(self):
+        data, header = self.getInfoStr()
+        print(",".join(header))
+        print(",".join([str(i) for i in data]))
+        self.printDicomsInfo()
+
     def info(self):
-        # Print info for this subject
+        # Return info string for this subject
         return f"{self.subjID}: {self.getName()} scanned on {self.getStudyDate()}"
 
     def printDicomsInfo(self):
@@ -797,7 +811,6 @@ class SubjectList(list):
                 pass
         return None
     
-
     def findSubjMatchingStudyID(self, studyID):
         """
         :param studyID (or examID): int
@@ -920,15 +933,15 @@ def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubjec
         subjList.reduceToExist()
     return subjList
 
-def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None):
+def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None, SubjClass=AbstractSubject):
     if (summaryFilePath is None) or (len(summaryFilePath) == 0):
         nowStr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         summaryFilePath = os.path.join(dataRootDir, f'Summary_{nowStr}.csv')
-    misubjList = SubjectList.setByDirectory(dataRootDir)
+    misubjList = SubjectList.setByDirectory(dataRootDir, subjectPrefix=subjPrefix, SubjClass=SubjClass)
     misubjList.writeSummaryCSV(summaryFilePath)
 
 ### ====================================================================================================================
-def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None):
+def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None, SubjClass=AbstractSubject):
     try:
         ds = spydcm.returnFirstDicomFound(dicomDir_OrData)
         queryUID = ds.get('StudyInstanceUID', None)
@@ -936,7 +949,7 @@ def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None):
         queryUID = dicomDir_OrData.getTag('StudyInstanceUID', ifNotFound=None)
     if queryUID is None: 
         return None
-    SubjList = SubjectList.setByDirectory(dataRoot=dataRoot, subjectPrefix=subjPrefix)
+    SubjList = SubjectList.setByDirectory(dataRoot=dataRoot, subjectPrefix=subjPrefix, SubjClass=SubjClass)
     return SubjList.findSubjMatchingStudyUID(queryUID)
 
 
@@ -1034,7 +1047,7 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
         newSubj = None
     else:
         # Check if a subject already exists with dicom data matching input
-        newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix)
+        newSubj = findSubjMatchingDicomStudyUID(dicomDir_orData, dataRoot, subjPrefix, SubjClass)
     if newSubj is not None:
         # Subject exists - so check nothing conflicting from inputs
         if subjNumber is not None:
