@@ -173,7 +173,7 @@ def subjFileToSubjN(subjFile):
         return [int(i[0][first_numeric:]) for i in allLines]
 
 
-def writeCsvFile(data, header, csvFile, FIX_NAN=False):
+def writeCSVFile(data, header, csvFile, FIX_NAN=False):
     with open(csvFile, 'w') as fout:
         csvWriter = csv.writer(fout, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         #first write column headers

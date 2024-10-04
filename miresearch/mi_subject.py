@@ -186,7 +186,6 @@ class AbstractSubject(object):
             self.anonymise(anonName=anonName)
         finalNumDicoms = self.countNumberOfDicoms()
         self.logger.info(f"Initial number of dicoms: {initNumDicoms}, number to load: {numDicomsToLoad}, final number dicoms: {finalNumDicoms}")
-        self.buildDicomMeta()
         self.buildSeriesDataMetaCSV(FORCE=True)
         self.runPostLoadPipeLine()
 
@@ -219,6 +218,9 @@ class AbstractSubject(object):
         return self._getDir([mi_utils.RAW])
     
     def getDicomsDir(self):
+        return self.__getDicomsDir()
+    
+    def __getDicomsDir(self):
         dirName = self._getDir([mi_utils.RAW, mi_utils.DICOM])
         return dirName
     
@@ -426,7 +428,7 @@ class AbstractSubject(object):
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
         spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
-        self.logger.info('updateMetaFile')
+        self.logger.info('Updated meta-file')
 
     def buildDicomMeta(self):
         """Builds a JSON file comprised of DICOM tags and some derived values. 
@@ -462,7 +464,7 @@ class AbstractSubject(object):
         self.updateMetaFile(ddFull)
 
     def countNumberOfDicoms(self):
-        return mi_utils.countFilesInDir(self.getDicomsDir())
+        return mi_utils.countFilesInDir(self.__getDicomsDir())
     
     def getDicomSeriesDir_Description(self, seriesDescription):
         dd = self.getSeriesNumbersMatchingDescriptionStr(seriesDescription)
@@ -489,6 +491,20 @@ class AbstractSubject(object):
         dirName = dcmSeries.getRootDir()
         return dirName
 
+
+    def hasDicomSeries(self, seriesDescription):
+        if type(seriesDescription) != list:
+            seriesDescription = [seriesDescription]
+        seriesDescription_ = [i.lower() for i in seriesDescription]
+        dcmDirs = self.getDicomFoldersListStr(FULL=False)
+        for iDcmDir in dcmDirs:
+            iDcmDir_ = iDcmDir.lower()
+            tf = [i in iDcmDir_ for i in seriesDescription_]
+            if all(tf):
+                return True
+        return False
+
+
     def getDicomFile(self, seriesNum, instanceNum=1):
         #FIXME Note - at some point the files were named incorrectly - this has to work around this... Could be better
         # (and the number of leading zeros changed)
@@ -501,6 +517,7 @@ class AbstractSubject(object):
             dicomf = os.path.join(self.getDicomSeriesDir(seriesNum),
                                   'IM-%05d-%05d.dcm' % (seriesNum, instanceNum))
         return dicomf
+
 
     def getDicomFoldersListStr(self, FULL=True, excludeSeNums=None):
         dFolders = []
@@ -524,6 +541,7 @@ class AbstractSubject(object):
         dcmDirList = sorted(dcmDirList, key=spydcm.dcmTools.instanceNumberSortKey)
         return dcmDirList
 
+
     def getListOfSeNums(self):
         se = []
         for ff in self.getDicomFoldersListStr(FULL=False):
@@ -534,11 +552,13 @@ class AbstractSubject(object):
                 pass
         return se
 
+
     def getStudyID(self):
         studyID = self.getMetaTagValue("StudyID")
         if studyID == "0":
             studyID = self.getMetaTagValue("ScannerStudyID")
         return studyID
+    
     
     def getSeriesDescriptionsStr(self):
         return ','.join(self.getDicomFoldersListStr(FULL=False))
@@ -563,25 +583,22 @@ class AbstractSubject(object):
 
     # ------------------------------------------------------------------------------------------
     def anonymise(self, anonName=None):
-        self.logger.info(f'Anonymise in place to {anonName}')
         name, firstNames = self.getName_FirstNames()
         anonName = self._checkAnonName(anonName, name, firstNames)
-        # anonName = self._checkAnonName(anonName, patName.split("^")[0], "_".join(patName.split("^")[1:]))
-        if type(anonName) == str:
-            if len(anonName) == 0:  
-                anonName = None # Still anonymise, but let program choose the new anonName
-        self.logger.info('Anonymise in place')
+        self.logger.info(f'Begin anonymise in place. New name: "{anonName}"')
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
+        self.logger.info('End anonymise')
         self.setIsAnonymised()
         self.buildDicomMeta()
 
     def _checkAnonName(self, anonName, name="", firstNames=""):
-        self.logger.info(f'_checkAnonName args: {anonName}, name={name}, firstnames={firstNames}') # FIXME debug
         if anonName == "SOFT":
             self.setEncodedName(NAME=name, FIRST_NAMES=firstNames)
             return ""
         elif anonName == "HARD":
             self.setEncodedName(NAME='Name-Unknown', FIRST_NAMES='FirstNames-Unknown')
+            return ""
+        elif anonName is None:
             return ""
         return anonName
     
@@ -592,7 +609,6 @@ class AbstractSubject(object):
         return self.getTagValue("ANONYMISED", False)
 
     def setEncodedName(self, NAME, FIRST_NAMES=""):
-        self.logger.info(f"Adding encoded name {NAME} & {FIRST_NAMES} -- {mi_utils.encodeString('Name-Unknown', self.subjID)}") # FIXME THIS IS DEBUG - REMOVE ME
         dd = {'NAME': mi_utils.encodeString(NAME, self.subjID),
               'FIRST_NAMES': mi_utils.encodeString(FIRST_NAMES, self.subjID)}
         self.updateMetaFile(dd)
@@ -615,7 +631,6 @@ class AbstractSubject(object):
                 pass
             
         name = self.getName()
-        self.logger.info(f"got name {name}") # FIXME THIS IS DEBUG - REMOVE ME
         parts = name.split("^")
         if len(parts) == 1:
             return parts[0], ""
@@ -860,7 +875,7 @@ class SubjectList(list):
                         header += hh2
                     ss += [seDict[i] for i in kkS]
             data.append(ss)
-        mi_utils.writeCsvFile(data, header, outputFileName_csv)
+        mi_utils.writeCSVFile(data, header, outputFileName_csv)
 
 ### ====================================================================================================================
 ###  Helper functions for subject list
@@ -1026,6 +1041,8 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
             if subjNumber != newSubj.subjN:
                 raise ValueError(f"You supplied subject number {subjNumber} but a different subject matching your input dicom study exists at {newSubj.subjN}")
         print(f"Found existing subject {newSubj.subjID} at {dataRoot} - adding to")
+        print("DEBUG - SKIPPING")
+        return 
     
     # If no subject exists matching the inputs - define a new subject (increment subjN from current in root directory)
     if newSubj is None: 
@@ -1089,6 +1106,7 @@ def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubje
 
 def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot, 
                                        SubjClass=AbstractSubject, subjPrefix=None, 
+                                       anonName=None, 
                                        IGNORE_UIDS=False, QUIET=False):
     if not os.path.isdir(multiDicomDirToLoad):
         raise IOError(" Load dir does not exist")
@@ -1108,6 +1126,7 @@ def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot,
                                              dataRoot=dataRoot,
                                              SubjClass=SubjClass,
                                              subjPrefix=subjPrefix,
+                                             anonName=anonName,
                                              QUIET=QUIET,
                                              IGNORE_UIDS=IGNORE_UIDS))
     return newSubjsList
@@ -1136,7 +1155,7 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
     Returns:
         list: list of Subject Objects added to or created
     """
-    if LOAD_MULTI and ((subjNumber is not None) or (anonName is not None)):
+    if LOAD_MULTI and (subjNumber is not None):
         raise ValueError("Can not pass subjNumber if LOAD_MULTI set True")
     if LOAD_MULTI:
         return SubjectList(_createNew_OrAddTo_Subjects_Multi(loadDirectory, 
@@ -1144,7 +1163,7 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
                                        SubjClass=SubjClass, 
                                        subjPrefix=subjPrefix, 
                                        IGNORE_UIDS=IGNORE_UIDS,
-                                       QUIET=QUIET))
+                                       QUIET=QUIET)) # TODO add anonName here so can deal with SOFT or HARD
     else:
         return SubjectList([_createNew_OrAddTo_Subject(loadDirectory, 
                                 dataRoot=dataRoot,

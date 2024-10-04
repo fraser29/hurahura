@@ -54,6 +54,7 @@ groupS.add_argument('-anonName', dest='anonName',
                     help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 
                     type=str, default=None)
     
+## === ACTIONS ===
 groupA = ParentAP.add_argument_group('Actions')
 # LOADING
 groupA.add_argument('-Load', dest='loadPath', 
@@ -73,6 +74,12 @@ groupA.add_argument('-RunPost', dest='subjRunPost',
 groupA.add_argument('-SubjInfo', dest='subjInfo', 
                     help='Print info for each subject', 
                     action='store_true')
+
+# SEARCH ACTIONS
+groupA.add_argument('-SearchSeriesDesc', dest='searchSerDesc', 
+                    help='Search based on a series description', 
+                    type=str, default=None)
+
 
 # GROUP ACTIONS
 groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
@@ -175,7 +182,20 @@ def runActions(args, extra_runActions=None):
                 if iSubj.exists():
                     if args.DEBUG:
                         print(f"Info: {iSubj.subjID}...")
-                    iSubj.info()
+                    print(iSubj.info())
+                elif not args.QUIET:
+                    print(f"{iSubj} does not exist at {iSubj.dataRoot}")
+
+        elif args.searchSerDesc:
+            for iSubj in subjList:
+                if iSubj.exists():
+                    if args.DEBUG:
+                        print(f"Searching: {iSubj.subjID}...")
+                    res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.searchSerDesc)
+                    if len(res) > 0:
+                        print(f"{iSubj} has {list(res.values())}")
+                elif not args.QUIET:
+                    print(f"{iSubj} does not exist at {iSubj.dataRoot}")
 
         # === SUBJECT GROUP ACTIONS ===
         # --- SummaryCSV ---
@@ -199,7 +219,11 @@ def runActions(args, extra_runActions=None):
         MIWatcher.run()
 
     if extra_runActions is not None:
-        extra_runActions(args)
+        if type(extra_runActions) == list:
+            for iExtra in extra_runActions:
+                iExtra(args)
+        else:
+            extra_runActions(args)
 
 ### ====================================================================================================================
 ### ====================================================================================================================
