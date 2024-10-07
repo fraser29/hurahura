@@ -343,17 +343,6 @@ class AbstractSubject(object):
         s2 = self.getTimeTakenForSeriesN_s(max(se))
         return s1 + s2
 
-    def findDicomSeries(self, descriptionStr):
-        return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr)
-
-    def getSeriesNumbersMatchingDescriptionStr(self, descriptionStr): # FIXME what if mult studies
-        dcmStudy = spydcm.dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True, ONE_FILE_PER_DIR=True)
-        dOut = {}
-        for iSeries in dcmStudy:
-            if descriptionStr.lower() in iSeries.getTag('SeriesDescription').lower():
-                dOut[iSeries.getTag('SeriesNumber', ifNotFound='#')] = iSeries.getSeriesOutDirName()
-        return dOut
-
     def getSeriesMetaValue(self, seNum, varName):
         """Get meta value for given series naumber
 
@@ -477,15 +466,36 @@ class AbstractSubject(object):
             pass # Found no Dicoms
         self.updateMetaFile(ddFull)
 
+
     def countNumberOfDicoms(self):
         return mi_utils.countFilesInDir(self.__getDicomsDir())
-    
+
+
+    def findDicomSeries(self, seriesDescription):
+        if type(seriesDescription) != list:
+            seriesDescription = [seriesDescription]
+        seriesDescription_ = [i.lower() for i in seriesDescription]
+        series = self.getMetaTagValue("Series")
+        possibles = {}
+        for iSeries in series:
+            iDescriptionStr_ = iSeries['SeriesDescription'].lower()
+            tf = [i in iDescriptionStr_ for i in seriesDescription_]
+            if all(tf):
+                possibles[iSeries['SeriesNumber']] = os.path.split(iSeries['DicomFileName'])[1]
+        return possibles
+
+
+    def getSeriesNumbersMatchingDescriptionStr(self, descriptionStr):
+        return self.findDicomSeries(descriptionStr).keys()
+
+
     def getDicomSeriesDir_Description(self, seriesDescription):
         dd = self.getSeriesNumbersMatchingDescriptionStr(seriesDescription)
         seNs = dd.keys()
         seN = min(seNs)
         return self.getDicomSeriesDir(seN)
-    
+
+
     def getDicomSeriesDir(self, seriesNum, seriesUID=None):
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
         if seriesUID is not None:
@@ -507,30 +517,21 @@ class AbstractSubject(object):
 
 
     def hasDicomSeries(self, seriesDescription):
-        if type(seriesDescription) != list:
-            seriesDescription = [seriesDescription]
-        seriesDescription_ = [i.lower() for i in seriesDescription]
-        dcmDirs = self.getDicomFoldersListStr(FULL=False)
-        for iDcmDir in dcmDirs:
-            iDcmDir_ = iDcmDir.lower()
-            tf = [i in iDcmDir_ for i in seriesDescription_]
-            if all(tf):
-                return True
-        return False
+        return len(self.findDicomSeries(seriesDescription)) > 0 
 
 
     def getDicomFile(self, seriesNum, instanceNum=1):
-        #FIXME Note - at some point the files were named incorrectly - this has to work around this... Could be better
-        # (and the number of leading zeros changed)
-        # possible fix - work it out on per subject basis
-        dicomf = os.path.join(self.getDicomSeriesDir(seriesNum), 'IM-%04d-%04d.dcm'%(seriesNum, instanceNum))
-        if not os.path.isfile(dicomf):
-            dicomf = os.path.join(self.getDicomSeriesDir(seriesNum),
-                                  'IM-%04d-%04d.dcm' % (1, instanceNum))
-        if not os.path.isfile(dicomf):
-            dicomf = os.path.join(self.getDicomSeriesDir(seriesNum),
-                                  'IM-%05d-%05d.dcm' % (seriesNum, instanceNum))
-        return dicomf
+        series = self.getMetaTagValue("Series")
+        for iSeries in series:
+            if int(iSeries['SeriesNumber']) == seriesNum:
+                dicomf = iSeries['DicomFileName']
+                if not os.path.isfile(dicomf):
+                    return None
+                root, filename = os.path.split(dicomf)
+                filename, ext = os.path.splitext(filename)
+                file_parts = filename.split('-')
+                return os.path.join(root, f"{file_parts[0]}-{file_parts[1]}-{instanceNum:04d}{ext}")
+        return None
 
 
     def getDicomFoldersListStr(self, FULL=True, excludeSeNums=None):
