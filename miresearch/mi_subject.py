@@ -487,7 +487,7 @@ class AbstractSubject(object):
             if all(tf):
                 relPath = os.path.split(iSeries['DicomFileName'])[0]
                 absPath = os.path.join(self.getTopDir(), relPath)
-                print(relPath, absPath)
+                print(relPath, absPath, self.getTopDir(), self.dataRoot, self.subjID)
                 possibles[iSeries['SeriesNumber']] = absPath
         print(possibles)
         return possibles
