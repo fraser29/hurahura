@@ -486,10 +486,10 @@ class AbstractSubject(object):
             tf = [i in iDescriptionStr_ for i in seriesDescription_]
             if all(tf):
                 relPath = os.path.split(iSeries['DicomFileName'])[0]
+                if relPath.startswith('/'):
+                    relPath = relPath[1:]  # Remove leading slash
                 absPath = os.path.join(self.getTopDir(), relPath)
-                print(relPath, absPath, self.getTopDir(), self.dataRoot, self.subjID)
                 possibles[iSeries['SeriesNumber']] = absPath
-        print(possibles)
         return possibles
 
 
