@@ -255,8 +255,10 @@ class AbstractSubject(object):
     def getSeriesMetaCSV(self):
         return os.path.join(self.getMetaDir(), 'ScanSeriesInfo.csv')
 
+
     def getSeriesMetaAsDataFrame(self):
         return pd.read_csv(self.getSeriesMetaCSV(),  encoding="ISO-8859-1")
+
 
     def buildSeriesDataMetaCSV(self, FORCE=False):
         if os.path.isfile(self.getSeriesMetaCSV()) and (not FORCE):
@@ -277,15 +279,18 @@ class AbstractSubject(object):
         df.to_csv(self.getSeriesMetaCSV())
         self.logger.info('buildSeriesDataMetaCSV')
 
+
     def infoFull(self):
         data, header = self.getInfoStr()
         print(",".join(header))
         print(",".join([str(i) for i in data]))
         self.printDicomsInfo()
 
+
     def info(self):
         # Return info string for this subject
         return f"{self.subjID}: {self.getName()} scanned on {self.getStudyDate()}"
+
 
     def printDicomsInfo(self):
         dicomFolderList = self.getDicomFoldersListStr(False)
@@ -294,13 +299,12 @@ class AbstractSubject(object):
         print("\n".join(ss))
         print("")
 
+
     def askUserForDicomSeriesNumber(self):
         self.printDicomsInfo()
         seNum = input("Enter the dicom series number: ")
         return int(seNum)
 
-    def findDicomSeries(self, descriptionStr, excludeStr=None):
-        return self.getSeriesNumbersMatchingDescriptionStr(descriptionStr, excludeStr=excludeStr)
 
     def getStartTime_EndTimeOfExam(self):
         NN = self.getListOfSeNums()
