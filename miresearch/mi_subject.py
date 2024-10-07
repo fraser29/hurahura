@@ -481,7 +481,7 @@ class AbstractSubject(object):
             iDescriptionStr_ = iSeries['SeriesDescription'].lower()
             tf = [i in iDescriptionStr_ for i in seriesDescription_]
             if all(tf):
-                possibles[iSeries['SeriesNumber']] = os.path.split(iSeries['DicomFileName'])[0]
+                possibles[iSeries['SeriesNumber']] = os.path.join(self.getTopDir(), os.path.split(iSeries['DicomFileName'])[0])
         return possibles
 
 
