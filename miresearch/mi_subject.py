@@ -1063,8 +1063,6 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
             if subjNumber != newSubj.subjN:
                 raise ValueError(f"You supplied subject number {subjNumber} but a different subject matching your input dicom study exists at {newSubj.subjN}")
         print(f"Found existing subject {newSubj.subjID} at {dataRoot} - adding to")
-        print("DEBUG - SKIPPING")
-        return 
     
     # If no subject exists matching the inputs - define a new subject (increment subjN from current in root directory)
     if newSubj is None: 
