@@ -197,10 +197,17 @@ class AbstractSubject(object):
         self.buildSeriesDataMetaCSV(FORCE=True)
         self.runPostLoadPipeLine()
 
+
     def runPostLoadPipeLine(self, *args, **kwargs):
         # this is an abstract method for implementation by subclasses
         pass
 
+
+    def getLevelCompleted(self):
+        # this is an abstract method for implementation by subclasses
+        return 0.0
+
+        
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
     def exists(self):
         return os.path.isdir(self.getTopDir())
