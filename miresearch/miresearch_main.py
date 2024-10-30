@@ -239,7 +239,11 @@ def runActions(args, extra_runActions=None):
     if extra_runActions is not None:
         if type(extra_runActions) == list:
             for iExtra in extra_runActions:
-                iExtra(args)
+                try:
+                    iExtra(args)
+                except AttributeError as AttrError:
+                    print(f"Error in extra action {iExtra}: Has the configuration been set up correctly (esp. 'class_path')?")
+                    raise AttrError
         else:
             extra_runActions(args)
 
