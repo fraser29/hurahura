@@ -23,7 +23,7 @@ KEYWORDS="medical, imaging, mri, ct, dicom"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "spydcmtk", "pandas", "numpy", "watchdog"
+    "spydcmtk", "pandas", "numpy", "watchdog", "nicegui"
 ]
 
 

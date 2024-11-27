@@ -20,12 +20,35 @@ import datetime
 import pandas as pd
 import shutil
 import logging
+from functools import wraps
+from typing import Optional
 ##
 from spydcmtk import spydcm
 from miresearch import mi_utils
 
 # ====================================================================================================
 # ====================================================================================================
+
+def ui_method(description: str = "", 
+              category: str = "General",
+              order: int = 100):
+    """Decorator to mark methods that should be available in UI
+    
+    Args:
+        description (str): Description of what the method does
+        category (str): Category for grouping in UI 
+        order (int): Display order in UI (lower numbers first)
+    """
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        wrapper._is_ui_method = True
+        wrapper._ui_description = description
+        wrapper._ui_category = category
+        wrapper._ui_order = order
+        return wrapper
+    return decorator
 
 # ====================================================================================================
 #       ABSTRACT SUBJECT CLASS
@@ -82,7 +105,20 @@ class AbstractSubject(object):
     ### ----------------------------------------------------------------------------------------------------------------
     ### Class Methods
     ### ----------------------------------------------------------------------------------------------------------------
-
+    @classmethod
+    def get_ui_methods(cls):
+        """Get all methods marked with @ui_method decorator"""
+        methods = []
+        for name, method in cls.__dict__.items():
+            if hasattr(method, '_is_ui_method'):
+                methods.append({
+                    'name': name,
+                    'method': method,
+                    'description': getattr(method, '_ui_description', ''),
+                    'category': getattr(method, '_ui_category', 'General'),
+                    'order': getattr(method, '_ui_order', 100)
+                })
+        return sorted(methods, key=lambda x: (x['category'], x['order'], x['name']))
     ### ----------------------------------------------------------------------------------------------------------------
     ### Overriding methods
     ### ----------------------------------------------------------------------------------------------------------------
@@ -612,6 +648,11 @@ class AbstractSubject(object):
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa, nDCM], infoKeys + ['Age', 'TotalDicoms']
 
     # ------------------------------------------------------------------------------------------
+    @ui_method(
+        description="Anonymise subject",
+        category="Anonymisation",
+        order=1
+    )
     def anonymise(self, anonName=None):
         name, firstNames = self.getName_FirstNames()
         anonName = self._checkAnonName(anonName, name, firstNames)
