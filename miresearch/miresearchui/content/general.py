@@ -43,7 +43,7 @@ def subject_page(subjid: str, dataRoot: str=os.path.expanduser("~")):
             seriesList = metaDict['Series']
             for iSeries in seriesList:
                 rowsSe.append({"serdesc": iSeries.get('SeriesDescription', 'UNKNOWN'), 
-                              "ndcm": iSeries.get('ImagesInSeries', 'UNKNOWN')})
+                              "ndcm": len(iSeries)})
             ui.table(columns=columnsSe, rows=rowsSe, row_key='key')
 
         with ui.tab_panel(logview):

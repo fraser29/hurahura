@@ -10,16 +10,16 @@ from content.general import subject_page
 # PYTHONPATH=/home/fraser/DEV/miresearch/
 from miresearch import mi_subject
 from miresearch.mi_config import MIResearch_config
-from zfmrf_research import zfmrf_subject
 DEBUG = True
 
 # TODO best here that I set from a config file - i.e. give dict - name - then 
-hardcoded_presets = {"ProjA": {"data_root_dir": "/home/fraser/WORK/MI_DATA/tmpTestSubjs2",
-                                "class_obj": zfmrf_subject.ZfMRFSubject,
-                                "subject_prefix": None,
-                                "anon_level": None}, 
-                    "ProjB": {"conf_file": "miresearchui/projB.conf"},
-                    "ProjC": {"conf_file": "miresearchui/projC.conf"}}
+# hardcoded_presets = {"ProjA": {"data_root_dir": "/home/fraser/WORK/MI_DATA/tmpTestSubjs2",
+#                                 "class_obj": mi_subject.AbstractSubject,
+#                                 "subject_prefix": None,
+#                                 "anon_level": None}, 
+#                     "ProjB": {"conf_file": "miresearchui/projB.conf"},
+#                     "ProjC": {"conf_file": "miresearchui/projC.conf"}}
+hardcoded_presets = {"ProjC": {"conf_file": "/home/fraser/MSK.conf"}}
 
 
 def get_index_of_field_open(data):
@@ -73,29 +73,25 @@ class miresearch_ui():
 
 
     def setUpAndRun(self):        
-        @ui.page('/')
-        def main_page():
-            with ui.row():
-                ui.button('Set subjects by directory', on_click=self.pick_file, icon='folder')
-                for iProjName in self.presetDict.keys():
-                    print(f"Setting up button for {iProjName}")
-                    ui.button(iProjName, on_click=lambda proj=iProjName: self.setSubjectListFromPreset(proj))
+        with ui.row():
+            ui.button('Set subjects by directory', on_click=self.pick_file, icon='folder')
+            for iProjName in self.presetDict.keys():
+                print(f"Setting up button for {iProjName}")
+                ui.button(iProjName, on_click=lambda proj=iProjName: self.setSubjectListFromPreset(proj))
 
-            myhtml_column = get_index_of_field_open(self.tableCols)
-            self.aggrid = ui.aggrid({
-                            'columnDefs': self.tableCols,
-                            'rowData': self.tableRows,
-                            'rowSelection': 'multiple',
-                            'stopEditingWhenCellsLoseFocus': True,
-                            "pagination" : "true",
-                            "paginationAutoPageSize" : "true",
-                                }, 
-                                html_columns=[myhtml_column])
-
-            with ui.row():
-                ui.button('Run A', on_click=self.runA, icon='gear')
-                ui.button('Run B', on_click=self.runA, icon='gear')
-
+        myhtml_column = get_index_of_field_open(self.tableCols)
+        self.aggrid = ui.aggrid({
+                        'columnDefs': self.tableCols,
+                        'rowData': self.tableRows,
+                        'rowSelection': 'multiple',
+                        'stopEditingWhenCellsLoseFocus': True,
+                        "pagination" : "true",
+                        "paginationAutoPageSize" : "true",
+                            }, 
+                            html_columns=[myhtml_column])
+        # with ui.row():
+        #     ui.button('Run A', on_click=self.runA, icon='gear')
+        #     ui.button('Run B', on_click=self.runA, icon='gear')
         ui.run()
 
 
@@ -110,7 +106,8 @@ class miresearch_ui():
     async def pick_file(self) -> None:
         try:
             result = await local_directory_picker('~', upper_limit=None, multiple=False)
-            print(result)
+            if DEBUG:
+                print(f"Picked directory: {result}")
             if (result is None) or (len(result) == 0):
                 return
             choosenDir = result[0]
@@ -120,14 +117,14 @@ class miresearch_ui():
             ui.notify(f"Error selecting directory: {str(e)}", type='error')
 
 
-    async def runA(self) ->None:
-        res = await self.aggrid.get_selected_rows()
-        print(res)
-        return True
+    # async def runA(self) ->None:
+    #     res = await self.aggrid.get_selected_rows()
+    #     print(res)
+    #     return True
     
 
-    async def runB(self) ->None:
-        return True
+    # async def runB(self) ->None:
+    #     return True
 
 
     def setSubjectListFromPreset(self, projectName):
@@ -141,6 +138,8 @@ class miresearch_ui():
 
 
     def setSubjectListFromLocalDirectory(self, localDirectory, subject_prefix=None, SubjClass=mi_subject.AbstractSubject):
+        if SubjClass is None:
+            SubjClass = mi_subject.AbstractSubject
         if os.path.isdir(localDirectory):
             self.dataRoot = localDirectory
             self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
