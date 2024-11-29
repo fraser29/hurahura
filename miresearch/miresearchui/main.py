@@ -22,13 +22,15 @@ DEBUG = True
 hardcoded_presets = {"ProjC": {"conf_file": "/home/fraser/MSK.conf"}}
 
 
+# ==========================================================================================
+# ==========================================================================================
+# HELPER FUNCTIONS  
+# ==========================================================================================
 def get_index_of_field_open(data):
     for index, dictionary in enumerate(data):
         if dictionary.get('field') == 'open':
             return index
     return -1  # Return -1 if no dictionary with field 'open' is found
-
-
 
 def _definePresetFromConfigfile(configFile):
     MIResearch_config.runconfigParser(configFile)
@@ -37,10 +39,14 @@ def _definePresetFromConfigfile(configFile):
             "subject_prefix": MIResearch_config.subject_prefix,
             "anon_level": MIResearch_config.anon_level}
 
-
+# ==========================================================================================
+# ==========================================================================================
+# MAIN CLASS 
+# ==========================================================================================
 class miresearch_ui():
 
     def __init__(self, dataRoot=None) -> None:
+        self.DEBUG = DEBUG
         self.dataRoot = dataRoot
         self.subjectList = []
         self.tableRows = []
@@ -106,7 +112,7 @@ class miresearch_ui():
     async def pick_file(self) -> None:
         try:
             result = await local_directory_picker('~', upper_limit=None, multiple=False)
-            if DEBUG:
+            if self.DEBUG:
                 print(f"Picked directory: {result}")
             if (result is None) or (len(result) == 0):
                 return
@@ -145,14 +151,14 @@ class miresearch_ui():
             self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
                                                                      subjectPrefix=subject_prefix,
                                                                      SubjClass=SubjClass)
-        if DEBUG:
-            print(f"Have {len(self.subjectList)} subjects (should be {len(os.listdir(self.dataRoot))})")
-        self.updateTable()
+            if self.DEBUG:
+                print(f"Have {len(self.subjectList)} subjects (should be {len(os.listdir(self.dataRoot))})")
+            self.updateTable()
 
 
     def updateTable(self):
         self.clearTable()
-        if DEBUG:
+        if self.DEBUG:
             print(self.aggrid.options['rowData'])
             print(f"Have {len(self.subjectList)} subjects - building table")
         c0 = 0
@@ -169,7 +175,7 @@ class miresearch_ui():
                             # 'open': ui.link(f"View {isubj.subjID}", f"subject_page/{isubj.subjID}?dataRoot={self.dataRoot}")}) 
         self.aggrid.options['rowData'] = self.tableRows
         self.aggrid.update()
-        if DEBUG:
+        if self.DEBUG:
             print(f'Done - {len(self.tableRows)}')
 
 
