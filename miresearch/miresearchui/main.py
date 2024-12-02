@@ -79,11 +79,13 @@ class miresearch_ui():
 
 
     def setUpAndRun(self):        
-        with ui.row():
+        with ui.row().classes('w-full border'):
             ui.button('Set subjects by directory', on_click=self.pick_file, icon='folder')
             for iProjName in self.presetDict.keys():
                 print(f"Setting up button for {iProjName}")
                 ui.button(iProjName, on_click=lambda proj=iProjName: self.setSubjectListFromPreset(proj))
+            ui.space()
+            ui.button('Settings', on_click=self.settings_page, icon='settings').classes('ml-auto')
 
         myhtml_column = get_index_of_field_open(self.tableCols)
         self.aggrid = ui.aggrid({
@@ -95,9 +97,9 @@ class miresearch_ui():
                         "paginationAutoPageSize" : "true",
                             }, 
                             html_columns=[myhtml_column])
-        # with ui.row():
-        #     ui.button('Run A', on_click=self.runA, icon='gear')
-        #     ui.button('Run B', on_click=self.runA, icon='gear')
+        with ui.row():
+            ui.button('Load subject', on_click=self.load_subject, icon='upload')
+            ui.button('Anonymise', on_click=self.anonymise_subject, icon='person_off')
         ui.run()
 
 
@@ -123,15 +125,15 @@ class miresearch_ui():
             ui.notify(f"Error selecting directory: {str(e)}", type='error')
 
 
-    # async def runA(self) ->None:
-    #     res = await self.aggrid.get_selected_rows()
-    #     print(res)
-    #     return True
+    async def load_subject(self) -> None:
+        return True
     
 
-    # async def runB(self) ->None:
-    #     return True
+    async def anonymise_subject(self) -> None:
+        return True
 
+    def settings_page(self):
+        pass
 
     def setSubjectListFromPreset(self, projectName):
         print(f"Setting subject list from preset {projectName}")
