@@ -1,19 +1,19 @@
 import os
-from nicegui import ui
+from nicegui import ui, app
 from miresearch import mi_subject
-
+from miresearch.miresearchui import miui_helpers
+import inspect
 
 @ui.page('/subject_page/{subjid}')
-def subject_page(subjid: str, dataRoot: str = os.path.expanduser("~")):
-    page = SubjectPage(subjid, dataRoot)
+def subject_page(subjid: str, dataRoot: str, classPath: str):
+    page = SubjectPage(subjid, dataRoot, classPath)
     page.build_page()
 
 
 class SubjectPage:
-    def __init__(self, subjid: str, dataRoot: str = os.path.expanduser("~")):
-        self.subjid = subjid
-        self.dataRoot = dataRoot
-        self.thisSubj = mi_subject.AbstractSubject(subjid, dataRoot=dataRoot)
+    def __init__(self, subjid: str, dataRoot: str, classPath: str):
+        self.thisSubj = miui_helpers.subjID_dataRoot_classPathTo_SubjObj(subjid, dataRoot, classPath)
+        self.class_obj = self.thisSubj.__class__
         
     def build_page(self):
         self._create_header()
@@ -27,25 +27,41 @@ class SubjectPage:
     def _create_tabs(self):
         with ui.tabs().classes('w-full') as tabs:
             actions = ui.tab('Actions')
-            overview = ui.tab('Overview')
+            study_overview = ui.tab('Study Overview')
+            series_overview = ui.tab('Series Overview')
             logview = ui.tab('Logs')
         with ui.tab_panels(tabs, value=logview).classes('w-full'):
             with ui.tab_panel(actions):
                 self._create_actions_panel()
-            with ui.tab_panel(overview):
-                self._create_overview_panel()
+            with ui.tab_panel(study_overview):
+                self._create_study_panel()
+            with ui.tab_panel(series_overview):
+                self._create_series_panel()
             with ui.tab_panel(logview):
                 self._create_log_panel()
 
     def _create_actions_panel(self):
-        pass
+        decorated_methods = self.class_obj.get_ui_methods()
+        for iMethod in decorated_methods:
+            with ui.row():
+                params = list(inspect.signature(iMethod['method']).parameters.items())[1:]  # Skip 'self'
+                input_fields = []
+                
+                for param_name, param in params:
+                    input_field = ui.input(label=param_name)
+                    input_fields.append(input_field)
+                
+                def handle_click(method=iMethod['method'], inputs=input_fields):
+                    try:
+                        args = [inp.value for inp in inputs]
+                        method(self.thisSubj, *args)
+                    except Exception as e:
+                        ui.notify(f'Error: {str(e)}', type='negative')
+                
+                ui.button(iMethod['name'], on_click=handle_click)
 
-    def _create_overview_panel(self):
-        with ui.row().classes('w-full'):
-            self._create_study_info()
-            self._create_series_info()
 
-    def _create_study_info(self):
+    def _create_study_panel(self):
         columnsO = [
             {'name': 'key', 'label': 'Key', 'field': 'key', 'align': 'left', 'sortable': True},
             {'name': 'value', 'label': 'Value', 'field': 'value', 'align': 'center'},
@@ -55,12 +71,12 @@ class SubjectPage:
         rowsO = []
         metaDict = self.thisSubj.getMetaDict()
         for iKey in studyLabels:
-            rowsO.append({"key": iKey, "value": str(metaDict[iKey])})
+            rowsO.append({"key": iKey, "value": str(metaDict.get(iKey, 'UNKNOWN'))})
         with ui.column().classes('w-full'):
             ui.label("STUDY INFORMATION")
             ui.table(columns=columnsO, rows=rowsO, row_key='key')
 
-    def _create_series_info(self):
+    def _create_series_panel(self):
         columnsSe = [
             {'name': 'sernum', 'label': 'Series Number', 'field': 'sernum', 'align': 'left', 'sortable': True},
             {'name': 'serdesc', 'label': 'Series Description', 'field': 'serdesc', 'align': 'left', 'sortable': True},
@@ -68,16 +84,16 @@ class SubjectPage:
         ]
         rowsSe = []
         metaDict = self.thisSubj.getMetaDict()
-        seriesList = metaDict['Series'] # Not actually reading dicoms here - just grabbing metadata
+        seriesList = metaDict.get('Series', []) # Not actually reading dicoms here - just grabbing metadata
         for iSeries in seriesList:
             rowsSe.append({
                 "sernum": iSeries.get('SeriesNumber', 'UNKNOWN'), 
                 "serdesc": iSeries.get('SeriesDescription', 'UNKNOWN'), 
-                "ndcm": len(iSeries),
+                "ndcm": iSeries.get('nSlice', 'UNKNOWN'), 
                 "_series": iSeries
             })
         
-        def on_select(e):
+        def on_select_series(e):
             dcmFile = f"{self.thisSubj.dataRoot}{os.sep}{self.thisSubj.subjID}{os.sep}{e.args[1]['_series']['DicomFileName']}"
             if os.path.exists(dcmFile):
                 dcmS = mi_subject.spydcm.dcmTK.DicomSeries.setFromFileList([dcmFile], HIDE_PROGRESSBAR=True)
@@ -93,9 +109,10 @@ class SubjectPage:
         with ui.column().classes('w-full'):
             ui.label("SERIES INFORMATION")
             with ui.row().classes('w-full'):
-                table = ui.table(columns=columnsSe, rows=rowsSe, row_key='sernum', on_select=on_select)
+                table = ui.table(columns=columnsSe, rows=rowsSe, row_key='sernum', on_select=on_select_series,
+                                 pagination={'rowsPerPage': 99, 'sortBy': 'sernum', 'page': 1})
                 table.add_slot('body-cell-sernum', r'<td><a :href="props.row.url">{{ props.row.sernum }}</a></td>')
-                table.on('rowClick', on_select)
+                table.on('rowClick', on_select_series)
                 fig_container = ui.element()
 
     def _create_log_panel(self):
@@ -109,5 +126,10 @@ class SubjectPage:
         rowsL = []
         for iLine in logLines:
             parts = iLine.split("|")
-            rowsL.append({"time": parts[0], "level": parts[1], "message": parts[3]})
+            if len(parts) > 3:
+                rowsL.append({"time": parts[0], "level": parts[1], "message": parts[3]})
+            elif len(parts) == 3: # this and else account for prevoius or incompatible log formats
+                rowsL.append({"time": parts[0], "level": parts[1], "message": parts[2]})
+            else:
+                rowsL.append({"time": "-", "level": "-", "message": iLine})
         ui.table(columns=columnsL, rows=rowsL, row_key='time')

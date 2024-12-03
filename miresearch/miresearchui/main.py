@@ -2,14 +2,14 @@
 
 import os
 from datetime import datetime
-
+from urllib.parse import quote
 from nicegui import ui
 from local_directory_picker import local_directory_picker
-from content.general import subject_page
+from general import subject_page
 
-# PYTHONPATH=/home/fraser/DEV/miresearch/
 from miresearch import mi_subject
-from miresearch.mi_config import MIResearch_config
+from miresearch.miresearchui import miui_helpers
+
 DEBUG = True
 
 # TODO best here that I set from a config file - i.e. give dict - name - then 
@@ -19,25 +19,11 @@ DEBUG = True
 #                                 "anon_level": None}, 
 #                     "ProjB": {"conf_file": "miresearchui/projB.conf"},
 #                     "ProjC": {"conf_file": "miresearchui/projC.conf"}}
-hardcoded_presets = {"ProjC": {"conf_file": "/home/fraser/MSK.conf"}}
+hardcoded_presets = {"TestRuru": {"conf_file": "/home/fraser/MSK.conf"},
+                     "TestMoa": {"conf_file": "/home/fraser/DEV/miresearch/miresearch/miresearchui/projC.conf"}}
 
 
 # ==========================================================================================
-# ==========================================================================================
-# HELPER FUNCTIONS  
-# ==========================================================================================
-def get_index_of_field_open(data):
-    for index, dictionary in enumerate(data):
-        if dictionary.get('field') == 'open':
-            return index
-    return -1  # Return -1 if no dictionary with field 'open' is found
-
-def _definePresetFromConfigfile(configFile):
-    MIResearch_config.runconfigParser(configFile)
-    return {"data_root_dir": MIResearch_config.data_root_dir, 
-            "class_obj": MIResearch_config.class_obj,
-            "subject_prefix": MIResearch_config.subject_prefix,
-            "anon_level": MIResearch_config.anon_level}
 
 # ==========================================================================================
 # ==========================================================================================
@@ -49,8 +35,8 @@ class miresearch_ui():
         self.DEBUG = DEBUG
         self.dataRoot = dataRoot
         self.subjectList = []
+        self.SubjClass = mi_subject.AbstractSubject # This is default - updated if read from config
         self.tableRows = []
-
         self.presetDict = {}
         self.setPresets(hardcoded_presets)
 
@@ -87,16 +73,17 @@ class miresearch_ui():
             ui.space()
             ui.button('Settings', on_click=self.settings_page, icon='settings').classes('ml-auto')
 
-        myhtml_column = get_index_of_field_open(self.tableCols)
-        self.aggrid = ui.aggrid({
+        myhtml_column = miui_helpers.get_index_of_field_open(self.tableCols)
+        with ui.row().classes('w-full flex-grow border'):
+            self.aggrid = ui.aggrid({
                         'columnDefs': self.tableCols,
                         'rowData': self.tableRows,
                         'rowSelection': 'multiple',
                         'stopEditingWhenCellsLoseFocus': True,
                         "pagination" : "true",
-                        "paginationAutoPageSize" : "true",
+                        'domLayout': 'autoHeight',
                             }, 
-                            html_columns=[myhtml_column])
+                            html_columns=[myhtml_column]).classes('w-full h-full')
         with ui.row():
             ui.button('Load subject', on_click=self.load_subject, icon='upload')
             ui.button('Anonymise', on_click=self.anonymise_subject, icon='person_off')
@@ -106,7 +93,7 @@ class miresearch_ui():
     def setPresets(self, presetDict):
         for iName in presetDict.keys():
             if "conf_file" in presetDict[iName].keys():
-                self.presetDict[iName] = _definePresetFromConfigfile(presetDict[iName]['conf_file'])
+                self.presetDict[iName] = miui_helpers.definePresetFromConfigfile(presetDict[iName]['conf_file'])
             else:
                 self.presetDict[iName] = presetDict[iName]
 
@@ -126,11 +113,34 @@ class miresearch_ui():
 
 
     async def load_subject(self) -> None:
+        try:
+            result = await local_directory_picker('~', upper_limit=None, multiple=False)
+            if self.DEBUG:
+                print(f"Picked directory: {result}")
+            if (result is None) or (len(result) == 0):
+                return
+            choosenDir = result[0]
+            self.SubjClass.load_subject(choosenDir)
+            ui.notify(f"Loaded subject {self.SubjClass.subjID}", type='positive')
+        except Exception as e:
+            if self.DEBUG:
+                print(f"Error in directory picker: {e}")
+            ui.notify(f"Error loading subject: {str(e)}", type='error')
         return True
     
 
     async def anonymise_subject(self) -> None:
+        selectedSubjects = await self.aggrid.get_selected_rows()
+        for iSubj in selectedSubjects:
+            defDict = miui_helpers.rowToSubjID_dataRoot_classPath(iSubj)
+            thisSubj = miui_helpers.subjID_dataRoot_classPathTo_SubjObj(defDict['subjID'], defDict['dataRoot'], defDict['classPath'])
+            try:
+                thisSubj.anonymise()
+                ui.notify(f"Anonymised subject {thisSubj.subjID}", type='positive')
+            except Exception as e:
+                ui.notify(f"Error anonymising subject {thisSubj.subjID}: {str(e)}", type='error')
         return True
+
 
     def settings_page(self):
         pass
@@ -148,11 +158,12 @@ class miresearch_ui():
     def setSubjectListFromLocalDirectory(self, localDirectory, subject_prefix=None, SubjClass=mi_subject.AbstractSubject):
         if SubjClass is None:
             SubjClass = mi_subject.AbstractSubject
+        self.SubjClass = SubjClass
         if os.path.isdir(localDirectory):
             self.dataRoot = localDirectory
             self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
                                                                      subjectPrefix=subject_prefix,
-                                                                     SubjClass=SubjClass)
+                                                                     SubjClass=self.SubjClass)
             if self.DEBUG:
                 print(f"Have {len(self.subjectList)} subjects (should be {len(os.listdir(self.dataRoot))})")
             self.updateTable()
@@ -166,15 +177,15 @@ class miresearch_ui():
         c0 = 0
         for isubj in self.subjectList:
             c0 += 1
+            classPath = self.SubjClass.__module__ + '.' + self.SubjClass.__name__
+            addr = f"subject_page/{isubj.subjID}?dataRoot={quote(self.dataRoot)}&classPath={quote(classPath)}"
             self.tableRows.append({'subjID': isubj.subjID, 
                             'name': isubj.getName(), 
                             'DOS': isubj.getStudyDate(),  
                             'StudyID': isubj.getStudyID(),
                             'age': isubj.getAge(), 
                             'levelCompleted': isubj.getLevelCompleted(),
-                            'open': f"<a href=subject_page/{isubj.subjID}?dataRoot={self.dataRoot}>View {isubj.subjID} </a>"})
-                            # Below does not work as not JSON serilizable 
-                            # 'open': ui.link(f"View {isubj.subjID}", f"subject_page/{isubj.subjID}?dataRoot={self.dataRoot}")}) 
+                            'open': f"<a href={addr}>View {isubj.subjID}</a>"})
         self.aggrid.options['rowData'] = self.tableRows
         self.aggrid.update()
         if self.DEBUG:
@@ -189,12 +200,12 @@ class miresearch_ui():
         self.aggrid.update()
 
 
-def run():
+@ui.page('/')
+async def run():
+    # Create the UI instance
     miui = miresearch_ui()
     miui.setUpAndRun()
 
-
-
 if __name__ in {"__main__", "__mp_main__"}:
-    run()
+    ui.run()
 

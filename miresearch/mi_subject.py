@@ -21,10 +21,10 @@ import pandas as pd
 import shutil
 import logging
 from functools import wraps
-from typing import Optional
 ##
 from spydcmtk import spydcm
 from miresearch import mi_utils
+import inspect  # Add this import at the top
 
 # ====================================================================================================
 # ====================================================================================================
@@ -42,11 +42,16 @@ def ui_method(description: str = "",
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            return f(*args, **kwargs)
+            # Set flag that this was called via UI
+            wrapper._called_via_ui = True
+            result = f(*args, **kwargs)
+            wrapper._called_via_ui = False
+            return result
         wrapper._is_ui_method = True
         wrapper._ui_description = description
         wrapper._ui_category = category
         wrapper._ui_order = order
+        wrapper._called_via_ui = False
         return wrapper
     return decorator
 
@@ -107,9 +112,10 @@ class AbstractSubject(object):
     ### ----------------------------------------------------------------------------------------------------------------
     @classmethod
     def get_ui_methods(cls):
-        """Get all methods marked with @ui_method decorator"""
+        """Get all methods marked with @ui_method decorator, including inherited ones"""
         methods = []
-        for name, method in cls.__dict__.items():
+        # Get all members including inherited ones
+        for name, method in inspect.getmembers(cls, predicate=inspect.isfunction):
             if hasattr(method, '_is_ui_method'):
                 methods.append({
                     'name': name,
@@ -275,6 +281,8 @@ class AbstractSubject(object):
         dirName = self._getDir([mi_utils.RAW, mi_utils.DICOM])
         return dirName
     
+
+    @ui_method(description="Rename subject", category="General", order=1)
     def renameSubjID(self, newSubjID):
         oldID = self.subjID
         if newSubjID == oldID:
@@ -425,6 +433,7 @@ class AbstractSubject(object):
     def getMetaTagsFile(self, suffix=""):
         return os.path.join(self.getMetaDir(), f"{self.subjID}Tags{suffix}.json")
 
+    @ui_method(description="Set tag value", category="Meta", order=1)
     def setTagValue(self, tag, value, suffix=""):
         self.updateMetaFile({tag:value}, suffix)
 
@@ -648,16 +657,16 @@ class AbstractSubject(object):
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa, nDCM], infoKeys + ['Age', 'TotalDicoms']
 
     # ------------------------------------------------------------------------------------------
-    @ui_method(
-        description="Anonymise subject",
-        category="Anonymisation",
-        order=1
-    )
-    def anonymise(self, anonName=None):
+    @ui_method(description="Anonymise subject", category="Anonymisation", order=1)
+    def anonymise(self, anonName=None, QUIET=False):
+        # Check if called via UI
+        called_via_ui = getattr(self.anonymise, '_called_via_ui', False)
+        if called_via_ui:
+            QUIET = True
         name, firstNames = self.getName_FirstNames()
         anonName = self._checkAnonName(anonName, name, firstNames)
         self.logger.info(f'Begin anonymise in place. New name: "{anonName}"')
-        spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName)
+        spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName, QUIET=QUIET)
         self.logger.info('End anonymise')
         self.setIsAnonymised()
         self.buildDicomMeta()
@@ -959,7 +968,7 @@ def _getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject, 
     subjObjList = []
     for i in allDir:
         try:
-            iSubjObj = SubjClass(i, dataRoot=dataRootDir)
+            iSubjObj = SubjClass(i, dataRoot=dataRootDir, subjectPrefix=subjectPrefix)
         except ValueError:
             print(f"WARNING: {i} at {dataRootDir} not valid subject")
         if iSubjObj.exists():
