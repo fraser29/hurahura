@@ -13,7 +13,7 @@ def subject_page(subjid: str, dataRoot: str, classPath: str):
 class SubjectPage:
     def __init__(self, subjid: str, dataRoot: str, classPath: str):
         self.thisSubj = miui_helpers.subjID_dataRoot_classPathTo_SubjObj(subjid, dataRoot, classPath)
-        self.class_obj = self.thisSubj.__class__
+        self.SubjClass = self.thisSubj.__class__
         
     def build_page(self):
         self._create_header()
@@ -40,9 +40,18 @@ class SubjectPage:
             with ui.tab_panel(logview):
                 self._create_log_panel()
 
+    # ========================================================================================
+    # ACTIONS PANEL
+    # ========================================================================================  
     def _create_actions_panel(self):
-        decorated_methods = self.class_obj.get_ui_methods()
+        decorated_methods = self.SubjClass.get_ui_methods()
         for iMethod in decorated_methods:
+            display_name = iMethod['name']
+            # Convert camel case to spaced text, but keep consecutive capitals together
+            display_name = ''.join(' ' + c if c.isupper() and (i > 0 and not display_name[i-1].isupper()) else c 
+                                  for i, c in enumerate(display_name)).strip()
+            display_name = display_name.replace('_', ' ').capitalize() # Replace underscores with spaces and capitalize
+            
             with ui.row():
                 params = list(inspect.signature(iMethod['method']).parameters.items())[1:]  # Skip 'self'
                 input_fields = []
@@ -55,12 +64,15 @@ class SubjectPage:
                     try:
                         args = [inp.value for inp in inputs]
                         method(self.thisSubj, *args)
+                        ui.notify(f'Method {iMethod["name"]} completed', type='positive')
                     except Exception as e:
-                        ui.notify(f'Error: {str(e)}', type='negative')
+                        ui.notify(f'Error: {iMethod["name"]}: {str(e)}', type='negative')
                 
-                ui.button(iMethod['name'], on_click=handle_click)
+                ui.button(display_name, on_click=handle_click)
 
-
+    # ========================================================================================
+    # STUDY PANEL
+    # ========================================================================================  
     def _create_study_panel(self):
         columnsO = [
             {'name': 'key', 'label': 'Key', 'field': 'key', 'align': 'left', 'sortable': True},
@@ -76,6 +88,9 @@ class SubjectPage:
             ui.label("STUDY INFORMATION")
             ui.table(columns=columnsO, rows=rowsO, row_key='key')
 
+    # ========================================================================================
+    # SERIES PANEL
+    # ========================================================================================  
     def _create_series_panel(self):
         columnsSe = [
             {'name': 'sernum', 'label': 'Series Number', 'field': 'sernum', 'align': 'left', 'sortable': True},
@@ -107,13 +122,14 @@ class SubjectPage:
                         ax.axis('off')
         ##
         with ui.column().classes('w-full'):
-            ui.label("SERIES INFORMATION")
+            ui.label("SERIES INFORMATION (select series for image overview)")
             with ui.row().classes('w-full'):
                 table = ui.table(columns=columnsSe, rows=rowsSe, row_key='sernum', on_select=on_select_series,
                                  pagination={'rowsPerPage': 99, 'sortBy': 'sernum', 'page': 1})
                 table.add_slot('body-cell-sernum', r'<td><a :href="props.row.url">{{ props.row.sernum }}</a></td>')
                 table.on('rowClick', on_select_series)
                 fig_container = ui.element()
+
 
     def _create_log_panel(self):
         columnsL = [
