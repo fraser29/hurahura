@@ -96,7 +96,14 @@ class miresearch_ui():
     def setPresets(self, presetDict):
         for iName in presetDict.keys():
             if "conf_file" in presetDict[iName].keys():
-                self.presetDict[iName] = miui_helpers.definePresetFromConfigfile(presetDict[iName]['conf_file'])
+                iConfFile = presetDict[iName]['conf_file']
+                try:
+                    self.presetDict[iName] = miui_helpers.definePresetFromConfigfile(iConfFile)
+                except FileNotFoundError:
+                    print(f"Unable to find file {iConfFile}")
+                except ModuleNotFoundError as e:
+                    print(f"Error loading {iConfFile}")
+                    print(f"   {e}")
             else:
                 self.presetDict[iName] = presetDict[iName]
 
