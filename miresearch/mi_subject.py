@@ -21,9 +21,9 @@ import pandas as pd
 import shutil
 import logging
 from functools import wraps
-from typing import Optional
 ##
 from spydcmtk import spydcm
+from ngawari import fIO
 from miresearch import mi_utils
 
 # ====================================================================================================
@@ -428,8 +428,8 @@ class AbstractSubject(object):
     def setTagValue(self, tag, value, suffix=""):
         self.updateMetaFile({tag:value}, suffix)
 
-    def getTagValue(self, tagName, ifNotFound='Unknown'): # FIXME is this done correctly
-        return self.getMetaDict().get(tagName, ifNotFound)
+    def getTagValue(self, tagName, ifNotFound='Unknown', metaSuffix=""): # FIXME is this done correctly
+        return self.getMetaTagValue(tagName, ifNotFound, metaSuffix)
 
     def getMetaDict(self, suffix=""):
         """Get meta json file as dictionary
@@ -443,7 +443,7 @@ class AbstractSubject(object):
         ff = self.getMetaTagsFile(suffix)
         dd = {}
         if os.path.isfile(ff):
-            dd = spydcm.dcmTools.parseJsonToDictionary(ff)
+            dd = fIO.parseJsonToDictionary(ff)
         return dd
 
     def getMetaTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
@@ -522,7 +522,7 @@ class AbstractSubject(object):
         if type(seriesDescription) != list:
             seriesDescription = [seriesDescription]
         seriesDescription_ = [i.lower() for i in seriesDescription]
-        series = self.getMetaTagValue("Series")
+        series = self.getMetaTagValue("Series", NOT_FOUND=[])
         possibles = {}
         for iSeries in series:
             iDescriptionStr_ = iSeries['SeriesDescription'].lower()
@@ -727,22 +727,41 @@ class AbstractSubject(object):
         """
         dd = self.getMetaDict()
         try:
-            ageStr = dd['PatientAge']
-        except KeyError:
+            birth = dd["PatientBirthDate"]
+            study = dd["StudyDate"]
+            return (spydcm.dcmTools.dbDateToDateTime(study) - spydcm.dcmTools.dbDateToDateTime(birth)).days / 365.0
+        except (KeyError, ValueError):
+            # This may be case if pre-anonymisation has removed DOB but left PatientAge
             try:
-                birth = dd["PatientBirthDate"]
-                study = dd["StudyDate"]
-                return (spydcm.dcmTools.dbDateToDateTime(study) - spydcm.dcmTools.dbDateToDateTime(birth)).days / 365.0
-            except (KeyError, ValueError):
+                ageStr = dd['PatientAge']
+            except KeyError: # Found no tags to provide age information
                 return np.nan
         age = np.nan
         try:
-            age = int(ageStr)
+            age = float(ageStr)
         except ValueError:
+            ageStrL = ageStr.lower()
+            if "y" in ageStrL:
+                factor = 1.0
+                ageC = ageStrL.replace('y', '')
+            elif "m" in ageStrL:
+                factor = 1/12.0
+                ageC = ageStrL.replace('m', '')
+            elif "w" in ageStrL:
+                factor = 1/52.0
+                ageC = ageStrL.replace('w', '')
+            elif "d" in ageStrL:
+                factor = 1 / 365.0
+                ageC = ageStrL.replace('d', '')
+            elif "h" in ageStrL:
+                factor = 1 / (365.0 * 24.0)
+                ageC = ageStrL.replace('h', '')
+            # Now have a cleaned age string and a factor to convert to years (as decimal)
             try:
-                age = int(ageStr.lower().replace('y', ''))
-            except ValueError:
-                pass
+                age = float(ageC) * factor
+            except: # Probably ValueError or UnboundLocalError (ageC not set) but catch all in case
+                # failed so return nan
+                return np.nan
         return age
 
     def getGender(self):
