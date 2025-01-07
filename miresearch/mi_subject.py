@@ -351,7 +351,7 @@ class AbstractSubject(object):
         print("")
 
 
-    def askUserForDicomSeriesNumber(self):
+    def getDicomSeriesNumber_Interactive(self):
         self.printDicomsInfo()
         seNum = input("Enter the dicom series number: ")
         return int(seNum)
@@ -438,7 +438,7 @@ class AbstractSubject(object):
         self.updateMetaFile({tag:value}, suffix)
 
     def getTagValue(self, tagName, ifNotFound='Unknown'): # FIXME is this done correctly
-        return self.getMetaDict().get(tagName, ifNotFound)
+        return self.getMetaTagValue(tagName, NOT_FOUND=ifNotFound)
 
     def getMetaDict(self, suffix=""):
         """Get meta json file as dictionary
@@ -658,29 +658,43 @@ class AbstractSubject(object):
 
     # ------------------------------------------------------------------------------------------
     @ui_method(description="Anonymise subject", category="Anonymisation", order=1)
-    def anonymise(self, anonName=None, QUIET=False):
+    def anonymise(self, anonName=None, anonID="", QUIET=False):
+        """
+        Check if anonName is valid and return anonName and anonID
+        If anonName = SOFT then set an encoded name in meta file and retain PatientID - anonymise DICOMS
+        If anonName = HARD then set encoded name in meta file to "Unknown" - anonymise DICOMS
+        If anonName is None then anonymise DICOMS
+        Else anonymise DICOMS with anonName for Name and PatientID
+        """
         # Check if called via UI
         called_via_ui = getattr(self.anonymise, '_called_via_ui', False)
         if called_via_ui:
             QUIET = True
         name, firstNames = self.getName_FirstNames()
-        anonName = self._checkAnonName(anonName, name, firstNames)
+        anonName, anonID = self._checkAnonName(anonName, name, firstNames, anonID)
         self.logger.info(f'Begin anonymise in place. New name: "{anonName}"')
-        spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName, QUIET=QUIET)
+        spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName, anonID=anonID, QUIET=QUIET)
         self.logger.info('End anonymise')
         self.setIsAnonymised()
         self.buildDicomMeta()
 
     def _checkAnonName(self, anonName, name="", firstNames=""):
+        """
+        Check if anonName is valid and return anonName and anonID
+        If anonName = SOFT then set an encoded name in meta file and retain PatientID - anonymise DICOMS
+        If anonName = HARD then set encoded name in meta file to "Unknown" - anonymise DICOMS
+        If anonName is None then anonymise DICOMS
+        Else anonymise DICOMS with anonName for Name and PatientID
+        """
         if anonName == "SOFT":
             self.setEncodedName(NAME=name, FIRST_NAMES=firstNames)
-            return ""
+            return "", self.getMetaTagValue("PatientID")
         elif anonName == "HARD":
             self.setEncodedName(NAME='Name-Unknown', FIRST_NAMES='FirstNames-Unknown')
-            return ""
+            return "", ""
         elif anonName is None:
-            return ""
-        return anonName
+            return "", ""
+        return anonName, anonName
     
     def setIsAnonymised(self):
         self.updateMetaFile({"ANONYMISED": True})

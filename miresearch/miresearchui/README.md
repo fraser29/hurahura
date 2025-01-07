@@ -1,10 +1,5 @@
 # miresearchui
 
-> temp
-> Building up a ui using NiceUI 
-> Intention: overview of projects and subjects status
->
-> Grand intention - can run basic operatioins from the interface. 
 
 Currently setup to permit load a subjlist from select a directory. Or have some preloaded projs with buttons to switch to
 

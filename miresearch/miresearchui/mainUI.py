@@ -90,7 +90,7 @@ class miresearch_ui():
         for iFile in configFile:
             confName = os.path.splitext(os.path.basename(iFile))[0]
             confContents[confName] = iFile
-        fIO.writeTagsDictionaryToFile(confContents, self.miui_conf_file)
+        fIO.writeDictionaryToFile(self.miui_conf_file, confContents)
 
 
     def setPresets(self, presetDict):
