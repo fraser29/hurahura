@@ -5,10 +5,10 @@ from typing import Optional
 from nicegui import events, ui
 
 
-class local_directory_picker(ui.dialog):
+class local_file_picker(ui.dialog):
 
     def __init__(self, directory: str, *,
-                 upper_limit: Optional[str] = ..., multiple: bool = False, show_hidden_files: bool = False, dialog_type="FOLDER_DIALOG") -> None:
+                 upper_limit: Optional[str] = ..., multiple: bool = False, show_hidden_files: bool = False, DIR_ONLY: bool = False) -> None:
         """Local File Picker
 
         This is a simple file picker that allows you to select a file from the local filesystem where NiceGUI is running.
@@ -26,11 +26,11 @@ class local_directory_picker(ui.dialog):
         else:
             self.upper_limit = Path(directory if upper_limit == ... else upper_limit).expanduser()
         self.show_hidden_files = show_hidden_files
-
+        self.DIR_ONLY = DIR_ONLY
         with self, ui.card():
             self.add_drives_toggle()
             self.grid = ui.aggrid({
-                'columnDefs': [{'field': 'name', 'headerName': 'Directory'}],
+                'columnDefs': [{'field': 'name', 'headerName': 'File'}],
                 'rowSelection': 'multiple' if multiple else 'single',
             }, html_columns=[0]).classes('w-96').on('cellDoubleClicked', self.handle_double_click)
             with ui.row().classes('w-full justify-end'):
@@ -52,19 +52,20 @@ class local_directory_picker(ui.dialog):
         paths = list(self.path.glob('*'))
         if not self.show_hidden_files:
             paths = [p for p in paths if not p.name.startswith('.')]
+        if self.DIR_ONLY:
+            paths = [p for p in paths if p.is_dir()]
         paths.sort(key=lambda p: p.name.lower())
         paths.sort(key=lambda p: not p.is_dir())
 
-        # 'name': f'📁 <strong>{p.name}</strong>' if p.is_dir() else p.name,
         self.grid.options['rowData'] = [
             {
-                'name': f'📁 <strong>{p.name}</strong>',
+                'name': f'📁 <strong>{p.name}</strong>' if p.is_dir() else p.name,
                 'path': str(p),
             }
-            for p in paths if p.is_dir()
+            for p in paths
         ]
-        if self.upper_limit is None and self.path != self.path.parent or \
-                self.upper_limit is not None and self.path != self.upper_limit:
+        if (self.upper_limit is None and self.path != self.path.parent) or \
+                (self.upper_limit is not None and self.path != self.upper_limit):
             self.grid.options['rowData'].insert(0, {
                 'name': '📁 <strong>..</strong>',
                 'path': str(self.path.parent),
@@ -79,6 +80,5 @@ class local_directory_picker(ui.dialog):
             self.submit([str(self.path)])
 
     async def _handle_ok(self):
-        rows = await ui.run_javascript(f'getElement({self.grid.id}).gridOptions.api.getSelectedRows()')
-        print(rows)
+        rows = await self.grid.get_selected_rows()
         self.submit([r['path'] for r in rows])
