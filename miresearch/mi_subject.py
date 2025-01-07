@@ -547,7 +547,7 @@ class AbstractSubject(object):
 
 
     def getSeriesNumbersMatchingDescriptionStr(self, descriptionStr):
-        return self.findDicomSeries(descriptionStr).keys()
+        return self.findDicomSeries(descriptionStr)
 
 
     def getDicomSeriesDir_Description(self, seriesDescription):
@@ -672,7 +672,9 @@ class AbstractSubject(object):
         if called_via_ui:
             QUIET = True
         name, firstNames = self.getName_FirstNames()
-        anonName, anonID = self._checkAnonName(anonName, name, firstNames, anonID)
+        anonName, anonIDt = self._checkAnonName(anonName, name, firstNames)
+        if len(anonID) == 0:
+            anonID = anonIDt
         self.logger.info(f'Begin anonymise in place. New name: "{anonName}"')
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName, anonID=anonID, QUIET=QUIET)
         self.logger.info('End anonymise')
