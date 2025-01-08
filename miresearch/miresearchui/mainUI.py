@@ -7,6 +7,7 @@ from nicegui import ui
 from ngawari import fIO
 from local_directory_picker import local_file_picker
 from subjectUI import subject_page
+from settingsUI import settings_page
 
 from miresearch import mi_subject
 from miresearch.miresearchui import miui_helpers
@@ -288,10 +289,7 @@ class miresearch_ui():
     # SETTINGS PAGE
     # ========================================================================================      
     def settings_page(self):
-        pass
-
-
-
+        ui.navigate.to('/settings_page')
 
 
 # ==========================================================================================
