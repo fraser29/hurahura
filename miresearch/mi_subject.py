@@ -341,7 +341,7 @@ class AbstractSubject(object):
 
     def info(self):
         # Return info string for this subject
-        return f"{self.subjID}: {self.getName()} scanned on {self.getStudyDate()}"
+        return f"{self.subjID}: {self.getName()} (ID:{self.getTagValue('PatientID')}, DOB:{self.getTagValue('PatientDateOfBirth')}) scanned on {self.getStudyDate()}"
 
 
     def printDicomsInfo(self):
@@ -1221,6 +1221,8 @@ def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot,
                                        SubjClass=AbstractSubject, subjPrefix=None, 
                                        anonName=None, 
                                        IGNORE_UIDS=False, QUIET=False):
+    if anonName not in [None, "SOFT", "HARD"]:
+        raise ValueError(f"anonName must be one of [None, 'SOFT', 'HARD'] for multi-load")
     if not os.path.isdir(multiDicomDirToLoad):
         raise IOError(" Load dir does not exist")
     dirsToLoad = [os.path.join(multiDicomDirToLoad, i) for i in os.listdir(multiDicomDirToLoad)]
@@ -1276,7 +1278,8 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
                                        SubjClass=SubjClass, 
                                        subjPrefix=subjPrefix, 
                                        IGNORE_UIDS=IGNORE_UIDS,
-                                       QUIET=QUIET)) # TODO add anonName here so can deal with SOFT or HARD
+                                       anonName=anonName,
+                                       QUIET=QUIET)) 
     else:
         return SubjectList([_createNew_OrAddTo_Subject(loadDirectory, 
                                 dataRoot=dataRoot,

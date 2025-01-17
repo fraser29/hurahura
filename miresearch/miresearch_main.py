@@ -78,12 +78,6 @@ groupA.add_argument('-SubjInfoFull', dest='subjInfoFull',
                     help='Print full info for each subject', 
                     action='store_true')
 
-# SEARCH ACTIONS
-groupA.add_argument('-SearchSeriesDesc', dest='searchSerDesc', 
-                    help='Search based on a series description', 
-                    type=str, default=None)
-
-
 # GROUP ACTIONS
 groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
@@ -97,6 +91,23 @@ groupA.add_argument('-WatchDirectory', dest='WatchDirectory',
                     help='Will watch given directory for new data and load as new study', 
                     type=str, default=None)
 
+## === QUERY ===
+groupQ = ParentAP.add_argument_group('Query')
+groupQ.add_argument('-qSeriesDesc', dest='qSeriesDesc', 
+                    help='Query based on a series description', 
+                    type=str, default=None)
+groupQ.add_argument('-qPID', dest='qPID', 
+                    help='Query based on patient ID', 
+                    type=str, default=None)
+groupQ.add_argument('-qPatName', dest='qPatName', 
+                    help='Query based on a patient name', 
+                    type=str, default=None)
+groupQ.add_argument('-qExamID', dest='qExamID', 
+                    help='Query based on exam (scanner assigned) ID', 
+                    type=str, default=None)
+groupQ.add_argument('-qDate', dest='qDate', # TODO - allow range 
+                    help='Query based on study date', 
+                    type=str, default=None)
 
 ### ====================================================================================================================
 #           CHECK ARGS
@@ -114,6 +125,7 @@ def setNList(args):
 
 def checkArgs(args):
     # 
+    args.RUN_ANON = False
     if args.configFile: MIResearch_config.runconfigParser(args.configFile)
     if args.INFO:
         MIResearch_config.printInfo()
@@ -127,6 +139,8 @@ def checkArgs(args):
         args.subjPrefix = MIResearch_config.subject_prefix
     if args.anonName is None:
         args.anonName = MIResearch_config.anon_level
+    else: 
+        args.RUN_ANON = True
     if not args.QUIET:
         print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
     if args.loadPath is not None:
@@ -166,13 +180,55 @@ def runActions(args, extra_runActions=None):
         if args.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
         subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
-        # --- ANONYMISE ---
-        if args.anonName is not None:
+
+        # --- QUERY ---
+        if args.qSeriesDesc:
             for iSubj in subjList:
                 if iSubj.exists():
-                    if not args.QUIET:
-                        print(f"Anonymise: {iSubj.subjID}...")
-                    iSubj.anonymise(args.anonName)
+                    if args.DEBUG:
+                        print(f"Searching: {iSubj.subjID}...")
+                    res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
+                    if len(res) > 0:
+                        print(f"{iSubj} has {list(res.values())}")
+
+        if args.qPID:
+            for iSubj in subjList:
+                if iSubj.exists():
+                    res = iSubj.getTagValue("PatientID")
+                    if str(res) == str(args.qPID):
+                        print(iSubj.info())
+
+        # if args.qSeriesDesc:
+        #     for iSubj in subjList:
+        #         if iSubj.exists():
+        #             if args.DEBUG:
+        #                 print(f"Searching: {iSubj.subjID}...")
+        #             res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
+        #             if len(res) > 0:
+        #                 print(f"{iSubj} has {list(res.values())}")
+        #         elif not args.QUIET:
+        #             print(f"{iSubj} does not exist at {iSubj.dataRoot}")
+
+        # if args.qSeriesDesc:
+        #     for iSubj in subjList:
+        #         if iSubj.exists():
+        #             if args.DEBUG:
+        #                 print(f"Searching: {iSubj.subjID}...")
+        #             res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
+        #             if len(res) > 0:
+        #                 print(f"{iSubj} has {list(res.values())}")
+        #         elif not args.QUIET:
+        #             print(f"{iSubj} does not exist at {iSubj.dataRoot}")
+
+
+        # --- ANONYMISE ---
+        elif args.RUN_ANON:
+            if args.anonName is not None:
+                for iSubj in subjList:
+                    if iSubj.exists():
+                        if not args.QUIET:
+                            print(f"Anonymise: {iSubj.subjID}...")
+                        iSubj.anonymise(args.anonName)
 
         # --- POST LOAD PIPELINE ---
         elif args.subjRunPost:
@@ -192,16 +248,6 @@ def runActions(args, extra_runActions=None):
                 elif not args.QUIET:
                     print(f"{iSubj} does not exist at {iSubj.dataRoot}")
 
-        elif args.searchSerDesc:
-            for iSubj in subjList:
-                if iSubj.exists():
-                    if args.DEBUG:
-                        print(f"Searching: {iSubj.subjID}...")
-                    res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.searchSerDesc)
-                    if len(res) > 0:
-                        print(f"{iSubj} has {list(res.values())}")
-                elif not args.QUIET:
-                    print(f"{iSubj} does not exist at {iSubj.dataRoot}")
         elif args.subjInfoFull:
             for iSubj in subjList:
                 if iSubj.exists():
