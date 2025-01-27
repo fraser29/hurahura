@@ -24,8 +24,10 @@ from functools import wraps
 ##
 from spydcmtk import spydcm
 from ngawari import fIO
+import inspect  
+
 from miresearch import mi_utils
-import inspect  # Add this import at the top
+
 
 # ====================================================================================================
 # ====================================================================================================
