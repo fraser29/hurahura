@@ -68,8 +68,7 @@ class AbstractSubject(object):
     def __init__(self, subjectNumber, 
                         dataRoot, 
                         subjectPrefix=None,
-                        DIRECTORY_STRUCTURE_TREE=mi_utils.buildDirectoryStructureTree(),
-                        padZeros=mi_utils.MIResearch_config.default_pad_zeros,
+                        padZeros=None,
                         suffix="") -> None:
         # -- CHECK REQUIRED INPUT --
         if subjectNumber is None:
@@ -100,8 +99,12 @@ class AbstractSubject(object):
                 self._subjID = subjectNumber
 
         self.suffix = suffix
+        if padZeros is None:
+            padZeros = mi_utils.MIResearch_config.default_pad_zeros
+        else:
+            padZeros = int(padZeros)
         self.padZeros = padZeros
-        self.DIRECTORY_STRUCTURE_TREE = DIRECTORY_STRUCTURE_TREE
+        self.DIRECTORY_STRUCTURE_TREE = mi_utils.buildDirectoryStructureTree()
         self.BUILD_DIR_IF_NEED = True
         self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
         self.QUIET = False
@@ -1122,9 +1125,11 @@ def guessSubjectPrefix(dataRootDir, QUIET=False):
 ### ====================================================================================================================
 ###  Helper functions for building new or adding to subjects
 ### ====================================================================================================================
-def buildSubjectID(subjN, subjectPrefix, padZeros=mi_utils.MIResearch_config.default_pad_zeros, suffix=''):
+def buildSubjectID(subjN, subjectPrefix, padZeros=None, suffix=''):
     if subjN is None:
         return subjectPrefix
+    if padZeros is None:
+        padZeros = mi_utils.MIResearch_config.default_pad_zeros
     return f"{subjectPrefix}{subjN:0{padZeros}d}{suffix}"
 
 def getNextSubjN(dataRootDir, subjectPrefix=None):
@@ -1136,9 +1141,11 @@ def getNextSubjN(dataRootDir, subjectPrefix=None):
     except ValueError:
         return 1
 
-def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None, padZeros=mi_utils.MIResearch_config.default_pad_zeros, suffix=""):
+def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None, padZeros=None, suffix=""):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
+    if padZeros is None:
+        padZeros = mi_utils.MIResearch_config.default_pad_zeros
     return os.path.isdir(os.path.join(dataRootDir, buildSubjectID(subjN, subjectPrefix, padZeros=padZeros, suffix=suffix)))
 
 def getNextSubjID(dataRootDir, subjectPrefix=None):

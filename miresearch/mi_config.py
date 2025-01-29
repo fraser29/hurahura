@@ -6,7 +6,7 @@ from collections import OrderedDict
 import os
 import importlib
 
-thisConfFileName = 'miresearch.conf'
+miresearch_conf = 'miresearch.conf'
 rootDir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -16,10 +16,10 @@ class _MIResearch_config():
         
 
         self.config = configparser.ConfigParser(dict_type=OrderedDict)
-        self.all_config_files = [os.path.join(rootDir,thisConfFileName), 
-                            os.path.join(os.path.expanduser("~"),thisConfFileName),
-                            os.path.join(os.path.expanduser("~"),'.'+thisConfFileName), 
-                            os.path.join(os.path.expanduser("~"), '.config',thisConfFileName),
+        self.all_config_files = [os.path.join(rootDir,miresearch_conf), 
+                            os.path.join(os.path.expanduser("~"),miresearch_conf),
+                            os.path.join(os.path.expanduser("~"),'.'+miresearch_conf), 
+                            os.path.join(os.path.expanduser("~"), '.config',miresearch_conf),
                             os.environ.get("MIRESEARCH_CONF", '')]
 
     def runconfigParser(self, extraConfFile=None):
