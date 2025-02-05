@@ -117,6 +117,9 @@ def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
         DirectoryTree.addNewStructure(i)
     return DirectoryTree
 
+
+def getDataRootDir():
+    return MIResearch_config.data_root_dir
 #==================================================================
 #==================================================================
 def countFilesInDir(dirName):

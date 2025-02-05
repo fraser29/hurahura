@@ -940,7 +940,24 @@ class SubjectList(list):
                 pass
         return None
 
-    def findSubjMatchingPatientID(self, patientID, dateOfScan_YYYYMMDD=None):
+    def filterSubjectListByDOS_closest(self, dateOfScan_YYYY_MM_DD, A_less_than_B=False):
+        """Reduce sList to one - closest to dateOfScan
+        
+        Keyword arguments:
+        subjList -- list of KMR_CARDIAC objects
+        dateOfScan_YYYY_MM_DD -- date of scan string to query
+        A_less_than_B = check to force subjDateOfScan <= dateOfScan query
+        Return: subjList length one
+        """
+        dateDiffs = [_getDateDiff_days(iSubj.getTagValue('StudyDate'), dateOfScan_YYYY_MM_DD) for iSubj in self]
+        if A_less_than_B: 
+            minDiff = min(dateDiffs)
+            dateDiffs = [i if i <=0 else (minDiff-999) for i in dateDiffs]
+        indexKeep = np.argmax(dateDiffs)
+        return [self[indexKeep]]
+
+
+    def findSubjMatchingPatientID(self, patientID, dateOfScan_YYYYMMDD=None, tolerance_days=0):
         """
         :param patientID:
         :param dateOfScan_YYYY_MM_DD: list of ints for DOS to fix ambiguity
@@ -955,7 +972,11 @@ class SubjectList(list):
             except ValueError:
                 pass
         if (len(matchList)>1) & (dateOfScan_YYYYMMDD is not None):
-            return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
+            dataEnd = None
+            if tolerance_days > 0:
+                dataEnd_DT = spydcm.dcmTools.dbDateToDateTime(dateOfScan_YYYYMMDD) + datetime.timedelta(days=tolerance_days)
+                dataEnd = spydcm.dcmTools.dateTime_to_dbString(dataEnd_DT)
+            return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD, dateEnd_YYYYMMDD=dataEnd)
         return matchList
 
     def findSubjMatchingName(self, nameStr, dateOfScan_YYYYMMDD=None, decodePassword=None):
@@ -1046,6 +1067,17 @@ def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None,
         summaryFilePath = os.path.join(dataRootDir, f'Summary_{nowStr}.csv')
     misubjList = SubjectList.setByDirectory(dataRootDir, subjectPrefix=subjPrefix, SubjClass=SubjClass)
     misubjList.writeSummaryCSV(summaryFilePath)
+
+def _getDateDiff_days(dateA, dateB):
+    if type(dateA) == str:
+        dateA = spydcm.dcmTools.dbDateToDateTime(dateA)
+    if type(dateB) == str:
+        dateB = spydcm.dcmTools.dbDateToDateTime(dateB)
+    return (dateA - dateB).days
+
+def doDatesMatch(dateA, dateB, tolerance_days=1):
+    dateDiff_days = _getDateDiff_days(dateA, dateB)
+    return abs(dateDiff_days) < tolerance_days
 
 ### ====================================================================================================================
 def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None, SubjClass=AbstractSubject):
