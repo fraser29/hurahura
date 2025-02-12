@@ -7,10 +7,10 @@ import os
 import sys
 import argparse
 
-from miresearch import mi_utils
-from miresearch import mi_subject
-from miresearch import miresearch_watchdog
-from miresearch.mi_config import MIResearch_config
+from hurahura import mi_utils
+from hurahura import mi_subject
+from hurahura import miresearch_watchdog
+from hurahura.mi_config import MIResearch_config
 
 
 ### ====================================================================================================================
@@ -123,13 +123,10 @@ def setNList(args):
             args.subjNList = args.subjNList+mi_utils.subjFileToSubjN(args.subjNListFile)
     # args.subjNList = sorted(list(set(args.subjNList)))
 
-def checkArgs(args):
+def checkArgs(args, class_obj=None):
     # 
     args.RUN_ANON = False
     if args.configFile: MIResearch_config.runconfigParser(args.configFile)
-    if args.INFO:
-        MIResearch_config.printInfo()
-        sys.exit(1)
     #
     if args.dataRoot is not None:
         args.dataRoot = os.path.abspath(args.dataRoot)
@@ -149,10 +146,15 @@ def checkArgs(args):
         args.LoadMulti = True
     
     MISubjClass = mi_subject.AbstractSubject
+    if class_obj is not None:
+        MIResearch_config.class_obj = class_obj
     if MIResearch_config.class_obj:
         MISubjClass = MIResearch_config.class_obj
     args.MISubjClass = MISubjClass
     ## -------------
+    if args.INFO:
+        MIResearch_config.printInfo()
+        sys.exit(1)
     setNList(args=args)
 
 ### ====================================================================================================================
@@ -296,9 +298,9 @@ def runActions(args, extra_runActions=None):
 ### ====================================================================================================================
 ### ====================================================================================================================
 # S T A R T
-def main(extra_runActions=None):
+def main(extra_runActions=None, class_obj=None):
     arguments = ParentAP.parse_args()
-    checkArgs(arguments) # Will substitute from config files if can
+    checkArgs(arguments, class_obj) # Will substitute from config files if can
     runActions(arguments, extra_runActions)
 
 

@@ -1,12 +1,16 @@
-# miresearch
+# hurahura - formally miresearch
+
 Organisation and automation tools for medical imaging research data
+
+__hurahura__ is maori for "to investigate" or "to look around"
 
 ## Installation: 
 
 ```bash
-pip install imaging-research
+pip install hurahura
+# formally: pip install imaging-research
+
 ```
-Note: pypi reported naming conflicts for miresearch
 
 > [!IMPORTANT]  
 > This package is currently undergoing frequent development and testing. Please check back regularly for version updates.

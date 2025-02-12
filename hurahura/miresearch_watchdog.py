@@ -7,8 +7,8 @@ import logging
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 #
-from miresearch import mi_subject
-from miresearch.mi_config import MIResearch_config
+from hurahura import mi_subject
+from hurahura.mi_config import MIResearch_config
 
 
 # ====================================================================================================

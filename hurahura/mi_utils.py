@@ -3,7 +3,7 @@ import base64
 import csv
 import datetime
 
-from miresearch.mi_config import MIResearch_config
+from hurahura.mi_config import MIResearch_config
 
 
 

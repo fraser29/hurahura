@@ -12,9 +12,9 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'imaging-research'
+NAME = 'hurahura'
 DESCRIPTION = 'Medical Imaginging Research structuring and automation'
-URL = 'https://github.com/fraser29/miresearch'
+URL = 'https://github.com/fraser29/hurahura'
 EMAIL = 'callaghan.fm@gmail.com'
 AUTHOR = 'Fraser M. Callaghan'
 REQUIRES_PYTHON = '>=3.9.0'
@@ -23,7 +23,7 @@ KEYWORDS="medical, imaging, mri, ct, dicom"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "spydcmtk", "pandas", "numpy", "watchdog", "nicegui"
+    "spydcmtk>=1.2.3", "pandas", "numpy", "watchdog", "nicegui"
 ]
 
 

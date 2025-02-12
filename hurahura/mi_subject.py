@@ -26,7 +26,7 @@ from spydcmtk import spydcm
 from ngawari import fIO
 import inspect  
 
-from miresearch import mi_utils
+from hurahura import mi_utils
 
 
 # ====================================================================================================
