@@ -3,8 +3,8 @@
 from urllib.parse import urlparse, parse_qs
 import importlib
 import asyncio
-from miresearch import mi_subject
-from miresearch.mi_config import MIResearch_config
+from hurahura import mi_subject
+from hurahura.mi_config import MIResearch_config
 DEBUG = True
 
 

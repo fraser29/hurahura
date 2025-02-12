@@ -18,12 +18,12 @@ URL = 'https://github.com/fraser29/hurahura'
 EMAIL = 'callaghan.fm@gmail.com'
 AUTHOR = 'Fraser M. Callaghan'
 REQUIRES_PYTHON = '>=3.9.0'
-VERSION = '0.1.6'
+VERSION = '0.1.1'
 KEYWORDS="medical, imaging, mri, ct, dicom"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "spydcmtk>=1.2.3", "pandas", "numpy", "watchdog", "nicegui"
+    "spydcmtk>=1.2.3", "pandas", "numpy", "watchdog", "nicegui", "ngawari"
 ]
 
 
@@ -99,9 +99,9 @@ setup(
     keywords=KEYWORDS,
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     entry_points={
-        "console_scripts": ["miresearch=miresearch.miresearch_main:main"],
+        "console_scripts": ["hurahura=hurahura.miresearch_main:main"],
     },
-    package_data={"miresearch": ["miresearch.conf",]},
+    package_data={"hurahura": ["miresearch.conf",]},
     install_requires=REQUIRED,
     # extras_require=EXTRAS,
     include_package_data=True,

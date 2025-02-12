@@ -1,7 +1,7 @@
 import os
 from nicegui import ui, app
-from miresearch import mi_subject
-from miresearch.miresearchui import miui_helpers
+from hurahura import mi_subject
+from hurahura.miresearchui import miui_helpers
 import inspect
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"

@@ -37,14 +37,14 @@ This package may be easily adapted and expanded upon for a high level control ov
 - *DIRECTORY_STRUCTURE_TREE* : DirectoryStructureTree class to define directory structure for each subject directory (see wiki for construction shortcuts)
     - Optional: Defaults to **RAW** and **META** directories. 
 
-This is the basic parent class containing fundamental methods for organisation and management. See  [miresearch docs](https://fraser29.github.io/miresearch/) for advanced usage, epsecially via inheritance and polymorphism. 
+This is the basic parent class containing fundamental methods for organisation and management. See  [hurahura docs](https://fraser29.github.io/hurahura/) for advanced usage, epsecially via inheritance and polymorphism. 
 
 # Exposed commandline tool: miresearch
 
 ```bash
 
-miresearch -h
-usage: miresearch [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-sSuffix SUBJSUFFIX]
+hurahura -h
+usage: hurahura [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-sSuffix SUBJSUFFIX]
                   [-anonName ANONNAME] [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SummaryCSV SUMMARYCSV] [-WatchDirectory WATCHDIRECTORY]
 
 options:
@@ -82,7 +82,7 @@ Actions:
 
 # Configuration
 
-miresearch uses a miresearch.conf file for configuration. 
+hurahura uses a miresearch.conf file for configuration. 
 
 By default miresearch.conf files are search for in the following locations: 
 
@@ -91,13 +91,13 @@ By default miresearch.conf files are search for in the following locations:
 3. $HOME/.miresearch.conf
 4. $HOME/.config/miresearch.conf
 5. Full file path defined at environment variable: "MIRESEARCH_CONF"
-6. Full path passed as commandline argument to `miresearch`
+6. Full path passed as commandline argument to `hurahura`
 
 Files are read in the above order with each subsequent variable present overwritting any previously defined. 
 For information on files found and variables used run:
 
-`miresearch -INFO` 
+`hurahura -INFO` 
 
 # Documentation
 
-For full documentation see [miresearch docs](https://fraser29.github.io/miresearch/)
+For full documentation see [hurahura docs](https://fraser29.github.io/hurahura/)

@@ -8,22 +8,13 @@ from ngawari import fIO
 from local_directory_picker import local_file_picker
 from subjectUI import subject_page
 
-from miresearch import mi_subject
-from miresearch.miresearchui import miui_helpers
+from hurahura import mi_subject
+from hurahura.miresearchui import miui_helpers
 import asyncio  # Add this import at the top
 
 DEBUG = True
 
-# TODO best here that I set from a config file - i.e. give dict - name - then 
-# hardcoded_presets = {"ProjA": {"data_root_dir": "/home/fraser/WORK/MI_DATA/tmpTestSubjs2",
-#                                 "class_obj": mi_subject.AbstractSubject,
-#                                 "subject_prefix": None,
-#                                 "anon_level": None}, 
-#                     "ProjB": {"conf_file": "miresearchui/projB.conf"},
-#                     "ProjC": {"conf_file": "miresearchui/projC.conf"}}
-hardcoded_presets = {"TestRuru": {"conf_file": "/home/fraser/MSK.conf"},
-                     "TestMoa": {"conf_file": "/home/fraser/DEV/miresearch/miresearch/miresearchui/projC.conf"}}
-
+hardcoded_presets = {}
 
 # ==========================================================================================
 
