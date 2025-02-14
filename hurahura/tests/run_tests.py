@@ -1,12 +1,12 @@
 
-from context import miresearch # This is useful for testing outside of environment
+from context import hurahura # This is useful for testing outside of environment
 
 import os
 import unittest
 import shutil
 
-from miresearch import mi_subject
-from miresearch.mi_config import MIResearch_config
+from hurahura import mi_subject
+from hurahura.mi_config import MIResearch_config
 
 
 this_dir = os.path.split(os.path.realpath(__file__))[0]
@@ -287,6 +287,36 @@ class TestArchiveSubject(unittest.TestCase):
     def tearDownClass(cls, OVERRIDE=False):
         if (not DEBUG) or OVERRIDE:
             shutil.rmtree(cls.tmpDir)
+                
+        
+class TestMoveSubject(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestMoveSubject')
+        cls.tmpDir2 = os.path.join(this_dir, 'TestMoveSubject2')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        if os.path.isdir(cls.tmpDir2):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir2)
+        cls.subj = mi_subject.createNew_OrAddTo_Subject(P4, cls.tmpDir, subjPrefix='MI-A', anonName="SubjectNumber1", QUIET=True)[0]
+
+    def test_SubjZip(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI-A000001')))
+        self.assertEqual(self.subj.countNumberOfDicoms(), 2)
+        self.subj.archiveSubject(self.tmpDir2)
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir2, 'MI-A000001')))
+        self.assertEqual(self.subj.countNumberOfDicoms(), 0)
+        newSubj = mi_subject.AbstractSubject(1, subjectPrefix='MI-A', dataRoot=self.tmpDir2)
+        self.assertEqual(newSubj.countNumberOfDicoms(), 2)
+    
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir2)
                 
 class TestRenameSubject(unittest.TestCase):
     @classmethod

@@ -19,6 +19,7 @@ import numpy as np
 import datetime
 import pandas as pd
 import shutil
+import subprocess
 import logging
 from functools import wraps
 ##
@@ -346,7 +347,9 @@ class AbstractSubject(object):
 
     def info(self):
         # Return info string for this subject
-        return f"{self.subjID}: {self.getName()} (ID:{self.getTagValue('PatientID')}, DOB:{self.getTagValue('PatientDateOfBirth')}) scanned on {self.getStudyDate()}"
+        data, _ = self.getInfoStr()
+        return ",".join([str(i) for i in data])
+        # return f"{self.subjID}: {self.getName()} (ID:{self.getTagValue('PatientID')}, DOB:{self.getTagValue('PatientDateOfBirth')}) scanned on {self.getStudyDate()}"
 
 
     def printDicomsInfo(self):
@@ -831,6 +834,83 @@ class AbstractSubject(object):
                     zipf.write(file_path, arcname=arcname)
         self.logger.info(f'Zipped subject to {archive_name}')
         return archive_name
+
+
+    def delteAllButMeta(self):
+        """Delete all contents of subject except META data (leave directory srtructure). Often after "archiveSubject"
+
+        Returns:
+            int: 0 for success else 1
+        """
+        self.logger.info(f"Start deleting all but META for {self.subjID} at {self.dataRoot}")
+        result = 0
+        for root, dirs, files in os.walk(self.dataRoot, topdown=True):
+            dirs[:] = [d for d in dirs if d != "META"]
+            for file in files:
+                fileFull = os.path.join(root, file)
+                try: 
+                    os.remove(fileFull)
+                except Exception as e:
+                    self.logger.error(f"ERROR deleting {fileFull}: {e}")
+                    result = 1
+        self.logger.info(f"Finished deleting all but META for {self.subjID} at {self.dataRoot}. RESULT {result}")
+        return result
+
+
+    def rsyncToOtherDataroot(self, otherDataRoot):
+        if not os.path.isdir(otherDataRoot):
+            raise ValueError(f"{otherDataRoot} should exist and should be a directory.")
+        self.logger.info(f"Start rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}")
+        if os.name == "posix":
+            try:
+                result = subprocess.run(["rsync", "-av", self.getTopDir(), otherDataRoot], 
+                                        check=True,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+                result = 0
+            except subprocess.CalledProcessError as e:
+                self.logger.error(f"ERROR performing rsync to other dataRoot: {e.stderr.decode()}")
+                result = 1
+        else:
+            try: 
+                shutil.copytree(self.getTopDir(), otherDataRoot, dirs_exist_ok=True)
+                result = 0
+            except FileNotFoundError:
+                self.logger.error(f"ERROR rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}: FileNotFoundError")
+                result = 1
+            except PermissionError:
+                self.logger.error(f"ERROR rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}: PermissionError")
+                result = 1
+            except shutil.Error as e:
+                self.logger.error(f"ERROR rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}: shutil.Error {e}")
+                result = 1
+        self.logger.info(f"Finished rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}. RESULT {result}")
+        return result
+
+
+    def archiveSubject(self, archiveRoot):
+        """Move a subject to another dataRoot then delete local files (keep META and directory structure). 
+        Use case to build and run pipelines on high performance local ssd 
+        then to move subject to e.g. NAS - still available for future interrogation. 
+
+        NOTE: This relies on rsync for the transfer on linux / mac. Falls back to shutil opn Windows. 
+
+        Args:
+            archiveRoot (str): directory path to the new dataRoot
+
+        Returns:
+            int: 0 for success else 1. 
+        """
+        self.logger.info(f"Start archiveSubject for {self.subjID} at {self.dataRoot} to {archiveRoot}.")
+        # Move the subejct
+        result = self.rsyncToOtherDataroot(archiveRoot)
+        if result == 0:
+            # Clean up local:
+            result = self.delteAllButMeta()
+        self.logger.info(f"Finished archiveSubject for {self.subjID} at {self.dataRoot} to {archiveRoot}. RESULT {result}")
+        return result
+
+
 
     # ------------------------------------------------------------------------------------------------------------------
     def getSpydcmDicomStudy(self):

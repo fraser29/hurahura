@@ -19,6 +19,8 @@ pip install hurahura
 
 This is a collection of classes for following OOP principles for organisation of research data for medical imaging research studies. 
 
+The intention is to provide a framework that will store imaging data on a "per __examination__" basis in a structured format. This structured format then permits simple interrogation, and automation.  
+
 It takes advantage of the dicom standard and the package [spydcmtk](https://github.com/fraser29/spydcmtk) for automating and generalising many typical steps with the intention of making the researcher's life easier. 
 
 This package may be easily adapted and expanded upon for a high level control over your research data. Or, it may be used as is for basic structure and organisation of data and automation of common tasks. 
@@ -44,8 +46,9 @@ This is the basic parent class containing fundamental methods for organisation a
 ```bash
 
 hurahura -h
-usage: hurahura [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-sSuffix SUBJSUFFIX]
-                  [-anonName ANONNAME] [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SummaryCSV SUMMARYCSV] [-WatchDirectory WATCHDIRECTORY]
+usage: hurahura [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sA] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-sSuffix SUBJSUFFIX] [-anonName ANONNAME]
+                [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SubjInfoFull] [-SummaryCSV [SUMMARYCSV ...]] [-Summary] [-WatchDirectory WATCHDIRECTORY] [-qSeriesDesc QSERIESDESC] [-qPID QPID]
+                [-qPatName QPATNAME] [-qExamID QEXAMID] [-qDate QDATE]
 
 options:
   -h, --help            show this help message and exit
@@ -58,7 +61,8 @@ Management Parameters:
   -DEBUG                Run in DEBUG mode (save intermediate steps, increase log output)
 
 Subject Definition:
-  -s [SUBJNLIST ...]    Subject number
+  -s [SUBJNLIST ...]    Subject number(s)
+  -sA                   All subjects
   -sf SUBJNLISTFILE     Subject numbers in file
   -sR SUBJRANGE SUBJRANGE
                         Subject range
@@ -73,10 +77,21 @@ Actions:
   -LOAD_MULTI_FORCE     Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory
   -RunPost              Run post load pipeline
   -SubjInfo             Print info for each subject
-  -SummaryCSV SUMMARYCSV
+  -SubjInfoFull         Print full info for each subject
+  -SummaryCSV [SUMMARYCSV ...]
                         Write summary CSV file (give output file name)
+  -Summary              Print summary of provided subjects to commandline (best with -sA option)
   -WatchDirectory WATCHDIRECTORY
                         Will watch given directory for new data and load as new study
+
+Query:
+  -qSeriesDesc QSERIESDESC
+                        Query based on a series description
+  -qPID QPID            Query based on patient ID
+  -qPatName QPATNAME    Query based on a patient name
+  -qExamID QEXAMID      Query based on exam (scanner assigned) ID
+  -qDate QDATE          Query based on study date
+
 
 ```
 

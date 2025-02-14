@@ -242,11 +242,14 @@ def runActions(args, extra_runActions=None):
 
         # --- PRINT INFO ---
         elif args.subjInfo:
+            HEADER = False
             for iSubj in subjList:
                 if iSubj.exists():
-                    if args.DEBUG:
-                        print(f"Info: {iSubj.subjID}...")
-                    print(iSubj.info())
+                    data, header = iSubj.getInfoStr()
+                    if not HEADER:
+                        print(",".join(header))
+                        HEADER = True
+                    print(",".join([str(i) for i in data]))
                 elif not args.QUIET:
                     print(f"{iSubj} does not exist at {iSubj.dataRoot}")
 
