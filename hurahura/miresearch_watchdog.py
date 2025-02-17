@@ -47,9 +47,9 @@ class MIResearch_WatchDog(object):
         self.DEBUG = DEBUG
         #
         self.processDir = os.path.join(self.directoryToWatch, 'MIResearch-PROCESSING')
-        self.completeDir = os.path.join(self.directoryToWatch, 'MIResearch-COMPLETE')
+        # self.completeDir = os.path.join(self.directoryToWatch, 'MIResearch-COMPLETE')
         os.makedirs(self.processDir, exist_ok=True)
-        os.makedirs(self.completeDir, exist_ok=True)
+        # os.makedirs(self.completeDir, exist_ok=True)
         # If storage dir not exist (but root directory does exist) then make
         if not os.path.isdir(self.dataStorageRoot): 
             if os.path.isdir(os.path.split(self.dataStorageRoot)[0]):
@@ -65,7 +65,7 @@ class MIResearch_WatchDog(object):
                                                             self.TO_ANONYMISE,
                                                             self.DEBUG)
         self.event_handler.processDir = self.processDir
-        self.event_handler.completeDir = self.completeDir
+        # self.event_handler.completeDir = self.completeDir
 
 
     def run(self):    
@@ -240,7 +240,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             if self.DEBUG:
                 raise e
             self.logger.error(f"An error occurred while loading subject: {str(e)} ")
-        if self.TO_ANONYMISE:
+        if self.TO_ANONYMISE: # This is for convienience - but conf file should control anonymisation at load time. 
                 for iNewSubj in newSubjList:
                     try:
                         iNewSubj.anonymise()
@@ -248,11 +248,14 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                         if self.DEBUG:
                             raise e
                         self.logger.error(f"An error occurred while anonymising {iNewSubj}: {str(e)} ")
-        finalCompleteDir = os.path.join(self.completeDir, os.path.split(directoryToLoad_process)[1])
-        if os.path.isdir(finalCompleteDir):
-            self.logger.warning(f"{finalCompleteDir} exists - will delete before moving {directoryToLoad_process}")
-            shutil.rmtree(finalCompleteDir)
-        shutil.move(directoryToLoad_process, self.completeDir)
+        self.logger.info(f"   FINISHED LOADING {directoryToLoad_process} ===")
+        shutil.rmtree(directoryToLoad_process)
+        self.logger.info(f"   DELETED {directoryToLoad_process} ===")
+        # finalCompleteDir = os.path.join(self.completeDir, os.path.split(directoryToLoad_process)[1])
+        # if os.path.isdir(finalCompleteDir):
+        #     self.logger.warning(f"{finalCompleteDir} exists - will delete before moving {directoryToLoad_process}")
+        #     shutil.rmtree(finalCompleteDir)
+        # shutil.move(directoryToLoad_process, self.completeDir)
         self.logger.info(f"=== FINISHED PROCESSING {directoryToLoad_process} ===")
 
 
