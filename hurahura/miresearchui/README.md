@@ -1,23 +1,21 @@
 # miresearchui
 
+Load a config file and show a list of subjects. 
 
-Currently setup to permit load a subjlist from select a directory. Or have some preloaded projs with buttons to switch to
+Previously loaded config files are stored and shown as short cut buttons. 
 
-Shows: 
+An over view of all subjects is shown with columns: 
 ID, Name, DOS, Age, Open (open allows to view subj specific data)
 
-TODO : run action 
-
-- need to have subj class passed with preloads (not sure how could manage from select)
-- down track could load a config file. 
-
+Click on a subject ot open to perform subject specific actions
 
 ## RUN
 
 ```bash
 
-source DEV/envs/niceui/bin/activate
-# Need this as watches directory
-cd /home/fraser/DEV/niceui_work/
-python miresearchui/main.py
+hurahura -UI -UI_port 8080
 ```
+
+Then view at:
+http://localhost:8080
+

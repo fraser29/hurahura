@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 import os
-from datetime import datetime
+import sys
 from urllib.parse import quote
-from nicegui import ui
+from nicegui import ui, app
 from ngawari import fIO
-from local_directory_picker import local_file_picker
-from subjectUI import subject_page
+import asyncio  
 
 from hurahura import mi_subject
 from hurahura.miresearchui import miui_helpers
-import asyncio  # Add this import at the top
+from hurahura.miresearchui.local_directory_picker import local_file_picker
+from hurahura.miresearchui.subjectUI import subject_page
 
 DEBUG = True
 
@@ -22,9 +22,9 @@ hardcoded_presets = {}
 # ==========================================================================================
 # MAIN CLASS 
 # ==========================================================================================
-class miresearch_ui():
+class MIResearchUI():
 
-    def __init__(self, dataRoot=None) -> None:
+    def __init__(self, dataRoot=None, port=8080) -> None:
         self.DEBUG = DEBUG
         self.dataRoot = dataRoot
         self.subjectList = []
@@ -32,7 +32,7 @@ class miresearch_ui():
         self.tableRows = []
         self.presetDict = {}
         self.setPresets(hardcoded_presets)
-
+        self.port = port
         self.tableCols = [
             {'field': 'subjID', 'sortable': True, 'checkboxSelection': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
             {'field': 'name', 'editable': True, 'filter': 'agTextColumnFilter', 'sortable': True, 'filterParams': {'filterOptions': ['contains', 'notContains', 'startsWith']}},
@@ -107,17 +107,8 @@ class miresearch_ui():
             if (result is None) or (len(result) == 0):
                 return
             configFile = result[0]
-            if os.path.isdir(configFile):
-                confFileList = []
-                for iFile in os.listdir(configFile):
-                    if iFile.endswith('.conf'):
-                        confFileList.append(os.path.join(configFile, iFile))
-                self._saveMIUI_ConfigFile(confFileList)
-                self.setPresets()
-                return
-            else:   
-                self._saveMIUI_ConfigFile(configFile)
-                self.setSubjectListFromConfigFile(configFile)
+            self._saveMIUI_ConfigFile(configFile)
+            self.setSubjectListFromConfigFile(configFile)
         except Exception as e:
             print(f"Error in directory picker: {e}")
             ui.notify(f"Error selecting directory: {str(e)}", type='error')
@@ -125,7 +116,17 @@ class miresearch_ui():
     # ========================================================================================
     # SETUP AND RUN
     # ========================================================================================        
-    def setUpAndRun(self):        
+    def setUpAndRun(self):    
+        miui_conf_dict = self.miui_conf_file_contents
+        miui_conf_keys = list(miui_conf_dict.keys())
+        for iKey in miui_conf_keys:
+            try:
+                self.presetDict[iKey] = miui_helpers.definePresetFromConfigfile(miui_conf_dict[iKey])
+            except FileNotFoundError:
+                print(f"Unable to find file {miui_conf_dict[iKey]}")
+            except Exception as e:
+                print(f"Error loading {miui_conf_dict[iKey]}")
+        print(f"Have {len(self.presetDict)} preset(s)")
         with ui.row().classes('w-full border'):
             ui.button('Choose config file', on_click=self.chooseConfig, icon='folder')
             for iProjName in self.presetDict.keys():
@@ -140,7 +141,7 @@ class miresearch_ui():
             self.aggrid = ui.aggrid({
                         'columnDefs': self.tableCols,
                         'rowData': self.tableRows,
-                        'rowSelection': 'multiple',
+                        # 'rowSelection': 'multiple',
                         'stopEditingWhenCellsLoseFocus': True,
                         "pagination" : "true",
                         'domLayout': 'autoHeight',
@@ -148,8 +149,8 @@ class miresearch_ui():
                             html_columns=[myhtml_column]).classes('w-full h-full')
         with ui.row():
             ui.button('Load subject', on_click=self.load_subject, icon='upload')
-            ui.button('Anonymise', on_click=self.anonymise_subject, icon='person_off')
-        ui.run()
+            ui.button('Shutdown', on_click=app.shutdown, icon='power_settings_new')
+        ui.run(port=int(self.port))
 
     # ========================================================================================
     # SUBJECT LEVEL ACTIONS
@@ -195,19 +196,6 @@ class miresearch_ui():
             ui.notify(f"Error loading subject: {str(e)}", type='error')
         return True
     
-
-    async def anonymise_subject(self) -> None:
-        selectedSubjects = await self.aggrid.get_selected_rows()
-        for iSubj in selectedSubjects:
-            defDict = miui_helpers.rowToSubjID_dataRoot_classPath(iSubj)
-            thisSubj = miui_helpers.subjID_dataRoot_classPathTo_SubjObj(defDict['subjID'], defDict['dataRoot'], defDict['classPath'])
-            try:
-                thisSubj.anonymise()
-                ui.notify(f"Anonymised subject {thisSubj.subjID}", type='positive')
-            except Exception as e:
-                ui.notify(f"Error anonymising subject {thisSubj.subjID}: {str(e)}", type='error')
-        return True
-
     # ========================================================================================
     # SET SUBJECT LIST 
     # ========================================================================================    
@@ -216,7 +204,7 @@ class miresearch_ui():
         Set the subject list from a config file (either selected or remembered)
         """
         if self.DEBUG:
-            print(f"Setting subject list from preset {projectName}")
+            print(f"Setting subject list from config file {projectName}")
         if os.path.isfile(projectName):
             iName = os.path.splitext(os.path.basename(projectName))[0]
             self.presetDict[iName] = miui_helpers.definePresetFromConfigfile(projectName)
@@ -278,23 +266,31 @@ class miresearch_ui():
     # ========================================================================================
     # SETTINGS PAGE
     # ========================================================================================      
+    @ui.page('/settings')
     def settings_page(self):
         pass
 
 
+# ==========================================================================================
+# ==========================================================================================
+class UIRunner():
+    def __init__(self, port=8081):
+        self.miui = MIResearchUI(port=port)
 
+    @ui.page('/miresearch')
+    def run(self):
+        self.miui.setUpAndRun()
 
 
 # ==========================================================================================
 # RUN THE UI
 # ==========================================================================================    
-@ui.page('/')
-def runMIUI():
+def runMIUI(port=8081):
     # Create the UI instance
-    miui = miresearch_ui()
-    miui.setUpAndRun()
+    miui = UIRunner(port=port)
+    miui.run()
 
 if __name__ in {"__main__", "__mp_main__"}:
     # app.on_shutdown(miui_helpers.cleanup)
-    runMIUI()
+    runMIUI(port=sys.argv[1])
 

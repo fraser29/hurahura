@@ -6,11 +6,13 @@
 import os
 import sys
 import argparse
+import subprocess
 
 from hurahura import mi_utils
 from hurahura import mi_subject
 from hurahura import miresearch_watchdog
 from hurahura.mi_config import MIResearch_config
+from hurahura.miresearchui import mainUI
 
 
 ### ====================================================================================================================
@@ -91,23 +93,31 @@ groupA.add_argument('-WatchDirectory', dest='WatchDirectory',
                     help='Will watch given directory for new data and load as new study', 
                     type=str, default=None)
 
+# WATCH DIRECTORY
+groupA.add_argument('-UI', dest='UI', 
+                    help='Run in UI mode', 
+                    action='store_true')
+groupA.add_argument('-UI_port', dest='UI_port', 
+                    help='Port to run UI on', 
+                    type=int, default=8080)
+
 ## === QUERY ===
 groupQ = ParentAP.add_argument_group('Query')
 groupQ.add_argument('-qSeriesDesc', dest='qSeriesDesc', 
-                    help='Query based on a series description', 
+                    help='Query based on a series description (must provide -s* option)', 
                     type=str, default=None)
 groupQ.add_argument('-qPID', dest='qPID', 
-                    help='Query based on patient ID', 
+                    help='Query based on patient ID (must provide -s* option)', 
                     type=str, default=None)
 groupQ.add_argument('-qPatName', dest='qPatName', 
-                    help='Query based on a patient name', 
+                    help='Query based on a patient name (must provide -s* option)', 
                     type=str, default=None)
 groupQ.add_argument('-qExamID', dest='qExamID', 
-                    help='Query based on exam (scanner assigned) ID', 
+                    help='Query based on exam (scanner assigned) ID (must provide -s* option)', 
                     type=str, default=None)
-groupQ.add_argument('-qDate', dest='qDate', # TODO - allow range 
-                    help='Query based on study date', 
-                    type=str, default=None)
+groupQ.add_argument('-qDate', dest='qDate', 
+                    help='Query based on study date: provide start and end, YYYYMMDD (must provide -s* option)', 
+                    type=str, default=[], nargs=2)
 
 ### ====================================================================================================================
 #           CHECK ARGS
@@ -194,34 +204,24 @@ def runActions(args, extra_runActions=None):
                         print(f"{iSubj} has {list(res.values())}")
 
         if args.qPID:
-            for iSubj in subjList:
-                if iSubj.exists():
-                    res = iSubj.getTagValue("PatientID")
-                    if str(res) == str(args.qPID):
-                        print(iSubj.info())
+            subList = subjList.findSubjMatchingPatientID(args.qPID)
+            for iSubj in subList:
+                print(iSubj.info())
 
-        # if args.qSeriesDesc:
-        #     for iSubj in subjList:
-        #         if iSubj.exists():
-        #             if args.DEBUG:
-        #                 print(f"Searching: {iSubj.subjID}...")
-        #             res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
-        #             if len(res) > 0:
-        #                 print(f"{iSubj} has {list(res.values())}")
-        #         elif not args.QUIET:
-        #             print(f"{iSubj} does not exist at {iSubj.dataRoot}")
+        if args.qPatName:
+            subList = subjList.findSubjMatchingName(args.qPatName)
+            for iSubj in subList:
+                print(iSubj.info())
 
-        # if args.qSeriesDesc:
-        #     for iSubj in subjList:
-        #         if iSubj.exists():
-        #             if args.DEBUG:
-        #                 print(f"Searching: {iSubj.subjID}...")
-        #             res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
-        #             if len(res) > 0:
-        #                 print(f"{iSubj} has {list(res.values())}")
-        #         elif not args.QUIET:
-        #             print(f"{iSubj} does not exist at {iSubj.dataRoot}")
+        if args.qExamID:
+            subList = subjList.findSubjMatchingStudyID(args.qExamID)
+            for iSubj in subList:
+                print(iSubj.info())
 
+        if len(args.qDate) == 2:
+            subList = subjList.filterSubjectListByDOS(args.qDate[0], args.qDate[1])
+            for iSubj in subList:
+                print(iSubj.info())
 
         # --- ANONYMISE ---
         elif args.RUN_ANON:
@@ -287,6 +287,12 @@ def runActions(args, extra_runActions=None):
                                         DEBUG=args.DEBUG)
         MIWatcher.run()
 
+
+    ## UI ##
+    elif args.UI:
+        miresearchui_path = os.path.join(os.path.dirname(__file__), 'miresearchui')
+        subprocess.Popen(['python', 'mainUI.py', str(args.UI_port)], cwd=miresearchui_path)
+
     if extra_runActions is not None:
         if type(extra_runActions) == list:
             for iExtra in extra_runActions:
@@ -307,5 +313,5 @@ def main(extra_runActions=None, class_obj=None):
     runActions(arguments, extra_runActions)
 
 
-if __name__ == '__main__':
+if __name__ in {"__main__", "__mp_main__"}:
     main()

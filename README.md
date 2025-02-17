@@ -1,4 +1,4 @@
-# hurahura - formally miresearch
+# hurahura - formerly miresearch
 
 Organisation and automation tools for medical imaging research data
 
@@ -8,7 +8,7 @@ __hurahura__ is maori for "to investigate" or "to look around"
 
 ```bash
 pip install hurahura
-# formally: pip install imaging-research
+# formerly: pip install imaging-research
 
 ```
 
