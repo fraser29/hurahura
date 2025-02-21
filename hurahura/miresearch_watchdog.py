@@ -142,7 +142,7 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         elif event.src_path.endswith('.zip') or \
                 event.src_path.endswith('.tar') or \
                 event.src_path.endswith('.tar.gz'):
-            self.logger.info(f"Archive created: {event.src_path}")
+            self.logger.info(f"Archive created: {event.src_path}") # Note other archives are not handled
             try:
                 self._action(event.src_path)
             except Exception as e:
