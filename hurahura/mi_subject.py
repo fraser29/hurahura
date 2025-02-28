@@ -860,6 +860,9 @@ class AbstractSubject(object):
     def rsyncToOtherDataroot(self, otherDataRoot):
         if not os.path.isdir(otherDataRoot):
             raise ValueError(f"{otherDataRoot} should exist and should be a directory.")
+        if otherDataRoot == self.dataRoot:
+            self.logger.error("Other root and data root are some - not performing rsync")
+            return 1
         self.logger.info(f"Start rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}")
         if os.name == "posix":
             try:
