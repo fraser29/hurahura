@@ -113,6 +113,47 @@ For information on files found and variables used run:
 
 `hurahura -INFO` 
 
+## systemctl 
+
+Running mi_watcher via systemctl is an attractive application: 
+
+### Ubuntu instructions:
+
+- Build a .service file in /etc/systemd/system:
+
+```ini
+[Unit]
+Description=My mi_watcher Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/path/to/script
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- Build /path/to/script: 
+
+```bash
+#!/bin/bash
+source /myvenv/bin/activate
+export MIRESEARCH_CONF=/path/to/my_proj.conf
+hurahura -WatchDirectory /path/to/watch_directory
+```
+
+- Reload systemd
+- enable service
+- start service
+  
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable myservice.service
+sudo systemctl start myservice.service
+```
+
 # Documentation
 
 For full documentation see [hurahura docs](https://fraser29.github.io/hurahura/)
