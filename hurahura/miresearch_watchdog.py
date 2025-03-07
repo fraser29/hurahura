@@ -82,9 +82,9 @@ class MIResearch_WatchDog(object):
         self.logger.info(f" -------------- OBSERVER STARTED --------------")
         try:
             while True:
-                time.sleep(1)
+                time.sleep(5)
         except KeyboardInterrupt:
-            self.logger.info(f"MIResearch_WatchDog watching {self.directoryToWatch} killed by keyboard interrupt.")
+            self.logger.info(f"MIResearch_WatchDog watching {self.directoryToWatch} killed.")
             self.logger.info("Closing cleanly. ")
             observer.stop()
         observer.join()
@@ -149,6 +149,10 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                 if self.DEBUG:
                     raise e
                 self.logger.error(f"    _action processing interrupted : {e}")
+        
+        elif event.src_path.endswith('kill_watcher'):
+            os.unlink(event.src_path)
+            raise KeyboardInterrupt
 
     def on_deleted(self, event):
         self.logger.info(f"deleted: {event.src_path}")
