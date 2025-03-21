@@ -28,7 +28,6 @@ from ngawari import fIO
 import inspect  
 
 from hurahura import mi_utils
-from spydcmtk.spydcm_config import SpydcmTK_config
 
 
 # ====================================================================================================
