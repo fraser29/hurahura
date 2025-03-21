@@ -7,7 +7,9 @@ from hurahura.mi_config import MIResearch_config
 
 
 
-DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
+DEFAULT_DICOM_META_TAG_LIST_STUDY = ["AccessionNumber",
+                                "InstitutionName",
+                                "BodyPartExamined",
                                 "MagneticFieldStrength",
                                 "Manufacturer",
                                 "ManufacturerModelName",
@@ -16,12 +18,45 @@ DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
                                 "PatientID",
                                 "PatientName",
                                 "PatientSex",
+                                "PatientAge",
+                                "PatientWeight",
+                                "ProtocolName",
                                 "ReceiveCoilName",
+                                "ScannerStudyID",
                                 "SoftwareVersions",
+                                "StationName",
                                 "StudyDate",
                                 "StudyDescription",
                                 "StudyID",
-                                "StudyInstanceUID"]
+                                "StudyInstanceUID",
+                                "StudyTime"]
+
+DEFAULT_DICOM_META_TAG_LIST_SERIES = [
+                                "AcquiredResolution",
+                                "AcquiredTemporalResolution",
+                                "AcquisitionMatrix",
+                                "AcquisitionTime",
+                                "DicomFileName",
+                                "EchoTime",
+                                "FlipAngle",
+                                "HeartRate",
+                                "InPlanePhaseEncodingDirection",
+                                "InternalPulseSequenceName",
+                                "MagneticFieldStrength",
+                                "Manufacturer",
+                                "ManufacturerModelName",
+                                "PixelBandwidth",
+                                "PulseSequenceName",
+                                "ReconstructionDiameter",
+                                "RepetitionTime",
+                                "ScanDuration",
+                                "ScanningSequence",
+                                "SeriesDescription",
+                                "SeriesNumber",
+                                "SoftwareVersions",
+                                "SpacingBetweenSlices",
+                                "StudyDate"]
+
 
 DEFAULT_DICOM_TIME_FORMAT = "%H%M%S" # TODO to config (and above) - or from spydcmtk
 

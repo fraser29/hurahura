@@ -28,6 +28,7 @@ from ngawari import fIO
 import inspect  
 
 from hurahura import mi_utils
+from spydcmtk.spydcm_config import SpydcmTK_config
 
 
 # ====================================================================================================
@@ -107,8 +108,10 @@ class AbstractSubject(object):
         self.padZeros = padZeros
         self.DIRECTORY_STRUCTURE_TREE = mi_utils.buildDirectoryStructureTree()
         self.BUILD_DIR_IF_NEED = True
-        self.dicomMetaTagList = mi_utils.DEFAULT_DICOM_META_TAG_LIST
+        self.dicomMetaTagListStudy = mi_utils.DEFAULT_DICOM_META_TAG_LIST_STUDY
+        self.dicomMetaTagListSeries = mi_utils.DEFAULT_DICOM_META_TAG_LIST_SERIES
         self.QUIET = False
+        #
         #
         self._logger = None
         self._loggerFH = None
@@ -513,18 +516,13 @@ class AbstractSubject(object):
         ddFull = {'SubjectID': self.subjID, 'SubjN': self._subjN, 'Series': []}
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         try:
-            dcmDict = dcmStudies[0].getStudySummaryDict()
+            dcmDict = dcmStudies[0].getStudySummaryDict(extraTags=self.dicomMetaTagListStudy)
             dcmDict.pop('Series') # Get more detailed series information
             ddFull.update(dcmDict)
             # 
             for iDcmStudy in dcmStudies:
                 for iSeries in iDcmStudy:
-                    serDict = iSeries.getSeriesInfoDict(["SeriesNumber", 
-                                                                "SeriesDescription", 
-                                                                "StudyDate", 
-                                                                "AcquisitionTime",
-                                                                "InPlanePhaseEncodingDirection", 
-                                                                "PixelBandwidth"])
+                    serDict = iSeries.getSeriesInfoDict(self.dicomMetaTagListSeries)
                     serDict['DicomFileName'] = iSeries.getDicomFullFileName().replace(self.getTopDir(), "")
                     ddFull['Series'].append(serDict)
         except IndexError:

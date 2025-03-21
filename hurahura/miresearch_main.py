@@ -12,7 +12,6 @@ from hurahura import mi_utils
 from hurahura import mi_subject
 from hurahura import miresearch_watchdog
 from hurahura.mi_config import MIResearch_config
-from hurahura.miresearchui import mainUI
 
 
 ### ====================================================================================================================
