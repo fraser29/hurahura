@@ -12,9 +12,6 @@ pip install hurahura
 
 ```
 
-> [!IMPORTANT]  
-> This package is currently undergoing frequent development and testing. Please check back regularly for version updates.
-
 ## About
 
 This is a collection of classes for following OOP principles for organisation of research data for medical imaging research studies. 
@@ -24,9 +21,6 @@ The intention is to provide a framework that will store imaging data on a "per _
 It takes advantage of the dicom standard and the package [spydcmtk](https://github.com/fraser29/spydcmtk) for automating and generalising many typical steps with the intention of making the researcher's life easier. 
 
 This package may be easily adapted and expanded upon for a high level control over your research data. Or, it may be used as is for basic structure and organisation of data and automation of common tasks. 
-
-> [!NOTE]  
-> Version 0.1.0 release: Greater flexibility in subject ID naming and stability improvements to miresearch_watchdog.
 
 
 ## Class structure
@@ -140,8 +134,7 @@ WantedBy=multi-user.target
 ```bash
 #!/bin/bash
 source /myvenv/bin/activate
-export MIRESEARCH_CONF=/path/to/my_proj.conf
-hurahura -WatchDirectory /path/to/watch_directory
+hurahura -WatchDirectory /path/to/watch_directory -config /path/to/my_proj.conf
 ```
 
 - Reload systemd
