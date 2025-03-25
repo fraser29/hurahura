@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hurahura"
+version = "0.1.4"
+description = "Medical Imaginging Research structuring and automation"
+readme = "README.md"
+authors = [
+    { name = "Fraser M. Callaghan", email = "callaghan.fm@gmail.com" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+keywords = ["medical", "imaging", "mri", "ct", "dicom"]
+dependencies = [
+    "spydcmtk>=1.2.6",
+    "pandas",
+    "numpy",
+    "watchdog",
+    "nicegui",
+    "ngawari",
+]
+requires-python = ">=3.9.0"
+
+[project.urls]
+Homepage = "https://github.com/fraser29/hurahura"
+
+[project.scripts]
+hurahura = "hurahura.miresearch_main:main"
+
+[tool.hatch.build]
+include = [
+    "hurahura/miresearch.conf",
+]
+exclude = [
+    "tests",
+    "*.tests",
+    "*.tests.*",
+    "tests.*"
+] 
