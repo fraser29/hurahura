@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hurahura"
-version = "0.1.4"
+version = "0.1.6"
 description = "Medical Imaginging Research structuring and automation"
 readme = "README.md"
 authors = [
@@ -38,11 +38,18 @@ hurahura = "hurahura.miresearch_main:main"
 
 [tool.hatch.build]
 include = [
-    "hurahura/miresearch.conf",
+    "hurahura/**/*.py",
+    "hurahura/**/*.conf",
 ]
 exclude = [
     "tests",
     "*.tests",
     "*.tests.*",
     "tests.*"
-] 
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["hurahura"]
+
+[tool.hatch.build.targets.sdist]
+packages = ["hurahura"] 
