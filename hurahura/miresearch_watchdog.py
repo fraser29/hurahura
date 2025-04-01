@@ -239,7 +239,9 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             newSubjList = mi_subject.createNew_OrAddTo_Subject(directoryToLoad_process,
                                                 dataRoot=self.dataStorageRoot,
                                                 SubjClass=self.SubjClass,
-                                                subjPrefix=self.subjectPrefix)
+                                                subjPrefix=self.subjectPrefix,
+                                                OTHER_DATA_DIR=directoryToLoad_process)
+
         except Exception as e:
             if self.DEBUG:
                 raise e

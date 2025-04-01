@@ -65,7 +65,7 @@ UNKNOWN = 'UNKNOWN'
 META = "META"
 RAW = "RAW"
 DICOM = "DICOM"
-
+OTHER = "OTHER"
 
 #==================================================================
 

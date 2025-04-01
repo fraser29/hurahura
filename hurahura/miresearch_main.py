@@ -57,9 +57,15 @@ groupS.add_argument('-anonName', dest='anonName',
     
 ## === ACTIONS ===
 groupA = ParentAP.add_argument_group('Actions')
+groupA.add_argument('-Build', dest='build', 
+                    help='Build empty subject(s)', 
+                    action='store_true')
 # LOADING
 groupA.add_argument('-Load', dest='loadPath', 
-                    help='Path to load dicoms from (file / directory / tar / tar.gz / zip)', 
+                    help='Path to load data from (file / directory / tar / tar.gz / zip)', 
+                    type=str, default=None)
+groupA.add_argument('-LoadOther', dest='loadPathOther', 
+                    help='Path to load other data from directory (non-DICOM)', 
                     type=str, default=None)
 groupA.add_argument('-LOAD_MULTI', dest='LoadMulti', 
                     help='Combine with "Load": Load new subject for each subdirectory under loadPath', 
@@ -177,7 +183,7 @@ def runActions(args, extra_runActions=None):
             args.subjNList = [None]
         if not args.QUIET:
             print(f'Running MIRESEARCH with loadPath {args.loadPath}')
-        mi_subject.createNew_OrAddTo_Subject(loadDirectory=args.loadPath,
+        subjList = mi_subject.createNew_OrAddTo_Subject(loadDirectory=args.loadPath,
                                              dataRoot=args.dataRoot,
                                              subjPrefix=args.subjPrefix,
                                              subjNumber=args.subjNList[0],
@@ -185,12 +191,28 @@ def runActions(args, extra_runActions=None):
                                              LOAD_MULTI=args.LoadMulti,
                                              SubjClass=args.MISubjClass,
                                              IGNORE_UIDS=args.LoadMultiForce,
+                                             OTHER_DATA_DIR=args.loadPathOther,
                                              QUIET=args.QUIET)
+
+    # SPECIAL ACTION - BUILD EMPTY SUBJECT(S)
+    elif args.build:
+        subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        for iSubj in subjList:
+            if not iSubj.exists():
+                print(f"Building: {iSubj.subjID}...")
+                iSubj.initDirectoryStructure()
+
     # SUBJECT LEVEL actions
     elif len(args.subjNList) > 0:
         if args.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
         subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
+
+        if args.loadPathOther is not None:
+            if len(subjList) == 1:
+                subjList[0].addOtherData(args.loadPathOther)
+            else:
+                print(f"Warning: -LoadOther option only supported for single subject")
 
         # --- QUERY ---
         if args.qSeriesDesc:

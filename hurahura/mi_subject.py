@@ -249,6 +249,22 @@ class AbstractSubject(object):
         self.runPostLoadPipeLine()
 
 
+    def addOtherData(self, directoryToLoad):
+        self.logger.info(f"Adding other data (non-dicoms) from {directoryToLoad}")
+        count = 0
+        for root, _, files in os.walk(directoryToLoad):
+            for file in files:
+                if file.endswith('.dcm'): # quickly skip dicoms - but still run check below
+                    continue
+                try:
+                    _ = spydcm.dcmTools.dicom.dcmread(os.path.join(root, file), stop_before_pixels=True, force=False)
+                except spydcm.dcmTools.dicom.filereader.InvalidDicomError:
+                    shutil.copy(os.path.join(root, file), os.path.join(self.getRawDirOther(), file))
+                    count += 1
+        self.logger.info(f"Added {count} files to {self.getRawDirOther()}")
+        if count > 0:
+            self.runPostLoadPipeLine()
+
     def runPostLoadPipeLine(self, *args, **kwargs):
         # this is an abstract method for implementation by subclasses
         pass
@@ -282,6 +298,9 @@ class AbstractSubject(object):
 
     def getRawDir(self):
         return self._getDir([mi_utils.RAW])
+
+    def getRawDirOther(self, BUILD_IF_NEED=True):
+        return self._getDir([mi_utils.RAW, mi_utils.OTHER], BUILD_IF_NEED=BUILD_IF_NEED)
     
     def getDicomsDir(self):
         return self.__getDicomsDir()
@@ -522,6 +541,17 @@ class AbstractSubject(object):
             for iDcmStudy in dcmStudies:
                 for iSeries in iDcmStudy:
                     serDict = iSeries.getSeriesInfoDict(self.dicomMetaTagListSeries)
+                    # Convert all values to JSON serializable types
+                    for key, value in serDict.items():
+                        if isinstance(value, (np.integer, np.floating)):
+                            serDict[key] = value.item()  # Convert numpy types to native Python types
+                        elif isinstance(value, (np.ndarray, list)):
+                            serDict[key] = [x.item() if isinstance(x, (np.integer, np.floating)) else x for x in value]
+                        elif value is None:
+                            serDict[key] = "None"  # Convert None to string
+                        elif not isinstance(value, (str, int, float, bool)):
+                            serDict[key] = str(value)  # Convert any other non-serializable types to strings
+                    
                     serDict['DicomFileName'] = iSeries.getDicomFullFileName().replace(self.getTopDir(), "")
                     ddFull['Series'].append(serDict)
         except IndexError:
@@ -1321,7 +1351,10 @@ def _subjNumberHelper(dataRoot, subjNumber, subjPrefix):
     return subjNumber
 
 def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, 
-                     subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, IGNORE_UIDS=False):
+                     subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, IGNORE_UIDS=False,
+                     OTHER_DATA_DIR=None):
+    if not os.path.isdir(dataRoot):
+        raise IOError(f" Destination does not exist: {dataRoot}")
     if not os.path.isdir(dicomDirToLoad):
         if os.path.isfile(dicomDirToLoad):
             newSubj = _createNewSubject_Compressed(dicomDirToLoad, dataRoot, SubjClass=SubjClass, subjNumber=subjNumber, 
@@ -1329,12 +1362,13 @@ def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubje
             return newSubj
         raise IOError(" Load dir does not exist")
     if spydcm.returnFirstDicomFound(dicomDirToLoad) is None:
+        # TODO - new subject and just add whatever is there to raw. meta etc will be empty
         raise IOError(f"Can not find valid dicoms under {dicomDirToLoad}")
-    if not os.path.isdir(dataRoot):
-        raise IOError(f" Destination does not exist: {dataRoot}")
     newSubj = _createSubjectHelper(dicomDirToLoad, SubjClass, subjNumber=subjNumber, dataRoot=dataRoot, 
                                     subjPrefix=subjPrefix, anonName=anonName, QUIET=QUIET, 
                                     FORCE_NEW_SUBJ=IGNORE_UIDS)
+    if OTHER_DATA_DIR is not None:
+        newSubj.addOtherData(OTHER_DATA_DIR)
     #
     return newSubj
 
@@ -1370,7 +1404,8 @@ def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot,
 ### ====================================================================================================================
 def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject, 
                            subjNumber=None, subjPrefix=None, anonName=None, 
-                           LOAD_MULTI=False, IGNORE_UIDS=False, QUIET=False):
+                           LOAD_MULTI=False, IGNORE_UIDS=False, QUIET=False,
+                           OTHER_DATA_DIR=None):
     """Used to create a new subject (or add data to already existing subject) from an input directory (or compressed file).
     Current compressed file tpyes supported: zip, tar, tar.gz
 
@@ -1384,7 +1419,7 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
         LOAD_MULTI (bool, optional): If true then each sub-directory in "loadDirectory" will be used to load a new subject. Defaults to False.
         IGNORE_UIDS (bool, optional): If true then ignore dicom UIDs and each sub-directory in "loadDirectory" will DEFINITLY be a new subject. Defaults to False.
         QUIET (bool, optional): If true will supress output. Defaults to False.
-
+        OTHER_DATA_DIR (str, optional): If given then add other data (non-dicoms) from this directory to the subject. Defaults to None.
     Raises:
         ValueError: If incompatible arguments given (can not give subjNumber if LOAD_MULTI is given)
 
@@ -1408,7 +1443,8 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
                                 subjNumber=subjNumber,
                                 subjPrefix=subjPrefix, 
                                 anonName=anonName, 
-                                QUIET=QUIET)])
+                                QUIET=QUIET,
+                                OTHER_DATA_DIR=OTHER_DATA_DIR)])
     
 ### ====================================================================================================================
 ### ====================================================================================================================
