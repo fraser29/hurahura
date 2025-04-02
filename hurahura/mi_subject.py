@@ -252,15 +252,19 @@ class AbstractSubject(object):
     def addOtherData(self, directoryToLoad):
         self.logger.info(f"Adding other data (non-dicoms) from {directoryToLoad}")
         count = 0
-        for root, _, files in os.walk(directoryToLoad):
-            for file in files:
-                if file.endswith('.dcm'): # quickly skip dicoms - but still run check below
-                    continue
-                try:
-                    _ = spydcm.dcmTools.dicom.dcmread(os.path.join(root, file), stop_before_pixels=True, force=False)
-                except spydcm.dcmTools.dicom.filereader.InvalidDicomError:
-                    shutil.copy(os.path.join(root, file), os.path.join(self.getRawDirOther(), file))
-                    count += 1
+        if os.path.isfile(directoryToLoad):
+            shutil.copy(directoryToLoad, os.path.join(self.getRawDirOther(), os.path.basename(directoryToLoad)))
+            count += 1
+        else:
+            for root, _, files in os.walk(directoryToLoad):
+                for file in files:
+                    if file.endswith('.dcm'): # quickly skip dicoms - but still run check below
+                        continue
+                    try:
+                        _ = spydcm.dcmTools.dicom.dcmread(os.path.join(root, file), stop_before_pixels=True, force=False)
+                    except spydcm.dcmTools.dicom.filereader.InvalidDicomError:
+                        shutil.copy(os.path.join(root, file), os.path.join(self.getRawDirOther(), file))
+                        count += 1
         self.logger.info(f"Added {count} files to {self.getRawDirOther()}")
         if count > 0:
             self.runPostLoadPipeLine()
@@ -541,17 +545,6 @@ class AbstractSubject(object):
             for iDcmStudy in dcmStudies:
                 for iSeries in iDcmStudy:
                     serDict = iSeries.getSeriesInfoDict(self.dicomMetaTagListSeries)
-                    # Convert all values to JSON serializable types
-                    for key, value in serDict.items():
-                        if isinstance(value, (np.integer, np.floating)):
-                            serDict[key] = value.item()  # Convert numpy types to native Python types
-                        elif isinstance(value, (np.ndarray, list)):
-                            serDict[key] = [x.item() if isinstance(x, (np.integer, np.floating)) else x for x in value]
-                        elif value is None:
-                            serDict[key] = "None"  # Convert None to string
-                        elif not isinstance(value, (str, int, float, bool)):
-                            serDict[key] = str(value)  # Convert any other non-serializable types to strings
-                    
                     serDict['DicomFileName'] = iSeries.getDicomFullFileName().replace(self.getTopDir(), "")
                     ddFull['Series'].append(serDict)
         except IndexError:

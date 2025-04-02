@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hurahura"
-version = "0.1.7"
+version = "0.1.8"
 description = "Medical Imaginging Research structuring and automation"
 readme = "README.md"
 authors = [
@@ -21,12 +21,12 @@ classifiers = [
 ]
 keywords = ["medical", "imaging", "mri", "ct", "dicom"]
 dependencies = [
-    "spydcmtk>=1.2.6",
+    "spydcmtk>=1.2.8",
     "pandas",
     "numpy",
     "watchdog",
     "nicegui",
-    "ngawari>=0.1.4",
+    "ngawari>=0.1.6",
 ]
 requires-python = ">=3.9.0"
 

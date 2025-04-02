@@ -158,11 +158,11 @@ def getDataRootDir():
 #==================================================================
 #==================================================================
 def countFilesInDir(dirName):
-    files = []
+    N = 0
     if os.path.isdir(dirName):
         for _, _, filenames in os.walk(dirName):  # @UnusedVariable
-            files.extend(filenames)
-    return len(files)
+            N += len(filenames)
+    return N
 
 def datetimeToStrTime(dateTimeVal, strFormat=DEFAULT_DICOM_TIME_FORMAT):
     return dateTimeVal.strftime(strFormat)

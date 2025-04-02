@@ -201,9 +201,10 @@ def runActions(args, extra_runActions=None):
             if not iSubj.exists():
                 print(f"Building: {iSubj.subjID}...")
                 iSubj.initDirectoryStructure()
+        args.subjNList = [iSubj.subjN for iSubj in subjList]
 
     # SUBJECT LEVEL actions
-    elif len(args.subjNList) > 0:
+    if len(args.subjNList) > 0:
         if args.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
         subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
