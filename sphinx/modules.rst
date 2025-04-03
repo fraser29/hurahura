@@ -1,7 +1,7 @@
-miresearch
+hurahura
 ==========
 
 .. toctree::
    :maxdepth: 4
 
-   miresearch
+   hurahura

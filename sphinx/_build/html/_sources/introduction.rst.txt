@@ -3,12 +3,14 @@
 Introduction
 ============
 
-Welcome to the **miresearch** project documentation!
+Welcome to the **hurahura** project documentation!
+
+> note: this project was formerly named miresearch
 
 Overview
 --------
 
-The **miresearch** project aims to provide a comprehensive platform for organizing and managing medical imaging research projects. It offers tools and utilities to streamline the research process, from data collection and preprocessing to analysis and visualization.
+The **hurahura** project aims to provide a comprehensive platform for organizing and managing medical imaging research projects. It offers tools and utilities to streamline the research process, from data collection and preprocessing to analysis and visualization.
 
 Features
 --------
@@ -23,16 +25,16 @@ Features
 Getting Started
 ----------------
 
-To get started with **miresearch**, you can follow these steps:
+To get started with **hurahura**, you can follow these steps:
 
-1. Install the **miresearch** package by running:
+1. Install the **hurahura** package by running:
 
    .. code-block:: shell
 
       pip install imaging-research
 
 2. Explore the documentation to learn about the project's features, usage, and API reference.
-3. Check out the tutorials and examples to see **miresearch** in action.
+3. Check out the tutorials and examples to see **hurahura** in action.
 
 .. note::
 
@@ -41,9 +43,9 @@ To get started with **miresearch**, you can follow these steps:
 Contributing
 ------------
 
-Contributions to the **miresearch** project are welcome! If you encounter any issues, have suggestions for improvements, or would like to contribute code, please visit the project repository on GitHub:
+Contributions to the **hurahura** project are welcome! If you encounter any issues, have suggestions for improvements, or would like to contribute code, please visit the project repository on GitHub:
 
-`miresearch GitHub Repository <https://github.com/fraser29/miresearch>`_
+`hurahura GitHub Repository <https://github.com/fraser29/hurahura>`_
 
 .. note::
 
@@ -52,9 +54,9 @@ Contributions to the **miresearch** project are welcome! If you encounter any is
 Feedback
 --------
 
-We value your feedback! If you have any questions, comments, or feedback regarding the **miresearch** project, please don't hesitate to reach out to us:
+We value your feedback! If you have any questions, comments, or feedback regarding the **hurahura** project, please don't hesitate to reach out to us:
 
-- Issue Tracker: `GitHub Issues <https://github.com/fraser29/miresearch/issues>`_
+- Issue Tracker: `GitHub Issues <https://github.com/fraser29/hurahura/issues>`_
 
-Thank you for using **miresearch** for your medical imaging research projects!
+Thank you for using **hurahura** for your medical imaging research projects!
 
