@@ -5,7 +5,9 @@ Introduction
 
 Welcome to the **hurahura** project documentation!
 
-> note: this project was formerly named miresearch
+.. note::
+
+    note: this project was formerly named miresearch
 
 Overview
 --------
