@@ -9,7 +9,7 @@
 project = 'hurahura'
 copyright = '2024, Fraser M. Callaghan'
 author = 'Fraser M. Callaghan'
-release = '0.0.2'
+release = '0.1.8'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
