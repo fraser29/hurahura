@@ -6,7 +6,7 @@ from collections import OrderedDict
 import os
 import importlib
 
-thisConfFileName = 'miresearch.conf'
+miresearch_conf = 'miresearch.conf'
 rootDir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -16,10 +16,10 @@ class _MIResearch_config():
         
 
         self.config = configparser.ConfigParser(dict_type=OrderedDict)
-        self.all_config_files = [os.path.join(rootDir,thisConfFileName), 
-                            os.path.join(os.path.expanduser("~"),thisConfFileName),
-                            os.path.join(os.path.expanduser("~"),'.'+thisConfFileName), 
-                            os.path.join(os.path.expanduser("~"), '.config',thisConfFileName),
+        self.all_config_files = [os.path.join(rootDir,miresearch_conf), 
+                            os.path.join(os.path.expanduser("~"),miresearch_conf),
+                            os.path.join(os.path.expanduser("~"),'.'+miresearch_conf), 
+                            os.path.join(os.path.expanduser("~"), '.config',miresearch_conf),
                             os.environ.get("MIRESEARCH_CONF", '')]
 
     def runconfigParser(self, extraConfFile=None):
@@ -37,8 +37,18 @@ class _MIResearch_config():
         self._data_root_dir = self.config.get("app", "data_root_dir", fallback="")
         self._subject_prefix = self.config.get("app", "subject_prefix", fallback="")
         self.stable_directory_age_sec = self.config.getint("app", "stable_directory_age_sec", fallback=60)
+        self.default_pad_zeros = self.config.getint("app", "default_pad_zeros", fallback=6)
         self.directory_structure = json.loads(self.config.get("app", "directories"))
 
+        ## All parameters: 
+        self.params = {}
+        for section in self.config.sections():
+            if section.lower() == 'parameters':
+                self.params[section] = {}
+                for option in self.config.options(section):
+                    self.params[section][option] = self.config.get(section, option)
+
+        # Class objects - want to do last so have access to parameters
         self.class_obj = None
         class_path = self.config.get("app", "class_path", fallback=None)
         if class_path:
@@ -48,14 +58,6 @@ class _MIResearch_config():
             except ModuleNotFoundError as e:
                 raise ModuleNotFoundError(f"*** is {module_name} found in PYTHONPATH? ***") from e
             self.class_obj = getattr(module, class_name)
-
-        ## All parameters: 
-        self.params = {}
-        for section in self.config.sections():
-            if section.lower() == 'parameters':
-                self.params[section] = {}
-                for option in self.config.options(section):
-                    self.params[section][option] = self.config.get(section, option)
 
     @property
     def data_root_dir(self):

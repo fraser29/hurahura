@@ -1,15 +1,15 @@
 import os
-import sys
-import argparse
 import base64
 import csv
 import datetime
 
-from miresearch.mi_config import MIResearch_config
+from hurahura.mi_config import MIResearch_config
 
 
 
-DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
+DEFAULT_DICOM_META_TAG_LIST_STUDY = ["AccessionNumber",
+                                "InstitutionName",
+                                "BodyPartExamined",
                                 "MagneticFieldStrength",
                                 "Manufacturer",
                                 "ManufacturerModelName",
@@ -18,12 +18,45 @@ DEFAULT_DICOM_META_TAG_LIST = ["BodyPartExamined",
                                 "PatientID",
                                 "PatientName",
                                 "PatientSex",
+                                "PatientAge",
+                                "PatientWeight",
+                                "ProtocolName",
                                 "ReceiveCoilName",
+                                "ScannerStudyID",
                                 "SoftwareVersions",
+                                "StationName",
                                 "StudyDate",
                                 "StudyDescription",
                                 "StudyID",
-                                "StudyInstanceUID"]
+                                "StudyInstanceUID",
+                                "StudyTime"]
+
+DEFAULT_DICOM_META_TAG_LIST_SERIES = [
+                                "AcquiredResolution",
+                                "AcquiredTemporalResolution",
+                                "AcquisitionMatrix",
+                                "AcquisitionTime",
+                                "DicomFileName",
+                                "EchoTime",
+                                "FlipAngle",
+                                "HeartRate",
+                                "InPlanePhaseEncodingDirection",
+                                "InternalPulseSequenceName",
+                                "MagneticFieldStrength",
+                                "Manufacturer",
+                                "ManufacturerModelName",
+                                "PixelBandwidth",
+                                "PulseSequenceName",
+                                "ReconstructionDiameter",
+                                "RepetitionTime",
+                                "ScanDuration",
+                                "ScanningSequence",
+                                "SeriesDescription",
+                                "SeriesNumber",
+                                "SoftwareVersions",
+                                "SpacingBetweenSlices",
+                                "StudyDate"]
+
 
 DEFAULT_DICOM_TIME_FORMAT = "%H%M%S" # TODO to config (and above) - or from spydcmtk
 
@@ -32,7 +65,7 @@ UNKNOWN = 'UNKNOWN'
 META = "META"
 RAW = "RAW"
 DICOM = "DICOM"
-
+OTHER = "OTHER"
 
 #==================================================================
 
@@ -119,91 +152,17 @@ def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
         DirectoryTree.addNewStructure(i)
     return DirectoryTree
 
-### ====================================================================================================================
-##          ARGUEMTENT PARSING AND ACTIONS - RUN VIA MAIN
-### ====================================================================================================================
-# Override error to show help on argparse error (missing required argument etc)
-class MiResearchParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('error: %s\n' % message)
-        self.print_help()
-        sys.exit(2)
 
-ParentAP = MiResearchParser(epilog="Written Fraser M. Callaghan. MRZentrum, University Children's Hospital Zurich")
-# ParentAP = MiResearchParser(add_help=False,
-#                                    epilog="Written Fraser M. Callaghan. MRZentrum, University Children's Hospital Zurich")
-
-groupM = ParentAP.add_argument_group('Management Parameters')
-groupM.add_argument('-config', dest='configFile', help='Path to configuration file to use.', type=str, default=None)
-groupM.add_argument('-FORCE', dest='FORCE', help='force action - use with caution',
-                        action='store_true')
-groupM.add_argument('-QUIET', dest='QUIET', help='Suppress progress bars and logging to terminal',
-                        action='store_true')
-groupM.add_argument('-INFO', dest='INFO', help='Provide setup (configuration) info and exit.',
-                        action='store_true')
-groupM.add_argument('-DEBUG', dest='DEBUG', help='Run in DEBUG mode (save intermediate steps, increase log output)',
-                        action='store_true')
-
-groupS = ParentAP.add_argument_group('Subject Definition')
-groupS.add_argument('-s', dest='subjNList', help='Subject number', nargs="*", type=int, default=[])
-groupS.add_argument('-sf', dest='subjNListFile', help='Subject numbers in file', type=str, default=None)
-groupS.add_argument('-sR', dest='subjRange', help='Subject range', nargs=2, type=int, default=[])
-groupS.add_argument('-y', dest='dataRoot', 
-                    help='Path of root data directory (where subjects are stored) [default None -> may be set in config file]', 
-                    type=str, default=None)
-groupS.add_argument('-sPrefix', dest='subjPrefix', 
-                    help='Subject prefix [default None -> will get from config file OR dataRoot]', 
-                    type=str, default=None)
-groupS.add_argument('-anonName', dest='anonName', 
-                    help='Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]', 
-                    type=str, default=None)
-    
-groupA = ParentAP.add_argument_group('Actions')
-# LOADING
-groupA.add_argument('-Load', dest='loadPath', 
-                    help='Path to load dicoms from (file / directory / tar / tar.gz / zip)', 
-                    type=str, default=None)
-groupA.add_argument('-LOAD_MULTI', dest='LoadMulti', 
-                    help='Combine with "Load": Load new subject for each subdirectory under loadPath', 
-                    action='store_true')
-groupA.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
-                    help='Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory', 
-                    action='store_true')
-
-# SUBJECT LEVEL
-groupA.add_argument('-RunPost', dest='subjRunPost', 
-                    help='Run post load pipeline', 
-                    action='store_true')
-groupA.add_argument('-SubjInfo', dest='subjInfo', 
-                    help='Print info for each subject', 
-                    action='store_true')
-
-# GROUP ACTIONS
-groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
-                    help='Write summary CSV file (give output file name)', 
-                    type=str, default=None)
-
-# WATCH DIRECTORY
-groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
-                    help='Will watch given directory for new data and load as new study', 
-                    type=str, default=None)
-
-
+def getDataRootDir():
+    return MIResearch_config.data_root_dir
 #==================================================================
-def setNList(args):
-    if len(args.subjRange) == 2:
-        args.subjNList = args.subjNList+list(range(args.subjRange[0], args.subjRange[1]))
-    if args.subjNListFile:
-        args.subjNList = args.subjNList+subjFileToSubjN(args.subjNListFile)
-    # args.subjNList = sorted(list(set(args.subjNList)))
-    
 #==================================================================
 def countFilesInDir(dirName):
-    files = []
+    N = 0
     if os.path.isdir(dirName):
         for _, _, filenames in os.walk(dirName):  # @UnusedVariable
-            files.extend(filenames)
-    return len(files)
+            N += len(filenames)
+    return N
 
 def datetimeToStrTime(dateTimeVal, strFormat=DEFAULT_DICOM_TIME_FORMAT):
     return dateTimeVal.strftime(strFormat)
@@ -220,7 +179,7 @@ def encodeString(strIn, passcode):
 
 def decodeString(encStr, passcode):
     dec = []
-    enc = base64.urlsafe_b64decode(encStr).decode()
+    enc = base64.urlsafe_b64decode(encStr+'==').decode()
     for i in range(len(enc)):
         key_c = passcode[i % len(passcode)]
         dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
@@ -252,7 +211,7 @@ def subjFileToSubjN(subjFile):
         return [int(i[0][first_numeric:]) for i in allLines]
 
 
-def writeCsvFile(data, header, csvFile, FIX_NAN=False):
+def writeCSVFile(data, header, csvFile, FIX_NAN=False):
     with open(csvFile, 'w') as fout:
         csvWriter = csv.writer(fout, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         #first write column headers

@@ -1,12 +1,12 @@
 
-from context import miresearch # This is useful for testing outside of environment
+from context import hurahura # This is useful for testing outside of environment
 
 import os
 import unittest
 import shutil
 
-from miresearch import mi_subject
-from miresearch.mi_config import MIResearch_config
+from hurahura import mi_subject
+from hurahura.mi_config import MIResearch_config
 
 
 this_dir = os.path.split(os.path.realpath(__file__))[0]
@@ -24,7 +24,7 @@ DEBUG = MIResearch_config.DEBUG
 class TestSubject(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj')
+        cls.tmpDir = os.path.join(this_dir, 'TestSubject')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -57,10 +57,11 @@ class TestSubject(unittest.TestCase):
 class TestSubject2(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj2')
+        cls.tmpDir = os.path.join(this_dir, 'TestSubject2')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
+        # this forces a poor form of subjID - tests that subjN wrong later
         cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MI2', QUIET=True)[0]
         cls.newSubj.anonymise()
 
@@ -71,6 +72,35 @@ class TestSubject2(unittest.TestCase):
         pWeight = int(self.newSubj.getTagValue('PatientWeight'))
         self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
         self.assertEqual(self.newSubj.getTagValue('StudyDate'), "20140409", msg="Got incorrect tag - studydate")
+        self.assertNotEqual(self.newSubj.subjN, 1, msg="SubjN 1 is wrong")
+        self.assertEqual(self.newSubj.subjN, 2000001, msg="SubjN 2000001 is wrong")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
+class TestSubject2b(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestSubject2b')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj1a = mi_subject.AbstractSubject(1, cls.tmpDir, 'OTHER', padZeros=3)
+        cls.newSubj1b = mi_subject.AbstractSubject(1, cls.tmpDir, 'TMP', padZeros=6, suffix="_NN")
+        cls.newSubj1a.loadDicomsToSubject(P1)
+        cls.newSubj1b.loadDicomsToSubject(P1)
+        # We add new subjet. Matching prefix (ignores suffix) auto increments number
+        cls.newSubj2 = mi_subject.createNew_OrAddTo_Subject(P2, cls.tmpDir, subjPrefix='TMP')[0]
+
+    def test_newSubj(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'OTHER001')))
+
+    def test_N(self):
+        self.assertEqual(self.newSubj1b.subjN, 1, msg="TestSubject2b: 1 subjN is wrong")
+        self.assertEqual(self.newSubj2.subjN, 2, msg="TestSubject2b: 2 subjN is wrong")
 
     @classmethod
     def tearDownClass(cls, OVERRIDE=False):
@@ -81,7 +111,7 @@ class TestSubject2(unittest.TestCase):
 class TestSubject3(unittest.TestCase): # No number in ID
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj3')
+        cls.tmpDir = os.path.join(this_dir, 'TestSubject3')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -93,7 +123,7 @@ class TestSubject3(unittest.TestCase): # No number in ID
         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MySpecialID')))
         self.assertEqual(self.newSubj.countNumberOfDicoms(), 2, msg="Incorrect number of dicoms")
 
-        newSubjObj2 = mi_subject.AbstractSubject(subjectNumber=None, dataRoot=self.tmpDir, subjectPrefix="MySpecialID")
+        newSubjObj2 = mi_subject.AbstractSubject(subjectNumber="MySpecialID", dataRoot=self.tmpDir)
 
         pWeight = int(newSubjObj2.getTagValue('PatientWeight'))
         self.assertEqual(pWeight, 80, msg="Got incorrect tag - weight")
@@ -108,15 +138,15 @@ class TestSubject3(unittest.TestCase): # No number in ID
 class TestSubject4(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubj4')
+        cls.tmpDir = os.path.join(this_dir, 'TestSubject4')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MI4', QUIET=True)[0]
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MIV', QUIET=True)[0]
         cls.newSubj.anonymise()
 
     def test_newSubj(self):
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI4000001')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIV000001')))
         tStart, tEnd = self.newSubj.getStartTime_EndTimeOfExam()
         tTotal = self.newSubj.getTotalScanTime_s()
         self.assertEqual(tStart, 94627.4875)
@@ -134,10 +164,31 @@ class TestSubject4(unittest.TestCase):
             shutil.rmtree(cls.tmpDir)
 
 
+class TestSubjectRename(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjectRename')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MIV', QUIET=True)[0]
+        cls.newSubj.anonymise()
+
+    def test_newSubj(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIV000001')))
+        self.newSubj.renameSubjID("SUBJA_28.999.032")
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'SUBJA_28.999.032')))
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
 class TestSubjects(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubjs')
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjects')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -172,17 +223,17 @@ class TestSubjects(unittest.TestCase):
 class TestSubjects2(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubjs2')
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjects2')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.subjList = mi_subject.createNew_OrAddTo_Subject(TEST_DIR, cls.tmpDir, subjPrefix='MI22', QUIET=True, LOAD_MULTI=True)
+        cls.subjList = mi_subject.createNew_OrAddTo_Subject(TEST_DIR, cls.tmpDir, subjPrefix='MIBB', QUIET=True, LOAD_MULTI=True)
 
     def test_newSubjs(self):
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000001')))
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000002')))
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000003')))
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI22000004'))) # This false as "4" finds subject already exists and adds to 
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIBB000001')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIBB000002')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIBB000003')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIBB000004'))) # This false as "4" finds subject already exists and adds to 
     
     def test_List(self):
         self.assertEqual(len(self.subjList), 5, "Error making subject list")
@@ -202,14 +253,14 @@ class TestSubjects2(unittest.TestCase):
 class TestSubjects3(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestSubjs3')
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjects3')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
-        cls.subj = mi_subject.createNew_OrAddTo_Subject(P3, cls.tmpDir, subjPrefix='MI3', anonName="SubjectNumber1", QUIET=True)[0]
+        cls.subj = mi_subject.createNew_OrAddTo_Subject(P3, cls.tmpDir, subjPrefix='MIP', anonName="SubjectNumber1", QUIET=True)[0]
 
     def test_newSubjs(self):
-        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI3000001')))
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIP000001')))
     
     @classmethod
     def tearDownClass(cls, OVERRIDE=False):
@@ -219,7 +270,7 @@ class TestSubjects3(unittest.TestCase):
 class TestArchiveSubject(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestZip')
+        cls.tmpDir = os.path.join(this_dir, 'TestArchiveSubject')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -237,10 +288,40 @@ class TestArchiveSubject(unittest.TestCase):
         if (not DEBUG) or OVERRIDE:
             shutil.rmtree(cls.tmpDir)
                 
+        
+class TestMoveSubject(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestMoveSubject')
+        cls.tmpDir2 = os.path.join(this_dir, 'TestMoveSubject2')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        if os.path.isdir(cls.tmpDir2):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir2)
+        cls.subj = mi_subject.createNew_OrAddTo_Subject(P4, cls.tmpDir, subjPrefix='MI-A', anonName="SubjectNumber1", QUIET=True)[0]
+
+    def test_SubjZip(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MI-A000001')))
+        self.assertEqual(self.subj.countNumberOfDicoms(), 2)
+        self.subj.archiveSubject(self.tmpDir2)
+        self.assertTrue(os.path.isdir(os.path.join(self.tmpDir2, 'MI-A000001')))
+        self.assertEqual(self.subj.countNumberOfDicoms(), 0)
+        newSubj = mi_subject.AbstractSubject(1, subjectPrefix='MI-A', dataRoot=self.tmpDir2)
+        self.assertEqual(newSubj.countNumberOfDicoms(), 2)
+    
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir2)
+                
 class TestRenameSubject(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmpDir = os.path.join(this_dir, 'tmpTestRename')
+        cls.tmpDir = os.path.join(this_dir, 'TestRenameSubject')
         if os.path.isdir(cls.tmpDir):
             cls.tearDownClass(True)
         os.makedirs(cls.tmpDir)
@@ -257,14 +338,114 @@ class TestRenameSubject(unittest.TestCase):
         # self.assertEqual(len(self.subjList), 2, "Error subject list wrong size")
         # sorted(self.subjList)
 
-
-
-
     @classmethod
     def tearDownClass(cls, OVERRIDE=False):
         if (not DEBUG) or OVERRIDE:
             shutil.rmtree(cls.tmpDir)
         
+
+class TestSubjectAnonName(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjectAnonName')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P2, cls.tmpDir, subjPrefix='MIN', QUIET=True)[0]
+
+    def test_newSubj(self):
+        name, firstNames = self.newSubj.getName_FirstNames()
+        self.assertEqual(name, "Subject", msg="Incorrect name")
+        self.assertEqual(firstNames, "Another", msg="Incorrect first name")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+class TestSubjectAnonName2(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjectAnonName2')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P2, cls.tmpDir, subjPrefix='MIN2', QUIET=True, anonName="SOFT")[0]
+
+    def test_newSubj(self):
+        name, firstNames = self.newSubj.getName_FirstNames()
+        self.assertEqual(name, "Subject", msg="Incorrect name")
+        self.assertEqual(firstNames, "Another", msg="Incorrect first name")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
+class TestSubjectAnonName3(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjectAnonName3')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P2, cls.tmpDir, subjPrefix='MIN2', QUIET=True, anonName="HARD")[0]
+        cls.newSubj2 = mi_subject.createNew_OrAddTo_Subject(P1, cls.tmpDir, subjPrefix='MIN2', QUIET=True, anonName="HARD")[0]
+
+    def test_newSubj(self):
+        name, firstNames = self.newSubj.getName_FirstNames()
+        self.assertEqual(name, "Name-Unknown", msg="Incorrect name")
+        self.assertEqual(firstNames, "FirstNames-Unknown", msg="Incorrect first name")
+        name, firstNames = self.newSubj2.getName_FirstNames()
+        self.assertEqual(name, "Name-Unknown", msg="Incorrect name")
+        self.assertEqual(firstNames, "FirstNames-Unknown", msg="Incorrect first name")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
+class TestSubjectAnonName4(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjectAnonName4')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P2, cls.tmpDir, subjPrefix='MIN2', QUIET=True, anonName="PostmanPat")[0]
+
+    def test_newSubj(self):
+        name, firstNames = self.newSubj.getName_FirstNames()
+        self.assertEqual(name, "PostmanPat", msg="Incorrect name")
+        self.assertEqual(firstNames, "", msg="Incorrect first name")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
+class TestSubjectAnonName5(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestSubjectAnonName5')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P2, cls.tmpDir, subjPrefix='MIN2', QUIET=True, anonName="Builder^Bob^The")[0]
+
+    def test_newSubj(self):
+        name, firstNames = self.newSubj.getName_FirstNames()
+        self.assertEqual(name, "Builder", msg="Incorrect name")
+        self.assertEqual(firstNames, "Bob_The", msg="Incorrect first name")
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
 
 # class TestMisc(unittest.TestCase):
 #     def test_DefaultRootDir(self):
