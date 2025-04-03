@@ -33,7 +33,7 @@ To get started with **hurahura**, you can follow these steps:
 
    .. code-block:: shell
 
-      pip install imaging-research
+      pip install hurahura
 
 2. Explore the documentation to learn about the project's features, usage, and API reference.
 3. Check out the tutorials and examples to see **hurahura** in action.

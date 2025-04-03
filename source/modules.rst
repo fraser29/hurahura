@@ -1,5 +1,5 @@
 hurahura
-==========
+========
 
 .. toctree::
    :maxdepth: 4
