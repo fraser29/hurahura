@@ -14,6 +14,8 @@ Welcome to hurahura's documentation!
    concept
    useage
 
+   hurahura
+
 
 Indices and tables
 ==================

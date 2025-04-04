@@ -23,5 +23,24 @@ Each subject then has a standard sub-directory structure of META, RAW/DICOM and 
 - **META** holds meta data, especially a log file, a json file containing tags extracted from the dicom data for quick and easy interrogation and a summary.csv file which provides a user friendly interface to query dicom data attributes. 
 - **RAW/OTHER** is built on demand if OTHER raw data is to be loaded. However, in such circumstances it is likely more preferable to build a subclass of the AbstractSubject class that hurahura provides and employ their own customization. See ?? for further details. 
 
-As example a directory and standard file structure is shown below:
+As example basic directory structure is shown below two subjects. In this case the subjectPrefix is "DEMO" :
 
+.. image:: _static/images/Demo_subjects_structure.png
+    :alt: Subjects structure
+    :align: center
+
+----
+
+The organised DICOMs for subject #1 is as follows:
+
+.. image:: _static/images/Demo_dicoms_structure.png
+    :alt: Subjects structure
+    :align: center
+
+----
+
+And the files in the META directory are:
+
+.. image:: _static/images/Demo_meta_files.png
+    :alt: Subjects structure
+    :align: center
