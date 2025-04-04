@@ -5,7 +5,9 @@ Useage
 
 The fundamental benefits of the hurahura directory structure is a standardized directory and file structure allowing 
 
-Using hurahura out of the box *Code free use of hurahura*
+Using hurahura out of the box 
+---------------------------------------------------------
+*Code free use of hurahura*
 ---------------------------------------------------------
 
 A number of primary features are available in hurahura that allows one to achieve full control of their data as well as enjoy the benefits of automation of various typical data management steps. 
@@ -16,7 +18,9 @@ Customisation can be achieved via generating a custom conf file.
 
 Permitted changes are:?? 
 
-Customising hurahura: Subclassing AbstractSubject
+Customising hurahura: 
+---------------------------------------------------------
+*Subclassing AbstractSubject*
 -------------------------------------------------
 
 To really take advantage of hurahrua subclassing the primary classes is recommended. 
