@@ -35,59 +35,6 @@ This package may be easily adapted and expanded upon for a high level control ov
 
 This is the basic parent class containing fundamental methods for organisation and management. See  [hurahura docs](https://fraser29.github.io/hurahura/) for advanced usage, epsecially via inheritance and polymorphism. 
 
-# Exposed commandline tool: miresearch
-
-```bash
-
-hurahura -h
-usage: hurahura [-h] [-config CONFIGFILE] [-FORCE] [-QUIET] [-INFO] [-DEBUG] [-s [SUBJNLIST ...]] [-sA] [-sf SUBJNLISTFILE] [-sR SUBJRANGE SUBJRANGE] [-y DATAROOT] [-sPrefix SUBJPREFIX] [-sSuffix SUBJSUFFIX] [-anonName ANONNAME]
-                [-Load LOADPATH] [-LOAD_MULTI] [-LOAD_MULTI_FORCE] [-RunPost] [-SubjInfo] [-SubjInfoFull] [-SummaryCSV [SUMMARYCSV ...]] [-Summary] [-WatchDirectory WATCHDIRECTORY] [-qSeriesDesc QSERIESDESC] [-qPID QPID]
-                [-qPatName QPATNAME] [-qExamID QEXAMID] [-qDate QDATE]
-
-options:
-  -h, --help            show this help message and exit
-
-Management Parameters:
-  -config CONFIGFILE    Path to configuration file to use.
-  -FORCE                force action - use with caution
-  -QUIET                Suppress progress bars and logging to terminal
-  -INFO                 Provide setup (configuration) info and exit.
-  -DEBUG                Run in DEBUG mode (save intermediate steps, increase log output)
-
-Subject Definition:
-  -s [SUBJNLIST ...]    Subject number(s)
-  -sA                   All subjects
-  -sf SUBJNLISTFILE     Subject numbers in file
-  -sR SUBJRANGE SUBJRANGE
-                        Subject range
-  -y DATAROOT           Path of root data directory (where subjects are stored) [default None -> may be set in config file]
-  -sPrefix SUBJPREFIX   Subject prefix [default None -> will get from config file OR dataRoot]
-  -sSuffix SUBJSUFFIX   Subject suffix [default ""]
-  -anonName ANONNAME    Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]
-
-Actions:
-  -Load LOADPATH        Path to load dicoms from (file / directory / tar / tar.gz / zip)
-  -LOAD_MULTI           Combine with "Load": Load new subject for each subdirectory under loadPath
-  -LOAD_MULTI_FORCE     Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory
-  -RunPost              Run post load pipeline
-  -SubjInfo             Print info for each subject
-  -SubjInfoFull         Print full info for each subject
-  -SummaryCSV [SUMMARYCSV ...]
-                        Write summary CSV file (give output file name)
-  -Summary              Print summary of provided subjects to commandline (best with -sA option)
-  -WatchDirectory WATCHDIRECTORY
-                        Will watch given directory for new data and load as new study
-
-Query:
-  -qSeriesDesc QSERIESDESC
-                        Query based on a series description
-  -qPID QPID            Query based on patient ID
-  -qPatName QPATNAME    Query based on a patient name
-  -qExamID QEXAMID      Query based on exam (scanner assigned) ID
-  -qDate QDATE          Query based on study date
-
-
-```
 
 # Configuration
 

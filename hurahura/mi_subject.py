@@ -1381,17 +1381,21 @@ def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot,
     for iDir in dirsToLoad:
         if spydcm.returnFirstDicomFound(iDir) is not None:
             dirsToLoad_checked.append(iDir)
+        else:
+            print(f"WARNING: No valid dicoms found under {iDir}")
     if len(dirsToLoad_checked) == 0:
         raise IOError(f"Can not find valid dicoms under {multiDicomDirToLoad}")
     newSubjsList = []
     for iDir in dirsToLoad_checked:
-        newSubjsList.append(_createNew_OrAddTo_Subject(iDir, 
+        newSubj = _createNew_OrAddTo_Subject(iDir, 
                                              dataRoot=dataRoot,
                                              SubjClass=SubjClass,
                                              subjPrefix=subjPrefix,
                                              anonName=anonName,
                                              QUIET=QUIET,
-                                             IGNORE_UIDS=IGNORE_UIDS))
+                                             IGNORE_UIDS=IGNORE_UIDS)
+        print(f"Loaded {iDir} to {newSubj}")
+        newSubjsList.append(newSubj)
     return newSubjsList
 
 ### ====================================================================================================================

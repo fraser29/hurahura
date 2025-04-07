@@ -98,13 +98,13 @@ groupA.add_argument('-WatchDirectory', dest='WatchDirectory',
                     help='Will watch given directory for new data and load as new study', 
                     type=str, default=None)
 
-# WATCH DIRECTORY
-groupA.add_argument('-UI', dest='UI', 
-                    help='Run in UI mode', 
-                    action='store_true')
-groupA.add_argument('-UI_port', dest='UI_port', 
-                    help='Port to run UI on', 
-                    type=int, default=8080)
+# UI STUFF
+# groupA.add_argument('-UI', dest='UI', 
+#                     help='Run in UI mode', 
+#                     action='store_true')
+# groupA.add_argument('-UI_port', dest='UI_port', 
+#                     help='Port to run UI on', 
+#                     type=int, default=8080)
 
 ## === QUERY ===
 groupQ = ParentAP.add_argument_group('Query')
