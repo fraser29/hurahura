@@ -180,7 +180,7 @@ def runActions(args, extra_runActions=None):
     # --- LOAD ---
     if args.loadPath is not None:
         if len(args.subjNList) == 0:
-            args.subjNList = [None]
+            args.subjNList = []
         if not args.QUIET:
             print(f'Running MIRESEARCH with loadPath {args.loadPath}')
         subjList = mi_subject.createNew_OrAddTo_Subject(loadDirectory=args.loadPath,
@@ -193,6 +193,7 @@ def runActions(args, extra_runActions=None):
                                              IGNORE_UIDS=args.LoadMultiForce,
                                              OTHER_DATA_DIR=args.loadPathOther,
                                              QUIET=args.QUIET)
+        args.subjNList = [iSubj.subjN for iSubj in subjList]
 
     # SPECIAL ACTION - BUILD EMPTY SUBJECT(S)
     elif args.build:
