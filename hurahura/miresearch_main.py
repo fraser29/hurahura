@@ -311,9 +311,9 @@ def runActions(args, extra_runActions=None):
 
 
     ## UI ##
-    elif args.UI:
-        miresearchui_path = os.path.join(os.path.dirname(__file__), 'miresearchui')
-        subprocess.Popen(['python', 'mainUI.py', str(args.UI_port)], cwd=miresearchui_path)
+    # elif args.UI:
+    #     miresearchui_path = os.path.join(os.path.dirname(__file__), 'miresearchui')
+    #     subprocess.Popen(['python', 'mainUI.py', str(args.UI_port)], cwd=miresearchui_path)
 
     if extra_runActions is not None:
         if type(extra_runActions) == list:
@@ -323,8 +323,13 @@ def runActions(args, extra_runActions=None):
                 except AttributeError as AttrError:
                     print(f"Error in extra action {iExtra}: Has the configuration been set up correctly (esp. 'class_path')?")
                     raise AttrError
+                except: 
+                    pass
         else:
-            extra_runActions(args)
+            try:
+                extra_runActions(args)
+            except:
+                pass
 
 ### ====================================================================================================================
 ### ====================================================================================================================
