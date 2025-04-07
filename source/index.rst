@@ -12,7 +12,14 @@ Welcome to hurahura's documentation!
 
    introduction
    concept
+
    useage
+   useage_codefree
+   useage_subclass
+
+   watch_dog
+
+   web_interface
 
    hurahura
 

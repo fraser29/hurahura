@@ -44,3 +44,9 @@ And the files in the META directory are:
 .. image:: _static/images/Demo_meta_files.png
     :alt: Subjects structure
     :align: center
+
+----
+
+Customisation beyond this setup is possible via subclassing the AbstractSubject class. 
+
+See: :ref:`useage` for further details. 

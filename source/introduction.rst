@@ -38,10 +38,6 @@ To get started with **hurahura**, you can follow these steps:
 2. Explore the documentation to learn about the project's features, usage, and API reference.
 3. Check out the tutorials and examples to see **hurahura** in action.
 
-.. note::
-
-   For detailed installation instructions and usage guidelines, please refer to the documentation sections below.
-
 Contributing
 ------------
 
