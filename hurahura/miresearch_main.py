@@ -180,7 +180,7 @@ def runActions(args, extra_runActions=None):
     # --- LOAD ---
     if args.loadPath is not None:
         if len(args.subjNList) == 0:
-            args.subjNList = []
+            args.subjNList = [None]
         if not args.QUIET:
             print(f'Running MIRESEARCH with loadPath {args.loadPath}')
         subjList = mi_subject.createNew_OrAddTo_Subject(loadDirectory=args.loadPath,
