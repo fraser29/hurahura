@@ -241,6 +241,8 @@ class AbstractSubject(object):
     
     def _finalLoadSteps(self, initNumDicoms, numDicomsToLoad, anonName=None):
         self.buildDicomMeta()
+        if anonName is None: 
+            anonName = mi_utils.MIResearch_config.anon_level
         if anonName is not None:
             self.anonymise(anonName=anonName)
         finalNumDicoms = self.countNumberOfDicoms()
