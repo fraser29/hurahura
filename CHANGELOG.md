@@ -7,4 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - refactor miresearch (in pip as imaging-miresearch) to package named hurahura 
 
+## [0.1.12] - 2025-04-15
+### Added
+- small bug fix - check if input is a string or Path
+
 
