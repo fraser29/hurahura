@@ -253,7 +253,7 @@ class AbstractSubject(object):
 
 
     def addOtherData(self, directoryToLoad):
-        self.logger.info(f"Adding other data (non-dicoms) from {directoryToLoad}")
+        self.logger.info(f"Adding other data (non-dicoms) ")
         count = 0
         if os.path.isfile(directoryToLoad):
             shutil.copy(directoryToLoad, os.path.join(self.getRawDirOther(), os.path.basename(directoryToLoad)))
