@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - small bug fix - check if input is a string or Path
 
-## [0.1.13] - 2025-04-15
+## [0.1.14] - 2025-04-15
 ### Removed
 - removed anonymisation from watchdog
 
