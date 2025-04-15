@@ -172,6 +172,8 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                     self.logger.warning(f"DELETING {already_exec_directory}")
                     try: 
                         shutil.rmtree(already_exec_directory)
+                    except NotADirectoryError: # MAY BE A zip or tar file
+                        os.unlink(already_exec_directory)
                     except FileNotFoundError:
                         self.logger.error(f"Error: Directory '{already_exec_directory}' does not exist - maybe just finished.")
                     except Exception as e:
@@ -241,8 +243,15 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                 raise e
             self.logger.error(f"An error occurred while loading subject: {str(e)} ")
         self.logger.info(f"   FINISHED LOADING {directoryToLoad_process} ===")
-        shutil.rmtree(directoryToLoad_process)
-        self.logger.info(f"   DELETED {directoryToLoad_process} ===")
+        try:
+            shutil.rmtree(directoryToLoad_process)
+            self.logger.info(f"   DELETED {directoryToLoad_process} ===")
+        except NotADirectoryError: # MAY BE A zip or tar file
+            os.unlink(directoryToLoad_process) 
+            self.logger.info(f"   DELETED {directoryToLoad_process} ===")
+        except Exception as e:
+            self.logger.error(f"An error occurred while deleting {directoryToLoad_process}: {str(e)}")
+
         # finalCompleteDir = os.path.join(self.completeDir, os.path.split(directoryToLoad_process)[1])
         # if os.path.isdir(finalCompleteDir):
         #     self.logger.warning(f"{finalCompleteDir} exists - will delete before moving {directoryToLoad_process}")
