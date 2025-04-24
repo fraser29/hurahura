@@ -324,13 +324,13 @@ def runActions(args, extra_runActions=None):
                 except AttributeError as AttrError:
                     print(f"Error in extra action {iExtra}: Has the configuration been set up correctly (esp. 'class_path')?")
                     raise AttrError
-                except: 
-                    pass
+                except Exception as e:
+                    print(f"Error: {e}") 
         else:
             try:
                 extra_runActions(args)
-            except:
-                pass
+            except Exception as e:
+                print(f"Error: {e}") 
 
 ### ====================================================================================================================
 ### ====================================================================================================================
