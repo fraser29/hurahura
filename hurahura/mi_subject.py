@@ -353,7 +353,7 @@ class AbstractSubject(object):
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), HIDE_PROGRESSBAR=True)
         for dcmStudy in dcmStudies:
             for dcmSE in dcmStudy:
-                iSerDict = dcmSE.getSeriesInfoDict(["SeriesNumber", 
+                iSerDict = dcmSE.getSeriesInfoDict(extraTags=["SeriesNumber", 
                                                             "SeriesDescription", 
                                                             "StudyDate", 
                                                             "AcquisitionTime",
@@ -547,7 +547,7 @@ class AbstractSubject(object):
             # 
             for iDcmStudy in dcmStudies:
                 for iSeries in iDcmStudy:
-                    serDict = iSeries.getSeriesInfoDict(self.dicomMetaTagListSeries)
+                    serDict = iSeries.getSeriesInfoDict(extraTags=self.dicomMetaTagListSeries)
                     serDict['DicomFileName'] = iSeries.getDicomFullFileName().replace(self.getTopDir(), "")
                     ddFull['Series'].append(serDict)
         except IndexError:
