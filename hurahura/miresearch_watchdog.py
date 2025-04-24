@@ -36,13 +36,11 @@ class MIResearch_WatchDog(object):
                  dataStorageRoot,
                  subjectPrefix,
                  SubjClass=mi_subject.AbstractSubject,
-                 TO_ANONYMISE=False,
                  DEBUG=False) -> None:
         self.directoryToWatch = directoryToWatch
         self.dataStorageRoot = dataStorageRoot
         self.subjectPrefix = subjectPrefix
         self.SubjClass = SubjClass
-        self.TO_ANONYMISE = TO_ANONYMISE
         self.recursive = False
         self.DEBUG = DEBUG
         #
@@ -62,7 +60,6 @@ class MIResearch_WatchDog(object):
                                                             self.subjectPrefix,
                                                             self.logger,
                                                             self.SubjClass,
-                                                            self.TO_ANONYMISE,
                                                             self.DEBUG)
         self.event_handler.processDir = self.processDir
         # self.event_handler.completeDir = self.completeDir
@@ -75,7 +72,6 @@ class MIResearch_WatchDog(object):
         self.logger.info(f" watching: {self.directoryToWatch}")
         self.logger.info(f" storage destination: {self.dataStorageRoot}")
         self.logger.info(f" subject prefix: {self.subjectPrefix}")
-        self.logger.info(f" anonymise: {self.TO_ANONYMISE}")
         self.logger.info(f" SubjectClass: {self.SubjClass}")
         self.logger.debug(f" RUNNING IN DEBUG MODE")
         observer.start()
@@ -106,7 +102,6 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                  subjectPrefix,
                  logger,
                  SubjClass=mi_subject.AbstractSubject,
-                 TO_ANONYMISE=False,
                  DEBUG=False) -> None:
         super(MIResearch_SubdirectoryHandler, self).__init__()
         self.directoryToWatch = directoryToWatch
@@ -114,7 +109,6 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         self.subjectPrefix = subjectPrefix
         self.logger = logger
         self.SubjClass = SubjClass
-        self.TO_ANONYMISE = TO_ANONYMISE
         self.DEBUG = DEBUG
         #
         self.ignore_pattern = ['.WORKING', 'MIResearch-']
@@ -178,6 +172,8 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                     self.logger.warning(f"DELETING {already_exec_directory}")
                     try: 
                         shutil.rmtree(already_exec_directory)
+                    except NotADirectoryError: # MAY BE A zip or tar file
+                        os.unlink(already_exec_directory)
                     except FileNotFoundError:
                         self.logger.error(f"Error: Directory '{already_exec_directory}' does not exist - maybe just finished.")
                     except Exception as e:
@@ -246,17 +242,16 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
             if self.DEBUG:
                 raise e
             self.logger.error(f"An error occurred while loading subject: {str(e)} ")
-        if self.TO_ANONYMISE: # This is for convienience - but conf file should control anonymisation at load time. 
-                for iNewSubj in newSubjList:
-                    try:
-                        iNewSubj.anonymise()
-                    except Exception as e:
-                        if self.DEBUG:
-                            raise e
-                        self.logger.error(f"An error occurred while anonymising {iNewSubj}: {str(e)} ")
         self.logger.info(f"   FINISHED LOADING {directoryToLoad_process} ===")
-        shutil.rmtree(directoryToLoad_process)
-        self.logger.info(f"   DELETED {directoryToLoad_process} ===")
+        try:
+            shutil.rmtree(directoryToLoad_process)
+            self.logger.info(f"   DELETED {directoryToLoad_process} ===")
+        except NotADirectoryError: # MAY BE A zip or tar file
+            os.unlink(directoryToLoad_process) 
+            self.logger.info(f"   DELETED {directoryToLoad_process} ===")
+        except Exception as e:
+            self.logger.error(f"An error occurred while deleting {directoryToLoad_process}: {str(e)}")
+
         # finalCompleteDir = os.path.join(self.completeDir, os.path.split(directoryToLoad_process)[1])
         # if os.path.isdir(finalCompleteDir):
         #     self.logger.warning(f"{finalCompleteDir} exists - will delete before moving {directoryToLoad_process}")

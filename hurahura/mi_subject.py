@@ -23,6 +23,7 @@ import subprocess
 import logging
 from functools import wraps
 ##
+from pathlib import Path
 from spydcmtk import spydcm
 from ngawari import fIO
 import inspect  
@@ -252,7 +253,7 @@ class AbstractSubject(object):
 
 
     def addOtherData(self, directoryToLoad):
-        self.logger.info(f"Adding other data (non-dicoms) from {directoryToLoad}")
+        self.logger.info(f"Adding other data (non-dicoms) ")
         count = 0
         if os.path.isfile(directoryToLoad):
             shutil.copy(directoryToLoad, os.path.join(self.getRawDirOther(), os.path.basename(directoryToLoad)))
@@ -705,7 +706,7 @@ class AbstractSubject(object):
         anonName, anonIDt = self._checkAnonName(anonName, name, firstNames)
         if len(anonID) == 0:
             anonID = anonIDt
-        self.logger.info(f'Begin anonymise in place. New name: "{anonName}"')
+        self.logger.info(f'Begin anonymise in place. New name: "{anonName}", anonID: "{anonID}"')
         spydcm.anonymiseInPlace(self.getDicomsDir(), anonName=anonName, anonID=anonID, QUIET=QUIET)
         self.logger.info('End anonymise')
         self.setIsAnonymised()
@@ -1310,7 +1311,7 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
     newSubj.QUIET = QUIET
 
     # Now have a subject - either newly created or existing and matching dicom data - load dicoms to subject:
-    if os.path.isdir(dicomDir_orData):
+    if isinstance(dicomDir_orData, (str, Path)):
         newSubj.loadDicomsToSubject(dicomDir_orData, anonName=anonName, HIDE_PROGRESSBAR=QUIET)
     else:
         newSubj.loadSpydcmStudyToSubject(dicomDir_orData, anonName=anonName)
