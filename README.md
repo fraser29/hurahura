@@ -2,7 +2,7 @@
 
 Organisation and automation tools for medical imaging research data
 
-__hurahura__ is maori for "to investigate" or "to look around"
+__hurahura__ is māori for "to investigate" or "to look around"
 
 ## Installation: 
 
@@ -18,7 +18,7 @@ This is a collection of classes for following OOP principles for organisation of
 
 The intention is to provide a framework that will store imaging data on a "per __examination__" basis in a structured format. This structured format then permits simple interrogation, and automation.  
 
-It takes advantage of the dicom standard and the package [spydcmtk](https://github.com/fraser29/spydcmtk) for automating and generalising many typical steps with the intention of making the researcher's life easier. 
+It takes advantage of the dicom standard and the package [spydcmtk](https://pypi.org/project/spydcmtk/) for automating and generalising many typical steps with the intention of making the researcher's life easier. 
 
 This package may be easily adapted and expanded upon for a high level control over your research data. Or, it may be used as is for basic structure and organisation of data and automation of common tasks. 
 
