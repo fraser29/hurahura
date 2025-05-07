@@ -11,6 +11,7 @@ from hurahura import mi_subject
 from hurahura.miresearchui import miui_helpers
 from hurahura.miresearchui.local_directory_picker import local_file_picker
 from hurahura.miresearchui.subjectUI import subject_page
+from hurahura.miresearchui import miui_settings_page
 
 DEBUG = True
 
@@ -56,7 +57,7 @@ class MIResearchUI():
         self.aggrid = None
         self.page = None  # Add this to store the page reference
 
-
+        miui_settings_page.initialize_settings_ui(self)
 
     @property
     def miui_conf_file(self):
@@ -134,7 +135,7 @@ class MIResearchUI():
                 ui.button(iProjName, on_click=lambda proj=iProjName: self.setSubjectListFromConfigFile(proj))
             ui.space()
             ui.button('', on_click=self.updateTable, icon='refresh').classes('ml-auto')
-            ui.button('', on_click=self.settings_page, icon='settings').classes('ml-auto')
+            ui.button('', on_click=self.show_settings_page, icon='settings').classes('ml-auto')
 
         myhtml_column = miui_helpers.get_index_of_field_open(self.tableCols)
         with ui.row().classes('w-full flex-grow border'):
@@ -266,9 +267,8 @@ class MIResearchUI():
     # ========================================================================================
     # SETTINGS PAGE
     # ========================================================================================      
-    @ui.page('/settings')
-    def settings_page(self):
-        pass
+    def show_settings_page(self):
+        ui.navigate.to('/miui_settings')
 
 
 # ==========================================================================================
@@ -292,5 +292,9 @@ def runMIUI(port=8081):
 
 if __name__ in {"__main__", "__mp_main__"}:
     # app.on_shutdown(miui_helpers.cleanup)
-    runMIUI(port=sys.argv[1])
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1]) 
+    else:
+        port = 8081
+    runMIUI(port=port)
 

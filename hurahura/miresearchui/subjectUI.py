@@ -125,7 +125,7 @@ class SubjectPage:
             dcmFile = f"{self.thisSubj.dataRoot}{os.sep}{self.thisSubj.subjID}{os.sep}{e.args[1]['_series']['DicomFileName']}"
             if os.path.exists(dcmFile):
                 dcmS = mi_subject.spydcm.dcmTK.DicomSeries.setFromFileList([dcmFile], HIDE_PROGRESSBAR=True)
-                fig = dcmS.buildOverviewImage(RETURN_FIG=True)
+                fig = dcmS.overviewImage(RETURN_FIG=True)
                 fig_container.clear()
                 with fig_container:
                     with ui.matplotlib(figsize=(8, 8)).figure as uifig:
