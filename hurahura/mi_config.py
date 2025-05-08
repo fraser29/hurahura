@@ -22,7 +22,7 @@ class _MIResearch_config():
                             os.path.join(os.path.expanduser("~"), '.config',miresearch_conf),
                             os.environ.get("MIRESEARCH_CONF", '')]
 
-    def runconfigParser(self, extraConfFile=None):
+    def runConfigParser(self, extraConfFile=None):
         
         if extraConfFile is not None:
             if os.path.isfile(extraConfFile):
@@ -49,15 +49,19 @@ class _MIResearch_config():
                     self.params[section][option] = self.config.get(section, option)
 
         # Class objects - want to do last so have access to parameters
-        self.class_obj = None
-        class_path = self.config.get("app", "class_path", fallback=None)
-        if class_path:
-            module_name, class_name = class_path.rsplit('.', 1)
-            try:
-                module = importlib.import_module(module_name)
-            except ModuleNotFoundError as e:
-                raise ModuleNotFoundError(f"*** is {module_name} found in PYTHONPATH? ***") from e
-            self.class_obj = getattr(module, class_name)
+        # self.class_obj = None
+        # class_path = self.config.get("app", "class_path", fallback=None)
+        # if class_path:
+        #     module_name, class_name = class_path.rsplit('.', 1)
+        #     try:
+        #         module = importlib.import_module(module_name)
+        #     except ModuleNotFoundError as e:
+        #         raise ModuleNotFoundError(f"*** is {module_name} found in PYTHONPATH? ***") from e
+        #     self.class_obj = getattr(module, class_name)
+
+        self.subject_class_name = self.config.get("app", "class_path", fallback=None) 
+
+
 
     @property
     def data_root_dir(self):
@@ -103,4 +107,4 @@ class _MIResearch_config():
 
 
 MIResearch_config = _MIResearch_config()
-MIResearch_config.runconfigParser()
+MIResearch_config.runConfigParser()

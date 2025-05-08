@@ -141,7 +141,7 @@ def setNList(args):
 def checkArgs(args, class_obj=None):
     # 
     args.RUN_ANON = False
-    if args.configFile: MIResearch_config.runconfigParser(args.configFile)
+    if args.configFile: MIResearch_config.runConfigParser(args.configFile)
     #
     if args.dataRoot is not None:
         args.dataRoot = os.path.abspath(args.dataRoot)
@@ -162,7 +162,10 @@ def checkArgs(args, class_obj=None):
     
     MISubjClass = mi_subject.AbstractSubject
     if class_obj is not None:
-        MIResearch_config.class_obj = class_obj
+        if isinstance(class_obj, str):
+            class_obj = mi_subject.get_configured_subject_class(class_obj)
+        else:
+            MIResearch_config.class_obj = class_obj
     if MIResearch_config.class_obj:
         MISubjClass = MIResearch_config.class_obj
     args.MISubjClass = MISubjClass

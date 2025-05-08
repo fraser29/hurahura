@@ -30,9 +30,9 @@ def get_index_of_field_open(data):
     return -1  # Return -1 if no dictionary with field 'open' is found
 
 def definePresetFromConfigfile(configFile):
-    MIResearch_config.runconfigParser(configFile)
+    MIResearch_config.runConfigParser(configFile)
     return {"data_root_dir": MIResearch_config.data_root_dir, 
-            "class_obj": MIResearch_config.class_obj,
+            "subject_class_name": MIResearch_config.subject_class_name,
             "subject_prefix": MIResearch_config.subject_prefix,
             "anon_level": MIResearch_config.anon_level}
 

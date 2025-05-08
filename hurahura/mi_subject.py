@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import logging
 from functools import wraps
+import importlib
 ##
 from pathlib import Path
 from spydcmtk import spydcm
@@ -30,6 +31,50 @@ import inspect
 
 from hurahura import mi_utils
 
+
+_CACHED_SUBJECT_CLASS = None
+_SENTINEL_CLASS_NOT_CONFIGURED_OR_FAILED = object() # Sentinel for failed/no config
+
+def get_configured_subject_class(subject_class_name=None):
+    """
+    Dynamically loads the subject class specified in the MIResearch_config.
+    Falls back to AbstractSubject if not specified or if loading fails.
+    Caches the result.
+    """
+    global _CACHED_SUBJECT_CLASS
+
+    if _CACHED_SUBJECT_CLASS is not None and _CACHED_SUBJECT_CLASS is not _SENTINEL_CLASS_NOT_CONFIGURED_OR_FAILED:
+        return _CACHED_SUBJECT_CLASS
+    if _CACHED_SUBJECT_CLASS is _SENTINEL_CLASS_NOT_CONFIGURED_OR_FAILED:
+        return AbstractSubject # Fallback for previously failed attempt
+
+    config = mi_utils.MIResearch_config
+    subject_class_name = subject_class_name or getattr(config, 'subject_class_name', None)
+
+    if not subject_class_name:
+        _CACHED_SUBJECT_CLASS = _SENTINEL_CLASS_NOT_CONFIGURED_OR_FAILED
+        # Optionally log that no custom class is configured, using AbstractSubject
+        return AbstractSubject
+
+    try:
+        module_name, class_name = subject_class_name.rsplit('.', 1)
+        module = importlib.import_module(module_name)
+        loaded_class = getattr(module, class_name)
+
+        # Ensure it's a subclass of AbstractSubject (optional but good practice)
+        if not issubclass(loaded_class, AbstractSubject):
+            # Log warning: loaded_class is not a subclass of AbstractSubject
+            print(f"WARNING: Configured subject class {subject_class_name} is not a subclass of AbstractSubject. Falling back to AbstractSubject.")
+            _CACHED_SUBJECT_CLASS = _SENTINEL_CLASS_NOT_CONFIGURED_OR_FAILED
+            return AbstractSubject
+        
+        _CACHED_SUBJECT_CLASS = loaded_class
+        return loaded_class
+    except Exception as e:
+        # Log warning: Failed to load subject_class_name, e.g., ModuleNotFound, AttributeError
+        print(f"WARNING: Failed to load configured subject class '{subject_class_name}': {e}. Falling back to AbstractSubject.")
+        _CACHED_SUBJECT_CLASS = _SENTINEL_CLASS_NOT_CONFIGURED_OR_FAILED
+        return AbstractSubject
 
 # ====================================================================================================
 # ====================================================================================================
@@ -377,7 +422,6 @@ class AbstractSubject(object):
         # Return info string for this subject
         data, _ = self.getInfoStr()
         return ",".join([str(i) for i in data])
-        # return f"{self.subjID}: {self.getName()} (ID:{self.getTagValue('PatientID')}, DOB:{self.getTagValue('PatientDateOfBirth')}) scanned on {self.getStudyDate()}"
 
 
     def printDicomsInfo(self):
@@ -958,7 +1002,9 @@ class SubjectList(list):
 
 
     @classmethod
-    def setByDirectory(cls, dataRoot, subjectPrefix=None, SubjClass=AbstractSubject):
+    def setByDirectory(cls, dataRoot, subjectPrefix=None, SubjClass=None):
+        if SubjClass is None:
+            SubjClass = get_configured_subject_class()
         listOfSubjects = getAllSubjects(dataRoot, subjectPrefix, SubjClass=SubjClass)
         return cls(listOfSubjects)
 
@@ -1127,7 +1173,9 @@ class SubjectList(list):
 ### ====================================================================================================================
 ###  Helper functions for subject list
 ### ====================================================================================================================
-def _getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject, RETURN_N=False):
+def _getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=None, RETURN_N=False):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
     allDir = os.listdir(dataRootDir)
@@ -1148,26 +1196,34 @@ def _getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject, 
             print(f"WARNING: {i} at {dataRootDir} not valid subject")
     return sorted(subjObjList)
 
-def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
+def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=None):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     return _getAllSubjects(dataRootDir, subjectPrefix, SubjClass)
 
 def getAllSubjectsN(dataRootDir, subjectPrefix=None):
     return _getAllSubjects(dataRootDir, subjectPrefix, RETURN_N=True)
 
-def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=AbstractSubject):
+def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=None):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
     subjObjList = [SubjClass(i, dataRoot=dataRootDir) for i in subjectNList]
     subjObjList = [i for i in subjObjList if i.exists()]
     return sorted(subjObjList)
 
-def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=AbstractSubject, CHECK_EXIST=True):
+def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=None, CHECK_EXIST=True):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     subjList = SubjectList([SubjClass(iN, dataRoot, subjPrefix) for iN in subjNList])
     if CHECK_EXIST:
         subjList.reduceToExist()
     return subjList
 
-def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None, SubjClass=AbstractSubject):
+def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None, SubjClass=None):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     if (summaryFilePath is None) or (len(summaryFilePath) == 0):
         nowStr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         summaryFilePath = os.path.join(dataRootDir, f'Summary_{nowStr}.csv')
@@ -1186,7 +1242,9 @@ def doDatesMatch(dateA, dateB, tolerance_days=1):
     return abs(dateDiff_days) < tolerance_days
 
 ### ====================================================================================================================
-def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None, SubjClass=AbstractSubject):
+def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None, SubjClass=None):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     try:
         ds = spydcm.returnFirstDicomFound(dicomDir_OrData)
         queryUID = ds.get('StudyInstanceUID', None)
@@ -1318,8 +1376,10 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
     #
     return newSubj
 
-def _createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=AbstractSubject, 
+def _createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=None, 
                                 subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     if compressedFile.endswith('zip'):
         listOfSubjects = spydcm.dcmTK.ListOfDicomStudies.setFromZip(compressedFile, HIDE_PROGRESSBAR=QUIET)
     elif compressedFile.endswith('tar') or compressedFile.endswith('tar.gz'):
@@ -1346,9 +1406,11 @@ def _subjNumberHelper(dataRoot, subjNumber, subjPrefix):
             raise ValueError("Subject already exists - use loadDicomsToSubject method to add data to existing subject.")
     return subjNumber
 
-def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubject, 
+def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=None, 
                      subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, IGNORE_UIDS=False,
                      OTHER_DATA_DIR=None):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     if not os.path.isdir(dataRoot):
         raise IOError(f" Destination does not exist: {dataRoot}")
     if not os.path.isdir(dicomDirToLoad):
@@ -1369,9 +1431,11 @@ def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=AbstractSubje
     return newSubj
 
 def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot, 
-                                       SubjClass=AbstractSubject, subjPrefix=None, 
+                                       SubjClass=None, subjPrefix=None, 
                                        anonName=None, 
                                        IGNORE_UIDS=False, QUIET=False):
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     if anonName not in [None, "SOFT", "HARD"]:
         raise ValueError(f"anonName must be one of [None, 'SOFT', 'HARD'] for multi-load")
     if not os.path.isdir(multiDicomDirToLoad):
@@ -1402,7 +1466,7 @@ def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot,
     return newSubjsList
 
 ### ====================================================================================================================
-def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject, 
+def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=None, 
                            subjNumber=None, subjPrefix=None, anonName=None, 
                            LOAD_MULTI=False, IGNORE_UIDS=False, QUIET=False,
                            OTHER_DATA_DIR=None):
@@ -1426,6 +1490,8 @@ def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=AbstractSubject
     Returns:
         list: list of Subject Objects added to or created
     """
+    if SubjClass is None:
+        SubjClass = get_configured_subject_class()
     if LOAD_MULTI and (subjNumber is not None):
         raise ValueError("Can not pass subjNumber if LOAD_MULTI set True")
     if LOAD_MULTI:

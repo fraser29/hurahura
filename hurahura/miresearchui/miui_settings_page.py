@@ -34,7 +34,7 @@ def create_settings_page(miui_instance):
             try:
                 with open(file_path, 'r') as f:
                     content = f.read()
-                content_display.set_text(content)
+                content_display.set_text(f"File source: {file_path}")
                 content_editor.set_value(content)
                 file_content_area.visible = True
             except Exception as e:
@@ -104,14 +104,14 @@ def create_settings_page(miui_instance):
             ui.label('MIUI Configuration Files').classes('text-2xl font-bold ml-2')
 
         with ui.row().classes('w-full mb-4'):
-            ui.label('Configuration Keys:').classes('text-lg mr-2')
+            ui.label(f'Configuration Keys (saved at {miui_instance.miui_conf_file}):').classes('text-lg mr-2')
             config_keys_select = ui.select(list(conf_files_dict.keys()), 
                                            label='Select Config', 
                                            on_change=lambda e: display_config_content(e.value))
             
         file_content_area = ui.column().classes('w-full p-2 border rounded')
         with file_content_area:
-            ui.label('File Content:').classes('text-lg font-semibold mb-2')
+            ui.label(f'File Content:').classes('text-lg font-semibold mb-2')
             content_display = ui.label('').classes('text-mono whitespace-pre-wrap')
             content_editor = ui.textarea(label='Edit Content').classes('w-full').props('outlined rows=10')
             

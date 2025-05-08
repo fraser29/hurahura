@@ -29,7 +29,7 @@ class MIResearchUI():
         self.DEBUG = DEBUG
         self.dataRoot = dataRoot
         self.subjectList = []
-        self.SubjClass = mi_subject.AbstractSubject # This is default - updated if read from config
+        self.SubjClass = mi_subject.get_configured_subject_class()
         self.tableRows = []
         self.presetDict = {}
         self.setPresets(hardcoded_presets)
@@ -121,12 +121,13 @@ class MIResearchUI():
         miui_conf_dict = self.miui_conf_file_contents
         miui_conf_keys = list(miui_conf_dict.keys())
         for iKey in miui_conf_keys:
-            try:
-                self.presetDict[iKey] = miui_helpers.definePresetFromConfigfile(miui_conf_dict[iKey])
-            except FileNotFoundError:
-                print(f"Unable to find file {miui_conf_dict[iKey]}")
-            except Exception as e:
-                print(f"Error loading {miui_conf_dict[iKey]}")
+            self.presetDict[iKey] = miui_helpers.definePresetFromConfigfile(miui_conf_dict[iKey])
+            # try:
+            #     self.presetDict[iKey] = miui_helpers.definePresetFromConfigfile(miui_conf_dict[iKey])
+            # except FileNotFoundError:
+            #     print(f"Unable to find file {miui_conf_dict[iKey]}")
+            # except Exception as e:
+            #     print(f"Error loading {miui_conf_dict[iKey]}")
         print(f"Have {len(self.presetDict)} preset(s)")
         with ui.row().classes('w-full border'):
             ui.button('Choose config file', on_click=self.chooseConfig, icon='folder')
@@ -212,15 +213,16 @@ class MIResearchUI():
             projectName = iName
         if projectName not in self.presetDict.keys():
             return
+        subjClass = mi_subject.get_configured_subject_class(self.presetDict[projectName].get("subject_class_name", None))
         self.setSubjectListFromLocalDirectory(localDirectory=self.presetDict[projectName].get("data_root_dir", "None"), 
                                               subject_prefix=self.presetDict[projectName].get("subject_prefix", None),  
-                                              SubjClass=self.presetDict[projectName].get("class_obj", mi_subject.AbstractSubject), )
+                                              SubjClass=subjClass)
         
 
 
-    def setSubjectListFromLocalDirectory(self, localDirectory, subject_prefix=None, SubjClass=mi_subject.AbstractSubject):
+    def setSubjectListFromLocalDirectory(self, localDirectory, subject_prefix=None, SubjClass=None):
         if SubjClass is None:
-            SubjClass = mi_subject.AbstractSubject
+            SubjClass = mi_subject.get_configured_subject_class()
         self.SubjClass = SubjClass
         if os.path.isdir(localDirectory):
             self.dataRoot = localDirectory
