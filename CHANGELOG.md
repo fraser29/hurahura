@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.17]
+### Fixed 
+- circular import bug fixed that can occur if SubjClass defined in conf file and read by environment variable
+
+
 ## [0.1.16]
 ### Fixed
 - minor bugs occuring in edge cases. 
