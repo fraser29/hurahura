@@ -36,7 +36,10 @@ class MIResearchUI():
         self.port = port
         self.tableCols = [
             {'field': 'subjID', 'sortable': True, 'checkboxSelection': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
-            {'field': 'name', 'editable': True, 'filter': 'agTextColumnFilter', 'sortable': True, 'filterParams': {'filterOptions': ['contains', 'notContains', 'startsWith']}},
+            {'field': 'name', 'editable': True, 
+                'filter': 'agTextColumnFilter', 
+                'sortable': True, 
+                'filterParams': {'filterOptions': ['contains', 'notContains', 'startsWith']}},
             {'field': 'DOS', 'sortable': True, 'filter': 'agDateColumnFilter', 'filterParams': {
                 'comparator': 'function(filterLocalDateAtMidnight, cellValue) { '
                               'if (!cellValue) return false; '
@@ -218,7 +221,6 @@ class MIResearchUI():
                                               subject_prefix=self.presetDict[projectName].get("subject_prefix", None),  
                                               SubjClass=subjClass)
         
-
 
     def setSubjectListFromLocalDirectory(self, localDirectory, subject_prefix=None, SubjClass=None):
         if SubjClass is None:
