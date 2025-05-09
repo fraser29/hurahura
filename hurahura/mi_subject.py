@@ -180,6 +180,8 @@ class AbstractSubject(object):
                     'order': getattr(method, '_ui_order', 100)
                 })
         return sorted(methods, key=lambda x: (x['category'], x['order'], x['name']))
+
+
     ### ----------------------------------------------------------------------------------------------------------------
     ### Overriding methods
     ### ----------------------------------------------------------------------------------------------------------------
@@ -211,9 +213,12 @@ class AbstractSubject(object):
             return self._subjID
         return buildSubjectID(self._subjN, self.subjectPrefix, padZeros=self.padZeros, suffix=self.suffix)
 
+
     @property
     def subjN(self):
         return splitSubjID(self.subjID)[1]
+    
+
     ### ----------------------------------------------------------------------------------------------------------------
     ### Logging
     ### ----------------------------------------------------------------------------------------------------------------
@@ -230,9 +235,11 @@ class AbstractSubject(object):
                 self._logger.addHandler(logging.StreamHandler())
         return self._logger
 
+
     @property
     def logfileName(self):
         return os.path.join(self.getMetaDir(), f'{self.subjID}.log')
+
 
     def _renameLogger(self):
         """Rename the logger - is run from method renameSubjID
@@ -244,13 +251,16 @@ class AbstractSubject(object):
         self._loggerFH.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
         self._logger.addHandler(self._loggerFH)
 
+
     def setLoggerDebug(self):
         self.logger.setLevel(logging.DEBUG)
         self.logger.propagate = False
 
+
     def setLoggerInfo(self):
         self.logger.setLevel(logging.INFO)
         self.logger.propagate = False
+
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
@@ -265,8 +275,10 @@ class AbstractSubject(object):
                 os.makedirs(os.path.join(self.getTopDir(), i.name, j), exist_ok=True)
         self.logger.info(f"Directory structure correct for {self.subjID} at {self.getTopDir()}.")
 
+
     def getPrefix_Number(self):
         return splitSubjID(self.subjID)
+
 
     ### LOADING -------------------------------------------------------------------------------------------------------
     def loadDicomsToSubject(self, dicomFolderToLoad, anonName=None, HIDE_PROGRESSBAR=False):
@@ -278,6 +290,7 @@ class AbstractSubject(object):
         res = study.writeToOrganisedFileStructure(self.getDicomsDir())
         self._finalLoadSteps(d0, dI, anonName)
 
+
     def loadSpydcmStudyToSubject(self, spydcmData, anonName=None):
         self.initDirectoryStructure()
         self.logger.info(f"LoadDicoms (spydcmtk data ==> {self.getDicomsDir()})")
@@ -285,6 +298,7 @@ class AbstractSubject(object):
         spydcmData.writeToOrganisedFileStructure(self.getDicomsDir())
         self._finalLoadSteps(d0, dI, anonName=anonName)
     
+
     def _finalLoadSteps(self, initNumDicoms, numDicomsToLoad, anonName=None):
         self.buildDicomMeta()
         if anonName is None: 
@@ -317,6 +331,7 @@ class AbstractSubject(object):
         if count > 0:
             self.runPostLoadPipeLine()
 
+
     def runPostLoadPipeLine(self, *args, **kwargs):
         # this is an abstract method for implementation by subclasses
         pass
@@ -331,8 +346,10 @@ class AbstractSubject(object):
     def exists(self):
         return os.path.isdir(self.getTopDir())
 
+
     def getTopDir(self):
         return os.path.join(self.dataRoot, self.subjID)
+
 
     def _getDir(self, listOfDirsBeyondStudyDir, BUILD_IF_NEED=True):
         if type(listOfDirsBeyondStudyDir) != list:
@@ -345,24 +362,28 @@ class AbstractSubject(object):
                 os.makedirs(dd, exist_ok=True)
         return dd
 
+
     def getMetaDir(self):
         return self._getDir([mi_utils.META])
+
 
     def getRawDir(self):
         return self._getDir([mi_utils.RAW])
 
+
     def getRawDirOther(self, BUILD_IF_NEED=True):
         return self._getDir([mi_utils.RAW, mi_utils.OTHER], BUILD_IF_NEED=BUILD_IF_NEED)
     
+
     def getDicomsDir(self):
         return self.__getDicomsDir()
     
+
     def __getDicomsDir(self):
         dirName = self._getDir([mi_utils.RAW, mi_utils.DICOM])
         return dirName
     
 
-    @ui_method(description="Rename subject", category="General", order=1)
     def renameSubjID(self, newSubjID):
         oldID = self.subjID
         if newSubjID == oldID:
@@ -381,6 +402,7 @@ class AbstractSubject(object):
         self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")        
         self.buildDicomMeta()
         self.buildSeriesDataMetaCSV(FORCE=True)
+
 
     ### META STUFF -----------------------------------------------------------------------------------------------------
     def getSeriesMetaCSV(self):
@@ -449,20 +471,24 @@ class AbstractSubject(object):
         endT_HHMMSS = datetime.datetime.strftime(endT, '%H%M%S')
         return self.getStartTimeForSeriesN_HHMMSS(Ns), endT_HHMMSS
 
+
     def getTimeTakenForSeriesN_s(self, N, df=None):
         if df is None:
             df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'ScanDuration'])[0]
+
 
     def getHRForSeriesN(self, N, df=None):
         if df is None:
             df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'HeartRate'])[0]
 
+
     def getStartTimeForSeriesN_HHMMSS(self, N, df=None):
         if df is None:
             df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber']==N,'AcquisitionTime'])[0]
+
 
     def getDifferenceBetweenStartTimesOfTwoScans_s(self, seN1, seN2):
         df = self.getSeriesMetaAsDataFrame()
@@ -472,12 +498,14 @@ class AbstractSubject(object):
         t2 = mi_utils.timeToDatetime(str(t2))
         return (t2-t1).seconds
 
+
     def getTotalScanTime_s(self):
         se = self.getListOfSeNums()
         se = [i for i in se if i < 1000]
         s1 = self.getDifferenceBetweenStartTimesOfTwoScans_s(min(se), max(se))
         s2 = self.getTimeTakenForSeriesN_s(max(se))
         return s1 + s2
+
 
     def getSeriesMetaValue(self, seNum, varName):
         """Get meta value for given series naumber
@@ -497,8 +525,10 @@ class AbstractSubject(object):
         df = self.getSeriesMetaAsDataFrame()
         return list(df.loc[df['SeriesNumber'] == seNum, varName])[0]
 
+
     def getDicomSeriesMetaList(self):
         return self.getMetaDict()['Series']
+
 
     def getDicomSeriesMeta(self, seriesNumber=None, seriesDescription=None):
         if (seriesNumber is None) and (seriesDescription is None):
@@ -511,15 +541,19 @@ class AbstractSubject(object):
             thisSeries = [i for i in allSeries if seD in i['SeriesDescription'].lower()]
         return thisSeries
 
+
     def getMetaTagsFile(self, suffix=""):
         return os.path.join(self.getMetaDir(), f"{self.subjID}Tags{suffix}.json")
+
 
     @ui_method(description="Set tag value", category="Meta", order=1)
     def setTagValue(self, tag, value, suffix=""):
         self.updateMetaFile({tag:value}, suffix)
 
+
     def getTagValue(self, tagName, ifNotFound='Unknown', metaSuffix=""): # FIXME is this done correctly
         return self.getMetaTagValue(tagName, ifNotFound, metaSuffix)
+
 
     def getMetaDict(self, suffix=""):
         """Get meta json file as dictionary
@@ -535,6 +569,7 @@ class AbstractSubject(object):
         if os.path.isfile(ff):
             dd = fIO.parseJsonToDictionary(ff)
         return dd
+
 
     def getMetaTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
         """Get specific tag from meta json file
@@ -558,6 +593,7 @@ class AbstractSubject(object):
             else:
                 raise e
 
+
     def updateMetaFile(self, metaDict, metasuffix=""):
         """Update the meta json file
 
@@ -569,6 +605,7 @@ class AbstractSubject(object):
         dd.update(metaDict)
         spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
         self.logger.info('Updated meta-file')
+
 
     def buildDicomMeta(self):
         """Builds a JSON file comprised of DICOM tags and some derived values. 
@@ -721,6 +758,7 @@ class AbstractSubject(object):
             spydcm.dcmTools.dbDateToDateTime(dos)
         return dos
 
+
     def getInfoStr(self, extraKeys=[]):
         # Return values_list, info_keys:
         #   list of values for info keys (+ age). 
@@ -731,6 +769,7 @@ class AbstractSubject(object):
         aa = f"{self.getAge():5.2f}"
         nDCM = f"{self.countNumberOfDicoms()}"
         return [mm.get(i, "Unknown") for i in infoKeys]+[aa, nDCM], infoKeys + ['Age', 'TotalDicoms']
+
 
     # ------------------------------------------------------------------------------------------
     @ui_method(description="Anonymise subject", category="Anonymisation", order=1)
@@ -756,6 +795,7 @@ class AbstractSubject(object):
         self.setIsAnonymised()
         self.buildDicomMeta()
 
+
     def _checkAnonName(self, anonName, name="", firstNames=""):
         """
         Check if anonName is valid and return anonName and anonID
@@ -774,16 +814,20 @@ class AbstractSubject(object):
             return "", ""
         return anonName, anonName
     
+
     def setIsAnonymised(self):
         self.updateMetaFile({"ANONYMISED": True})
     
+
     def isAnonymised(self):
         return self.getTagValue("ANONYMISED", False)
+
 
     def setEncodedName(self, NAME, FIRST_NAMES=""):
         dd = {'NAME': mi_utils.encodeString(NAME, self.subjID),
               'FIRST_NAMES': mi_utils.encodeString(FIRST_NAMES, self.subjID)}
         self.updateMetaFile(dd)
+
 
     def getName(self):
         if self.isAnonymised():
@@ -793,6 +837,7 @@ class AbstractSubject(object):
                 return self.getTagValue('PatientName', 'Name-Unknown')
         else:
             return self.getTagValue('PatientName', 'Name-Unknown')
+
 
     def getName_FirstNames(self):
         if self.isAnonymised():
@@ -819,6 +864,7 @@ class AbstractSubject(object):
                 len(self.getMetaTagValue('Series')), self.getSeriesDescriptionsStr()]
         ss = [str(i) for i in parts]
         return hh, ss
+
 
     def getAge(self):
         """
@@ -865,12 +911,15 @@ class AbstractSubject(object):
                 return np.nan
         return age
 
+
     def getGender(self):
         return self.getMetaDict()['PatientSex']
     
+
     def isMale(self):
         sex = self.getGender()
         return sex.strip().lower() == 'm'
+
 
     # ------------------------------------------------------------------------------------------------------------------
     def zipUpSubject(self, outputDirectory, fileName=None, EXCLUDE_RAW=False):
@@ -986,6 +1035,7 @@ class AbstractSubject(object):
     def getSpydcmDicomStudy(self):
         return spydcm.dcmTK.DicomStudy.setFromDirectory(self.getDicomsDir())
     
+
     def getSpydcmDicomSeries(self, seNumber):
         dcmdir = self.getDicomSeriesDir(seNumber)
         return spydcm.dcmTK.DicomSeries.setFromDirectory(dcmdir)
@@ -1008,16 +1058,20 @@ class SubjectList(list):
         listOfSubjects = getAllSubjects(dataRoot, subjectPrefix, SubjClass=SubjClass)
         return cls(listOfSubjects)
 
+
     @property
     def subjIDs(self):
         return [i.subjID for i in self]
     
+
     @property
     def subjNs(self):
         return [i.subjN for i in self]
 
+
     def __str__(self) -> str:
         return f"{len(self)} subjects of {self[0].subjectPrefix} at {self[0].dataRoot}"
+
 
     def reduceToExist(self):
         toRemove = []
@@ -1027,6 +1081,7 @@ class SubjectList(list):
         for i in toRemove:
             self.remove(i)
 
+
     def reduceToSet(self):
         toRemove = []
         for k1 in range(len(self)):
@@ -1034,6 +1089,7 @@ class SubjectList(list):
                 toRemove.append(self[k1])
         for i in toRemove:
             self.remove(i)
+
 
     def filterSubjectListByDOS(self, dateOfScan_YYYYMMDD, dateEnd_YYYYMMDD=None): #TODO
         """
@@ -1057,6 +1113,7 @@ class SubjectList(list):
                 continue
         return SubjectList(filteredMatchList)
 
+
     def findSubjMatching_SubjN(self, subjN):
         """
         :param studyID (or examID): int
@@ -1070,6 +1127,7 @@ class SubjectList(list):
                 pass
         return None
     
+
     def findSubjMatchingStudyID(self, studyID):
         """
         :param studyID (or examID): int
@@ -1083,6 +1141,7 @@ class SubjectList(list):
                 pass
         return None
     
+
     def findSubjMatchingStudyUID(self, studyUID):
         for iSubj in self:
             try:
@@ -1091,6 +1150,7 @@ class SubjectList(list):
             except TypeError:
                 pass
         return None
+
 
     def filterSubjectListByDOS_closest(self, dateOfScan_YYYY_MM_DD, A_less_than_B=False):
         """Reduce sList to one - closest to dateOfScan
@@ -1131,6 +1191,7 @@ class SubjectList(list):
             return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD, dateEnd_YYYYMMDD=dataEnd)
         return matchList
 
+
     def findSubjMatchingName(self, nameStr, dateOfScan_YYYYMMDD=None, decodePassword=None):
         """
         :param nameStr:
@@ -1151,6 +1212,7 @@ class SubjectList(list):
         if (len(matchList)>1) & (dateOfScan_YYYYMMDD is not None):
             return matchList.filterSubjectListByDOS(dateOfScan_YYYYMMDD)
         return matchList
+
 
     def writeSummaryCSV(self, outputFileName_csv, extra_series_tags=[]):
         data, header = [], []
@@ -1196,13 +1258,16 @@ def _getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=None, RETURN_N=Fa
             print(f"WARNING: {i} at {dataRootDir} not valid subject")
     return sorted(subjObjList)
 
+
 def getAllSubjects(dataRootDir, subjectPrefix=None, SubjClass=None):
     if SubjClass is None:
         SubjClass = get_configured_subject_class()
     return _getAllSubjects(dataRootDir, subjectPrefix, SubjClass)
 
+
 def getAllSubjectsN(dataRootDir, subjectPrefix=None):
     return _getAllSubjects(dataRootDir, subjectPrefix, RETURN_N=True)
+
 
 def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=None):
     if SubjClass is None:
@@ -1213,6 +1278,7 @@ def getSubjects(subjectNList, dataRootDir, subjectPrefix=None, SubjClass=None):
     subjObjList = [i for i in subjObjList if i.exists()]
     return sorted(subjObjList)
 
+
 def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=None, CHECK_EXIST=True):
     if SubjClass is None:
         SubjClass = get_configured_subject_class()
@@ -1220,6 +1286,7 @@ def subjNListToSubjObj(subjNList, dataRoot, subjPrefix, SubjClass=None, CHECK_EX
     if CHECK_EXIST:
         subjList.reduceToExist()
     return subjList
+
 
 def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None, SubjClass=None):
     if SubjClass is None:
@@ -1230,6 +1297,7 @@ def WriteSubjectStudySummary(dataRootDir, summaryFilePath=None, subjPrefix=None,
     misubjList = SubjectList.setByDirectory(dataRootDir, subjectPrefix=subjPrefix, SubjClass=SubjClass)
     misubjList.writeSummaryCSV(summaryFilePath)
 
+
 def _getDateDiff_days(dateA, dateB):
     if type(dateA) == str:
         dateA = spydcm.dcmTools.dbDateToDateTime(dateA)
@@ -1237,9 +1305,11 @@ def _getDateDiff_days(dateA, dateB):
         dateB = spydcm.dcmTools.dbDateToDateTime(dateB)
     return (dateA - dateB).days
 
+
 def doDatesMatch(dateA, dateB, tolerance_days=1):
     dateDiff_days = _getDateDiff_days(dateA, dateB)
     return abs(dateDiff_days) < tolerance_days
+
 
 ### ====================================================================================================================
 def findSubjMatchingDicomStudyUID(dicomDir_OrData, dataRoot, subjPrefix=None, SubjClass=None):
@@ -1272,8 +1342,10 @@ def splitSubjID(s):
         return parts[0], int(parts[1]), ''.join(parts[2:])
     return parts[0], int(parts[1])
 
+
 def getNumberFromSubjID(subjID):
     return splitSubjID(subjID)[1]
+
 
 def findZeroPadding(subjID):
     match = re.search(r'\d+', subjID) # first seq of numbers
@@ -1282,6 +1354,7 @@ def findZeroPadding(subjID):
         return len(number)# 
     else:
         return 0  # If no number found, return 0
+
 
 def guessSubjectPrefix(dataRootDir, QUIET=False):
     """Guess the subject prefix by looking for common names in the dataRootDir
@@ -1328,6 +1401,7 @@ def buildSubjectID(subjN, subjectPrefix, padZeros=None, suffix=''):
         padZeros = mi_utils.MIResearch_config.default_pad_zeros
     return f"{subjectPrefix}{subjN:0{padZeros}d}{suffix}"
 
+
 def getNextSubjN(dataRootDir, subjectPrefix=None):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
@@ -1337,6 +1411,7 @@ def getNextSubjN(dataRootDir, subjectPrefix=None):
     except ValueError:
         return 1
 
+
 def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None, padZeros=None, suffix=""):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
@@ -1344,10 +1419,12 @@ def doesSubjectExist(subjN, dataRootDir, subjectPrefix=None, padZeros=None, suff
         padZeros = mi_utils.MIResearch_config.default_pad_zeros
     return os.path.isdir(os.path.join(dataRootDir, buildSubjectID(subjN, subjectPrefix, padZeros=padZeros, suffix=suffix)))
 
+
 def getNextSubjID(dataRootDir, subjectPrefix=None):
     if subjectPrefix is None:
         subjectPrefix = guessSubjectPrefix(dataRootDir)
     return buildSubjectID(getNextSubjN(dataRootDir, subjectPrefix), subjectPrefix)
+
 
 def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjPrefix, anonName, QUIET, FORCE_NEW_SUBJ=False):
     if FORCE_NEW_SUBJ:
@@ -1376,6 +1453,7 @@ def _createSubjectHelper(dicomDir_orData, SubjClass, subjNumber, dataRoot, subjP
     #
     return newSubj
 
+
 def _createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=None, 
                                 subjNumber=None, subjPrefix=None, anonName=None, QUIET=False):
     if SubjClass is None:
@@ -1398,6 +1476,7 @@ def _createNewSubject_Compressed(compressedFile, dataRoot, SubjClass=None,
         return newSubjList[0]
     return newSubjList
 
+
 def _subjNumberHelper(dataRoot, subjNumber, subjPrefix):
     if subjNumber is None:
         subjNumber = getNextSubjN(dataRoot, subjPrefix)
@@ -1405,6 +1484,7 @@ def _subjNumberHelper(dataRoot, subjNumber, subjPrefix):
         if doesSubjectExist(subjNumber, dataRoot, subjPrefix):
             raise ValueError("Subject already exists - use loadDicomsToSubject method to add data to existing subject.")
     return subjNumber
+
 
 def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=None, 
                      subjNumber=None, subjPrefix=None, anonName=None, QUIET=False, IGNORE_UIDS=False,
@@ -1429,6 +1509,7 @@ def _createNew_OrAddTo_Subject(dicomDirToLoad, dataRoot, SubjClass=None,
         newSubj.addOtherData(OTHER_DATA_DIR)
     #
     return newSubj
+
 
 def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot, 
                                        SubjClass=None, subjPrefix=None, 
@@ -1464,6 +1545,7 @@ def _createNew_OrAddTo_Subjects_Multi(multiDicomDirToLoad, dataRoot,
         print(f"Loaded {iDir} to {newSubj}")
         newSubjsList.append(newSubj)
     return newSubjsList
+
 
 ### ====================================================================================================================
 def createNew_OrAddTo_Subject(loadDirectory, dataRoot, SubjClass=None, 
