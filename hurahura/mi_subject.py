@@ -671,6 +671,7 @@ class AbstractSubject(object):
 
     def getDicomSeriesDir(self, seriesNum, seriesUID=None):
         dcmStudies = spydcm.dcmTK.ListOfDicomStudies.setFromDirectory(self.getDicomsDir(), ONE_FILE_PER_DIR=True, HIDE_PROGRESSBAR=True)
+        dcmSeries = None
         if seriesUID is not None:
             for dcmStudy in dcmStudies:
                 dcmSeries = dcmStudy.getSeriesByUID()
@@ -716,6 +717,7 @@ class AbstractSubject(object):
         dS = sorted(dFolders, key=spydcm.dcmTools.instanceNumberSortKey)
         if not FULL:
             dS = [os.path.split(i)[1] for i in dS]
+            dS = sorted(dS, key=lambda x: int(x.split('_')[0][2:]))
             return dS
         if excludeSeNums is None:
             excludeSeNums = []
@@ -725,8 +727,8 @@ class AbstractSubject(object):
                 seN.append(int(i.split('_')[0][2:]))
             except ValueError:
                 pass
-        dcmDirList = [self.getDicomSeriesDir(i) for i in seN if i not in excludeSeNums]
-        dcmDirList = sorted(dcmDirList, key=spydcm.dcmTools.instanceNumberSortKey)
+        dcmDirList = [self.getDicomSeriesDir(i) for i in sorted(seN) if i not in excludeSeNums]
+        # dcmDirList = sorted(dcmDirList, key=spydcm.dcmTools.instanceNumberSortKey)
         return dcmDirList
 
 
@@ -1202,7 +1204,9 @@ class SubjectList(list):
         matchList = SubjectList()
         for iSubj in self:
             iName = iSubj.getTagValue("NAME", mi_utils.UNKNOWN)
-            if decodePassword is not None:
+            if decodePassword == "SubjID":
+                iName = mi_utils.decodeString(iName, iSubj.subjID).lower()
+            elif decodePassword is not None:
                 iName = mi_utils.decodeString(iName, decodePassword).lower()
             try:
                 if nameStr_l in iName:
