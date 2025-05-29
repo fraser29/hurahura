@@ -156,6 +156,7 @@ class AbstractSubject(object):
         self.dicomMetaTagListStudy = mi_utils.DEFAULT_DICOM_META_TAG_LIST_STUDY
         self.dicomMetaTagListSeries = mi_utils.DEFAULT_DICOM_META_TAG_LIST_SERIES
         self.QUIET = False
+        self.DEBUG = False
         #
         #
         self._logger = None
@@ -228,11 +229,22 @@ class AbstractSubject(object):
             rr = os.path.split(self.dataRoot)[1]
             self._logger = logging.getLogger(f"{rr}/{self.subjID}")
             self._logger.setLevel(logging.INFO)
+            self._logger.propagate = False  # Set propagate to False by default
+            
+            # Remove any existing handlers
+            for handler in self._logger.handlers[:]:
+                self._logger.removeHandler(handler)
+            
+            # Add file handler
             self._loggerFH = logging.FileHandler(self.logfileName)
             self._loggerFH.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
             self._logger.addHandler(self._loggerFH)
+            
+            # Add stream handler if not quiet
             if not self.QUIET:
-                self._logger.addHandler(logging.StreamHandler())
+                stream_handler = logging.StreamHandler()
+                stream_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+                self._logger.addHandler(stream_handler)
         return self._logger
 
 
@@ -253,14 +265,52 @@ class AbstractSubject(object):
 
 
     def setLoggerDebug(self):
+        # Remove existing handlers
+        for handler in self.logger.handlers[:]:
+            self.logger.removeHandler(handler)
+            
+        # Add file handler
+        self._loggerFH = logging.FileHandler(self.logfileName)
+        self._loggerFH.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+        self.logger.addHandler(self._loggerFH)
+        
+        # Add stream handler if not quiet
+        if not self.QUIET:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+            self.logger.addHandler(stream_handler)
+            
         self.logger.setLevel(logging.DEBUG)
         self.logger.propagate = False
 
 
     def setLoggerInfo(self):
+        # Remove existing handlers
+        for handler in self.logger.handlers[:]:
+            self.logger.removeHandler(handler)
+            
+        # Add file handler
+        self._loggerFH = logging.FileHandler(self.logfileName)
+        self._loggerFH.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+        self.logger.addHandler(self._loggerFH)
+        
+        # Add stream handler if not quiet
+        if not self.QUIET:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S'))
+            self.logger.addHandler(stream_handler)
+            
         self.logger.setLevel(logging.INFO)
         self.logger.propagate = False
 
+
+    def setDEBUGMode(self, DEBUG):
+        self.DEBUG = DEBUG
+        if self.DEBUG:
+            self.setLoggerDebug()
+            self.logger.debug("Logger set to debug mode.")
+        else:
+            self.setLoggerInfo()
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods

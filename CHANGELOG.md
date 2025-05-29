@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.19]
+### Fixed
+- minor error on logging in debug mode. 
+
 ## [0.1.18]
 ### Fixed
 - minor error catching on edge cases. 

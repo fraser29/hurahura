@@ -213,6 +213,9 @@ def runActions(args, extra_runActions=None):
             print(f"SubjList provided is: {args.subjNList}")
         subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
 
+        for iSubj in subjList:
+            iSubj.setDEBUGMode(args.DEBUG)
+
         if args.loadPathOther is not None:
             if len(subjList) == 1:
                 subjList[0].addOtherData(args.loadPathOther)
