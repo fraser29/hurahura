@@ -312,6 +312,12 @@ class AbstractSubject(object):
         else:
             self.setLoggerInfo()
 
+
+    def close_logger(self):
+        for handler in self.logger.handlers[:]:
+            self.logger.removeHandler(handler)
+            handler.close()
+
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
     ### ----------------------------------------------------------------------------------------------------------------
@@ -653,7 +659,8 @@ class AbstractSubject(object):
         """
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
-        spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
+        fIO.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
+        # spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
         self.logger.info('Updated meta-file')
 
 
