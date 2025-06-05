@@ -1033,6 +1033,7 @@ class AbstractSubject(object):
 
 
     def rsyncToOtherDataroot(self, otherDataRoot):
+        result = 1
         if not os.path.isdir(otherDataRoot):
             raise ValueError(f"{otherDataRoot} should exist and should be a directory.")
         if otherDataRoot == self.dataRoot:
@@ -1062,6 +1063,15 @@ class AbstractSubject(object):
             except shutil.Error as e:
                 self.logger.error(f"ERROR rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}: shutil.Error {e}")
                 result = 1
+        remoteDirectory = os.path.join(otherDataRoot, self.subjID)
+        if not os.path.isdir(remoteDirectory):
+            self.logger.error(f"Error in rsyncToOtherDataroot. {remoteDirectory} does not exist. ")
+            return 1
+        nFilesThisRoot = mi_utils.countFilesInDir(self.getTopDir())
+        nFilesRemote = mi_utils.countFilesInDir(remoteDirectory)
+        if nFilesThisRoot > nFilesRemote:
+            self.logger.error(f"Error in rsyncToOtherDataroot. N-files-local={nFilesThisRoot}, N-files-remote={nFilesRemote}")
+            return 1
         self.logger.info(f"Finished rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}. RESULT {result}")
         return result
 
@@ -1132,11 +1142,13 @@ class SubjectList(list):
         return f"{len(self)} subjects of {self[0].subjectPrefix} at {self[0].dataRoot}"
 
 
-    def reduceToExist(self):
+    def reduceToExist(self, VERBOSE=False):
         toRemove = []
         for i in self:
             if not i.exists():
                 toRemove.append(i)
+        if VERBOSE:
+            print(f"Removing non-existant subjects: {toRemove}")
         for i in toRemove:
             self.remove(i)
 

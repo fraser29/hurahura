@@ -207,11 +207,13 @@ def runActions(args, extra_runActions=None):
                 iSubj.initDirectoryStructure()
         args.subjNList = [iSubj.subjN for iSubj in subjList]
 
+    # ------------------------------------------------------------------------------------------------------------------------------
     # SUBJECT LEVEL actions
     if len(args.subjNList) > 0:
         if args.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
         subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        subjList.reduceToExist(args.DEBUG)
 
         for iSubj in subjList:
             iSubj.setDEBUGMode(args.DEBUG)
@@ -225,12 +227,11 @@ def runActions(args, extra_runActions=None):
         # --- QUERY ---
         if args.qSeriesDesc:
             for iSubj in subjList:
-                if iSubj.exists():
-                    if args.DEBUG:
-                        print(f"Searching: {iSubj.subjID}...")
-                    res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
-                    if len(res) > 0:
-                        print(f"{iSubj} has {list(res.values())}")
+                if args.DEBUG:
+                    print(f"Searching: {iSubj.subjID}...")
+                res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
+                if len(res) > 0:
+                    print(f"{iSubj} has {list(res.values())}")
 
         if args.qPID:
             subList = subjList.findSubjMatchingPatientID(args.qPID)
@@ -256,38 +257,32 @@ def runActions(args, extra_runActions=None):
         elif args.RUN_ANON:
             if args.anonName is not None:
                 for iSubj in subjList:
-                    if iSubj.exists():
-                        if not args.QUIET:
-                            print(f"Anonymise: {iSubj.subjID}...")
-                        iSubj.anonymise(args.anonName)
+                    if not args.QUIET:
+                        print(f"Anonymise: {iSubj.subjID}...")
+                    iSubj.anonymise(args.anonName)
 
         # --- POST LOAD PIPELINE ---
         elif args.subjRunPost:
             for iSubj in subjList:
-                if iSubj.exists():
-                    if not args.QUIET:
-                        print(f"Post load pipeline: {iSubj.subjID}...")
-                    iSubj.runPostLoadPipeLine()
+                if not args.QUIET:
+                    print(f"Post load pipeline: {iSubj.subjID}...")
+                iSubj.runPostLoadPipeLine()
 
         # --- PRINT INFO ---
         elif args.subjInfo:
             HEADER = False
             for iSubj in subjList:
-                if iSubj.exists():
-                    data, header = iSubj.getInfoStr()
-                    if not HEADER:
-                        print(",".join(header))
-                        HEADER = True
-                    print(",".join([str(i) for i in data]))
-                elif not args.QUIET:
-                    print(f"{iSubj} does not exist at {iSubj.dataRoot}")
+                data, header = iSubj.getInfoStr()
+                if not HEADER:
+                    print(",".join(header))
+                    HEADER = True
+                print(",".join([str(i) for i in data]))
 
         elif args.subjInfoFull:
             for iSubj in subjList:
-                if iSubj.exists():
-                    if args.DEBUG:
-                        print(f"Info: {iSubj.subjID}...")
-                    iSubj.infoFull()
+                if args.DEBUG:
+                    print(f"Info: {iSubj.subjID}...")
+                iSubj.infoFull()
                     
 
         # === SUBJECT GROUP ACTIONS ===
