@@ -216,6 +216,7 @@ class AbstractSubject(object):
 
     def close(self):
         self.close_logger()
+
     ### ----------------------------------------------------------------------------------------------------------------
     ### Properties
     ### ----------------------------------------------------------------------------------------------------------------
@@ -325,9 +326,12 @@ class AbstractSubject(object):
 
 
     def close_logger(self):
-        for handler in self.logger.handlers[:]:
-            self.logger.removeHandler(handler)
-            handler.close()
+        try:
+            for handler in self.logger.handlers[:]:
+                self.logger.removeHandler(handler)
+                handler.close()
+        except IOError:
+            pass # If does not exist. 
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Methods
