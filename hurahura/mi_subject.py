@@ -861,6 +861,7 @@ class AbstractSubject(object):
             QUIET = True
         name, firstNames = self.getName_FirstNames()
         anonName, anonIDt = self._checkAnonName(anonName, name, firstNames)
+        self.updateMetaFile({"Age": self.getAge()})
         if len(anonID) == 0:
             anonID = anonIDt
         self.logger.info(f'Begin anonymise in place. New name: "{anonName}", anonID: "{anonID}"')
@@ -947,10 +948,14 @@ class AbstractSubject(object):
         :return: years - float
         """
         dd = self.getMetaDict()
+        if "Age" in dd:
+            return float(dd["Age"])
         try:
             birth = dd["PatientBirthDate"]
             study = dd["StudyDate"]
-            return (spydcm.dcmTools.dbDateToDateTime(study) - spydcm.dcmTools.dbDateToDateTime(birth)).days / 365.0
+            age = (spydcm.dcmTools.dbDateToDateTime(study) - spydcm.dcmTools.dbDateToDateTime(birth)).days / 365.0
+            self.updateMetaFile({"Age": age})
+            return age
         except (KeyError, ValueError):
             # This may be case if pre-anonymisation has removed DOB but left PatientAge
             try:
