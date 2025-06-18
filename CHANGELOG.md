@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.22]
+### Fixed
+- Bug fix on conf class definition
+
 ## [0.1.21]
 ### Added
 - added age to meta file. Set at first request or upon anonymisation.

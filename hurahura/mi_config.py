@@ -59,7 +59,7 @@ class _MIResearch_config():
         #         raise ModuleNotFoundError(f"*** is {module_name} found in PYTHONPATH? ***") from e
         #     self.class_obj = getattr(module, class_name)
 
-        self.subject_class_name = self.config.get("app", "class_path", fallback=None) 
+        self.class_obj = self.config.get("app", "class_path", fallback=None) 
 
 
 
