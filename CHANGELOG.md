@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.22]
+## [0.1.23]
 ### Fixed
 - Bug fix on conf class definition
 
