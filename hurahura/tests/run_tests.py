@@ -447,6 +447,28 @@ class TestSubjectAnonName5(unittest.TestCase):
             shutil.rmtree(cls.tmpDir)
 
 
+class TestSubjectUseConfFile(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TEST_ROOT') # This is matched in conf file
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        MIResearch_config.runConfigParser(os.path.join(this_dir, 'testA.conf'))
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(P2, 
+                                                           dataRoot=cls.tmpDir, # Can't set this in conf file
+                                                           subjPrefix=MIResearch_config.subject_prefix, 
+                                                           QUIET=True)[0]
+
+    def test_newSubj(self):
+        self.assertTrue(os.path.isdir(os.path.join(self.newSubj.getTopDir(), "TEST")))
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        if (not DEBUG) or OVERRIDE:
+            shutil.rmtree(cls.tmpDir)
+
+
 # class TestMisc(unittest.TestCase):
 #     def test_DefaultRootDir(self):
 #         if DEBUG:

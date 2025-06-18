@@ -167,6 +167,8 @@ def checkArgs(args, class_obj=None):
         else:
             MIResearch_config.class_obj = class_obj
     if MIResearch_config.class_obj:
+        if isinstance(MIResearch_config.class_obj, str):
+            MIResearch_config.class_obj = mi_subject.get_configured_subject_class(MIResearch_config.class_obj)
         MISubjClass = MIResearch_config.class_obj
     args.MISubjClass = MISubjClass
     ## -------------
