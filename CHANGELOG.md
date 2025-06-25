@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.24]
+- Feature add - for watcher - if encounter error - move watched data to "Error" directory
+
 ## [0.1.23]
 ### Fixed
 - Bug fix on conf class definition

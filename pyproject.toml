@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hurahura"
-version = "0.1.23"
+version = "0.1.24"
 description = "Medical Imaginging Research structuring and automation"
 readme = "README.md"
 authors = [
@@ -26,7 +26,7 @@ dependencies = [
     "numpy",
     "watchdog",
     "nicegui",
-    "ngawari>=0.1.6",
+    "ngawari>=0.1.8",
 ]
 requires-python = ">=3.9.0"
 
