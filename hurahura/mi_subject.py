@@ -1066,7 +1066,9 @@ class AbstractSubject(object):
                                         check=True,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)
-                result = 0
+                if result.returncode != 0:
+                    self.logger.error(f"ERROR performing rsync to other dataRoot: {e.stderr.decode()}")
+                result = result.returncode    
             except subprocess.CalledProcessError as e:
                 self.logger.error(f"ERROR performing rsync to other dataRoot: {e.stderr.decode()}")
                 result = 1
