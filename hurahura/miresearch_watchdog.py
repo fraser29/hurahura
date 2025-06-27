@@ -46,7 +46,9 @@ class MIResearch_WatchDog(object):
         #
         self.processDir = os.path.join(self.directoryToWatch, 'MIResearch-PROCESSING')
         # self.completeDir = os.path.join(self.directoryToWatch, 'MIResearch-COMPLETE')
+        self.errorDir = os.path.join(self.directoryToWatch, 'MIResearch-ERROR')
         os.makedirs(self.processDir, exist_ok=True)
+        os.makedirs(self.errorDir, exist_ok=True)
         # os.makedirs(self.completeDir, exist_ok=True)
         # If storage dir not exist (but root directory does exist) then make
         if not os.path.isdir(self.dataStorageRoot): 
@@ -62,6 +64,7 @@ class MIResearch_WatchDog(object):
                                                             self.SubjClass,
                                                             self.DEBUG)
         self.event_handler.processDir = self.processDir
+        self.event_handler.errorDir = self.errorDir
         # self.event_handler.completeDir = self.completeDir
 
 
@@ -116,6 +119,8 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         self.pollDelay = 5 # seconds
         self.pollStable = max([MIResearch_config.stable_directory_age_sec, self.pollDelay+1])
         self.pollTimeOut = 10*self.pollStable
+        # NOTE:
+        # self.processDir and self.errorDir are set on the FileSystemEventHandler by the MIResearch_WatchDog class
 
     def on_moved(self, event):
         if event.is_directory:
@@ -239,9 +244,18 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
                                                 OTHER_DATA_DIR=directoryToLoad_process)
 
         except Exception as e:
+            self.logger.error(f"An error occurred while loading subject: {str(e)} ")
             if self.DEBUG:
                 raise e
-            self.logger.error(f"An error occurred while loading subject: {str(e)} ")
+            else:
+                # Move the directory to the error directory
+                finalCompleteDir = os.path.join(self.errorDir, os.path.split(directoryToLoad_process)[1])
+                if os.path.isdir(finalCompleteDir):
+                    self.logger.warning(f"{finalCompleteDir} exists - will delete before moving {directoryToLoad_process}")
+                    shutil.rmtree(finalCompleteDir)
+                shutil.move(directoryToLoad_process, self.errorDir)
+                self.logger.error(f"An error occurred while loading subject: {str(e)} data moved to {self.errorDir}")
+                return
         self.logger.info(f"   FINISHED LOADING {directoryToLoad_process} ===")
         try:
             shutil.rmtree(directoryToLoad_process)
@@ -252,11 +266,6 @@ class MIResearch_SubdirectoryHandler(FileSystemEventHandler):
         except Exception as e:
             self.logger.error(f"An error occurred while deleting {directoryToLoad_process}: {str(e)}")
 
-        # finalCompleteDir = os.path.join(self.completeDir, os.path.split(directoryToLoad_process)[1])
-        # if os.path.isdir(finalCompleteDir):
-        #     self.logger.warning(f"{finalCompleteDir} exists - will delete before moving {directoryToLoad_process}")
-        #     shutil.rmtree(finalCompleteDir)
-        # shutil.move(directoryToLoad_process, self.completeDir)
         self.logger.info(f"=== FINISHED PROCESSING {directoryToLoad_process} ===")
 
 
