@@ -12,10 +12,8 @@ from hurahura.miresearchui import miui_helpers
 from hurahura.miresearchui.local_directory_picker import local_file_picker
 from hurahura.miresearchui.subjectUI import subject_page
 from hurahura.miresearchui import miui_settings_page
+from hurahura.mi_config import MIResearch_config
 
-DEBUG = True
-
-hardcoded_presets = {}
 
 # ==========================================================================================
 
@@ -25,14 +23,13 @@ hardcoded_presets = {}
 # ==========================================================================================
 class MIResearchUI():
 
-    def __init__(self, dataRoot=None, port=8080) -> None:
-        self.DEBUG = DEBUG
-        self.dataRoot = dataRoot
+    def __init__(self, port=8080) -> None:
+        self.DEBUG = MIResearch_config.DEBUG
+        self.dataRoot = MIResearch_config.data_root_dir
         self.subjectList = []
         self.SubjClass = mi_subject.get_configured_subject_class()
+        self.subject_prefix = MIResearch_config.subject_prefix
         self.tableRows = []
-        self.presetDict = {}
-        self.setPresets(hardcoded_presets)
         self.port = port
         self.tableCols = [
             {'field': 'subjID', 'sortable': True, 'checkboxSelection': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
@@ -62,100 +59,71 @@ class MIResearchUI():
 
         miui_settings_page.initialize_settings_ui(self)
 
-    @property
-    def miui_conf_file(self):
-        miuiConfDir = os.path.expanduser('~/.config/miresearch')
-        miuiConfFile = os.path.join(miuiConfDir, 'miresearchui.conf')
-        if not os.path.isfile(miuiConfFile):
-            os.makedirs(miuiConfDir, exist_ok=True)
-            with open(miuiConfFile, 'w') as f:
-                f.write("")
-        return miuiConfFile
-
-
-    @property   
-    def miui_conf_file_contents(self):
-        return fIO.parseFileToTagsDictionary(self.miui_conf_file)
-
-
-    def _saveMIUI_ConfigFile(self, configFile):
-        if not isinstance(configFile, list):
-            configFile = [configFile]
-        confContents = self.miui_conf_file_contents
-        for iFile in configFile:
-            confName = os.path.splitext(os.path.basename(iFile))[0]
-            confContents[confName] = iFile
-        fIO.writeDictionaryToFile(self.miui_conf_file, confContents)
-
-
-    def setPresets(self, presetDict):
-        for iName in presetDict.keys():
-            if "conf_file" in presetDict[iName].keys():
-                iConfFile = presetDict[iName]['conf_file']
-                try:
-                    self.presetDict[iName] = miui_helpers.definePresetFromConfigfile(iConfFile)
-                except FileNotFoundError:
-                    print(f"Unable to find file {iConfFile}")
-                except ModuleNotFoundError as e:
-                    print(f"Error loading {iConfFile}")
-                    print(f"   {e}")
-            else:
-                self.presetDict[iName] = presetDict[iName]
-
-
-    async def chooseConfig(self) -> None:
-        try:
-            result = await local_file_picker('~', upper_limit=None, multiple=False)
-            if self.DEBUG:
-                print(f"Picked config file: {result}")
-            if (result is None) or (len(result) == 0):
-                return
-            configFile = result[0]
-            self._saveMIUI_ConfigFile(configFile)
-            self.setSubjectListFromConfigFile(configFile)
-        except Exception as e:
-            print(f"Error in directory picker: {e}")
-            ui.notify(f"Error selecting directory: {str(e)}", type='error')
-
     # ========================================================================================
     # SETUP AND RUN
     # ========================================================================================        
     def setUpAndRun(self):    
-        miui_conf_dict = self.miui_conf_file_contents
-        miui_conf_keys = list(miui_conf_dict.keys())
-        for iKey in miui_conf_keys:
-            self.presetDict[iKey] = miui_helpers.definePresetFromConfigfile(miui_conf_dict[iKey])
-            # try:
-            #     self.presetDict[iKey] = miui_helpers.definePresetFromConfigfile(miui_conf_dict[iKey])
-            # except FileNotFoundError:
-            #     print(f"Unable to find file {miui_conf_dict[iKey]}")
-            # except Exception as e:
-            #     print(f"Error loading {miui_conf_dict[iKey]}")
-        print(f"Have {len(self.presetDict)} preset(s)")
-        with ui.row().classes('w-full border'):
-            ui.button('Choose config file', on_click=self.chooseConfig, icon='folder')
-            for iProjName in self.presetDict.keys():
-                print(f"Setting up button for {iProjName}")
-                ui.button(iProjName, on_click=lambda proj=iProjName: self.setSubjectListFromConfigFile(proj))
-            ui.space()
-            ui.button('', on_click=self.updateTable, icon='refresh').classes('ml-auto')
-            ui.button('', on_click=self.show_settings_page, icon='settings').classes('ml-auto')
+        if self.DEBUG:
+            print(f"DEBUG: Starting setUpAndRun")
+        # Create a container for all UI elements
+        with ui.column().classes('w-full h-full') as main_container:
+            if self.DEBUG:
+                print(f"DEBUG: Created main container")
+            with ui.row().classes('w-full border'):
+                if self.DEBUG:
+                    print(f"DEBUG: Creating input row")
+                ui.input(label='Data Root', value=self.dataRoot, on_change=self.updateDataRoot)
+                ui.input(label='Subject Prefix', value=self.subject_prefix, on_change=self.updateSubjectPrefix)
+                ui.space()
+                ui.button('', on_click=self.refresh, icon='refresh').classes('ml-auto')
+                # ui.button('', on_click=self.show_settings_page, icon='settings').classes('ml-auto')
 
-        myhtml_column = miui_helpers.get_index_of_field_open(self.tableCols)
-        with ui.row().classes('w-full flex-grow border'):
-            self.aggrid = ui.aggrid({
-                        'columnDefs': self.tableCols,
-                        'rowData': self.tableRows,
-                        # 'rowSelection': 'multiple',
-                        'stopEditingWhenCellsLoseFocus': True,
-                        "pagination" : "true",
-                        'domLayout': 'autoHeight',
-                            }, 
-                            html_columns=[myhtml_column]).classes('w-full h-full')
-        with ui.row():
-            ui.button('Load subject', on_click=self.load_subject, icon='upload')
-            ui.button('Shutdown', on_click=app.shutdown, icon='power_settings_new')
-        ui.run(port=int(self.port))
+            myhtml_column = miui_helpers.get_index_of_field_open(self.tableCols)
+            if self.DEBUG:
+                print(f"DEBUG: Creating table row")
+            with ui.row().classes('w-full flex-grow border'):
+                self.aggrid = ui.aggrid({
+                            'columnDefs': self.tableCols,
+                            'rowData': self.tableRows,
+                            # 'rowSelection': 'multiple',
+                            'stopEditingWhenCellsLoseFocus': True,
+                            "pagination" : "true",
+                            'domLayout': 'autoHeight',
+                                }, 
+                                html_columns=[myhtml_column]).classes('w-full h-full')
+            if self.DEBUG:
+                print(f"DEBUG: Creating button row")
+            with ui.row():
+                ui.button('Load subject', on_click=self.load_subject, icon='upload')
+                ui.button('Shutdown', on_click=self.shutdown, icon='power_settings_new')
+        
+        if self.DEBUG:
+            print(f"DEBUG: Running UI on port {self.port}. Debug mode is {self.DEBUG}")
+        self.setSubjectList()
+        
+        if self.DEBUG:
+            print(f"DEBUG: setUpAndRun completed, returning main_container: {main_container}")
+        # Return the main container so it's displayed on the page
+        return main_container
+
+    
+    def updateDataRoot(self, e):
+        self.dataRoot = e.value
+    
+    def updateSubjectPrefix(self, e):
+        self.subject_prefix = e.value
+    
+    
+    def refresh(self):
+        print(f"DEBUG: Refreshing subject list for {self.dataRoot} with prefix {self.subject_prefix}")
+        if self.DEBUG:
+            print(f"DEBUG: Refreshing subject list for {self.dataRoot} with prefix {self.subject_prefix}")
+        self.setSubjectList()
+
+
+    def shutdown(self):
+        print(f"DEBUG: Shutting down UI")
+        app.shutdown()
 
     # ========================================================================================
     # SUBJECT LEVEL ACTIONS
@@ -204,36 +172,15 @@ class MIResearchUI():
     # ========================================================================================
     # SET SUBJECT LIST 
     # ========================================================================================    
-    def setSubjectListFromConfigFile(self, projectName):
-        """
-        Set the subject list from a config file (either selected or remembered)
-        """
+    def setSubjectList(self):
         if self.DEBUG:
-            print(f"Setting subject list from config file {projectName}")
-        if os.path.isfile(projectName):
-            iName = os.path.splitext(os.path.basename(projectName))[0]
-            self.presetDict[iName] = miui_helpers.definePresetFromConfigfile(projectName)
-            projectName = iName
-        if projectName not in self.presetDict.keys():
-            return
-        subjClass = mi_subject.get_configured_subject_class(self.presetDict[projectName].get("subject_class_name", None))
-        self.setSubjectListFromLocalDirectory(localDirectory=self.presetDict[projectName].get("data_root_dir", "None"), 
-                                              subject_prefix=self.presetDict[projectName].get("subject_prefix", None),  
-                                              SubjClass=subjClass)
-        
-
-    def setSubjectListFromLocalDirectory(self, localDirectory, subject_prefix=None, SubjClass=None):
-        if SubjClass is None:
-            SubjClass = mi_subject.get_configured_subject_class()
-        self.SubjClass = SubjClass
-        if os.path.isdir(localDirectory):
-            self.dataRoot = localDirectory
-            self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
-                                                                     subjectPrefix=subject_prefix,
-                                                                     SubjClass=self.SubjClass)
-            if self.DEBUG:
-                print(f"Have {len(self.subjectList)} subjects (should be {len(os.listdir(self.dataRoot))})")
-            self.updateTable()
+            print(f"Setting subject list for {self.dataRoot} with prefix {self.subject_prefix}")
+        self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
+                                                                    subjectPrefix=self.subject_prefix,
+                                                                    SubjClass=self.SubjClass)
+        if self.DEBUG:
+            print(f"Have {len(self.subjectList)} subjects (should be {len(os.listdir(self.dataRoot))})")
+        self.updateTable()
 
     # ========================================================================================
     # UPDATE TABLE
@@ -277,13 +224,44 @@ class MIResearchUI():
 
 # ==========================================================================================
 # ==========================================================================================
+# Global instance to hold the UI configuration
+_global_ui_runner = None
+
 class UIRunner():
     def __init__(self, port=8081):
         self.miui = MIResearchUI(port=port)
+        self.port = port
+        # Store this instance globally so the page methods can access it
+        global _global_ui_runner
+        _global_ui_runner = self
 
+    @staticmethod
     @ui.page('/miresearch')
-    def run(self):
-        self.miui.setUpAndRun()
+    def run():
+        print(f"DEBUG: Page /miresearch accessed")
+        global _global_ui_runner
+        if _global_ui_runner is None:
+            return ui.label("Error: UI not initialized")
+        
+        try:
+            # Set up the UI when this page is accessed and return the UI elements
+            result = _global_ui_runner.miui.setUpAndRun()
+            print(f"DEBUG: UI setup completed, returning: {result}")
+            return result
+        except Exception as e:
+            print(f"DEBUG: Error in UI setup: {e}")
+            import traceback
+            traceback.print_exc()
+            # Return a simple error message if setup fails
+            return ui.label(f"Error setting up UI: {e}")
+
+    @staticmethod
+    @ui.page('/')
+    def home():
+        print(f"DEBUG: Home page accessed, redirecting to miresearch")
+        # Redirect to the miresearch page
+        ui.navigate.to('/miresearch')
+        return ui.label("Redirecting to MIRESEARCH...")
 
 
 # ==========================================================================================
@@ -292,7 +270,8 @@ class UIRunner():
 def runMIUI(port=8081):
     # Create the UI instance
     miui = UIRunner(port=port)
-    miui.run()
+    # Start the NiceGUI server
+    ui.run(port=miui.port, show=True, reload=False)
 
 if __name__ in {"__main__", "__mp_main__"}:
     # app.on_shutdown(miui_helpers.cleanup)

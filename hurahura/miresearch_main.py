@@ -13,6 +13,8 @@ from hurahura import mi_subject
 from hurahura import miresearch_watchdog
 from hurahura.mi_config import MIResearch_config
 
+from hurahura.miresearchui import mainUI
+
 
 ### ====================================================================================================================
 #          ARGUEMTENT PARSING AND ACTIONS 
@@ -99,12 +101,12 @@ groupA.add_argument('-WatchDirectory', dest='WatchDirectory',
                     type=str, default=None)
 
 # UI STUFF
-# groupA.add_argument('-UI', dest='UI', 
-#                     help='Run in UI mode', 
-#                     action='store_true')
-# groupA.add_argument('-UI_port', dest='UI_port', 
-#                     help='Port to run UI on', 
-#                     type=int, default=8080)
+groupA.add_argument('-UI', dest='UI', 
+                    help='Run in UI mode', 
+                    action='store_true')
+groupA.add_argument('-UI_port', dest='UI_port', 
+                    help='Port to run UI on', 
+                    type=int, default=8080)
 
 ## === QUERY ===
 groupQ = ParentAP.add_argument_group('Query')
@@ -128,33 +130,27 @@ groupQ.add_argument('-qDate', dest='qDate',
 #           CHECK ARGS
 ### ====================================================================================================================
 
-def setNList(args):
-    if args.AllSubjs:
-        args.subjNList = mi_subject.getAllSubjectsN(args.dataRoot, args.subjPrefix)
-    else:
-        if len(args.subjRange) == 2:
-            args.subjNList = args.subjNList+list(range(args.subjRange[0], args.subjRange[1]))
-        if args.subjNListFile:
-            args.subjNList = args.subjNList+mi_utils.subjFileToSubjN(args.subjNListFile)
-    # args.subjNList = sorted(list(set(args.subjNList)))
-
 def checkArgs(args, class_obj=None):
+    if args.DEBUG: # Only override if explicitly set
+        MIResearch_config.DEBUG = True
     # 
     args.RUN_ANON = False
-    if args.configFile: MIResearch_config.runConfigParser(args.configFile)
+    if args.configFile: 
+        MIResearch_config.runConfigParser(args.configFile)
     #
     if args.dataRoot is not None:
-        args.dataRoot = os.path.abspath(args.dataRoot)
-    else:
-        args.dataRoot = MIResearch_config.data_root_dir
-    if args.subjPrefix is None:
-        args.subjPrefix = MIResearch_config.subject_prefix
-    if args.anonName is None:
+        MIResearch_config.data_root_dir = args.dataRoot
+    if args.subjPrefix is not None:
+        MIResearch_config.subject_prefix = args.subjPrefix
+    # NOTE: anon slightly different to other settings:
+    # - anon_level used in Config (NONE, SOFT, HARD)
+    # - but option to specify a specific anonName for each subject here (args.anonName)
+    if args.anonName is None: 
         args.anonName = MIResearch_config.anon_level
     else: 
         args.RUN_ANON = True
     if not args.QUIET:
-        print(f'Running MIRESEARCH with dataRoot {args.dataRoot}')
+        print(f'Running MIRESEARCH with dataRoot {MIResearch_config.data_root_dir}')
     if args.loadPath is not None:
         args.loadPath = os.path.abspath(args.loadPath)
     if args.LoadMultiForce:
@@ -177,6 +173,18 @@ def checkArgs(args, class_obj=None):
         sys.exit(1)
     setNList(args=args)
 
+
+def setNList(args):
+    if args.AllSubjs:
+        args.subjNList = mi_subject.getAllSubjectsN(MIResearch_config.data_root_dir, MIResearch_config.subject_prefix)
+    else:
+        if len(args.subjRange) == 2:
+            args.subjNList = args.subjNList+list(range(args.subjRange[0], args.subjRange[1]))
+        if args.subjNListFile:
+            args.subjNList = args.subjNList+mi_utils.subjFileToSubjN(args.subjNListFile)
+    # args.subjNList = sorted(list(set(args.subjNList)))
+
+
 ### ====================================================================================================================
 #           RUN ACTIONS
 ### ====================================================================================================================
@@ -189,8 +197,8 @@ def runActions(args, extra_runActions=None):
         if not args.QUIET:
             print(f'Running MIRESEARCH with loadPath {args.loadPath}')
         subjList = mi_subject.createNew_OrAddTo_Subject(loadDirectory=args.loadPath,
-                                             dataRoot=args.dataRoot,
-                                             subjPrefix=args.subjPrefix,
+                                             dataRoot=MIResearch_config.data_root_dir,
+                                             subjPrefix=MIResearch_config.subject_prefix,
                                              subjNumber=args.subjNList[0],
                                              anonName=args.anonName,
                                              LOAD_MULTI=args.LoadMulti,
@@ -202,7 +210,7 @@ def runActions(args, extra_runActions=None):
 
     # SPECIAL ACTION - BUILD EMPTY SUBJECT(S)
     elif args.build:
-        subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        subjList = mi_subject.SubjectList([args.MISubjClass(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
         for iSubj in subjList:
             if not iSubj.exists():
                 print(f"Building: {iSubj.subjID}...")
@@ -212,14 +220,14 @@ def runActions(args, extra_runActions=None):
     # ------------------------------------------------------------------------------------------------------------------------------
     # SUBJECT LEVEL actions
     if len(args.subjNList) > 0:
-        if args.DEBUG:
+        if MIResearch_config.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
-        subjList = mi_subject.SubjectList([args.MISubjClass(sn, args.dataRoot, args.subjPrefix, suffix=args.subjSuffix) for sn in args.subjNList])
-        subjList.reduceToExist(args.DEBUG)
+        subjList = mi_subject.SubjectList([args.MISubjClass(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        subjList.reduceToExist(MIResearch_config.DEBUG)
 
-        if args.DEBUG:
+        if MIResearch_config.DEBUG:
             for iSubj in subjList:
-                iSubj.setDEBUGMode(args.DEBUG)
+                iSubj.setDEBUGMode(MIResearch_config.DEBUG)
 
         if args.loadPathOther is not None:
             if len(subjList) == 1:
@@ -230,7 +238,7 @@ def runActions(args, extra_runActions=None):
         # --- QUERY ---
         if args.qSeriesDesc:
             for iSubj in subjList:
-                if args.DEBUG:
+                if MIResearch_config.DEBUG:
                     print(f"Searching: {iSubj.subjID}...")
                 res = iSubj.getSeriesNumbersMatchingDescriptionStr(args.qSeriesDesc)
                 if len(res) > 0:
@@ -283,7 +291,7 @@ def runActions(args, extra_runActions=None):
 
         elif args.subjInfoFull:
             for iSubj in subjList:
-                if args.DEBUG:
+                if MIResearch_config.DEBUG:
                     print(f"Info: {iSubj.subjID}...")
                 iSubj.infoFull()
                     
@@ -292,7 +300,7 @@ def runActions(args, extra_runActions=None):
         # --- SummaryCSV ---
         elif args.SummaryCSV is not None:
             if not args.QUIET:
-                print(f"Info: writting summary for {len(args.subjNList)} subjects at {args.dataRoot} to {args.SummaryCSV[0]}")
+                print(f"Info: writting summary for {len(args.subjNList)} subjects at {MIResearch_config.data_root_dir} to {args.SummaryCSV[0]}")
                 if len(args.SummaryCSV) > 1:
                     print(f"  With tags: {args.SummaryCSV[1:]}")
             subjList.writeSummaryCSV(args.SummaryCSV[0], extra_series_tags=args.SummaryCSV[1:])
@@ -300,24 +308,25 @@ def runActions(args, extra_runActions=None):
         # --- Summary ---
         elif args.Summary:
             if not args.QUIET:
-                print(f"Info: summary for {len(args.subjNList)} subjects at {args.dataRoot}")
+                print(f"Info: summary for {len(args.subjNList)} subjects at {MIResearch_config.data_root_dir}")
             print(subjList)
 
     ## WATCH DIRECTORY ##
     elif args.WatchDirectory is not None:
 
         MIWatcher = miresearch_watchdog.MIResearch_WatchDog(args.WatchDirectory,
-                                        args.dataRoot,
-                                        args.subjPrefix,
+                                        MIResearch_config.data_root_dir,
+                                        MIResearch_config.subject_prefix,
                                         SubjClass=args.MISubjClass,
-                                        DEBUG=args.DEBUG)
+                                        DEBUG=MIResearch_config.DEBUG)
         MIWatcher.run()
 
 
     ## UI ##
-    # elif args.UI:
-    #     miresearchui_path = os.path.join(os.path.dirname(__file__), 'miresearchui')
-    #     subprocess.Popen(['python', 'mainUI.py', str(args.UI_port)], cwd=miresearchui_path)
+    elif args.UI:
+        mainUI.runMIUI(port=args.UI_port)
+        # miresearchui_path = os.path.join(os.path.dirname(__file__), 'miresearchui')
+        # subprocess.Popen(['python', 'mainUI.py', str(args.UI_port)], cwd=miresearchui_path)
 
     if extra_runActions is not None:
         if type(extra_runActions) == list:

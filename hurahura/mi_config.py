@@ -34,8 +34,10 @@ class _MIResearch_config():
 
         self.DEBUG = self.config.getboolean("app", "debug", fallback=False)
         self._anon_level = self.config.get("app", "anon_level", fallback='NONE')
-        self._data_root_dir = self.config.get("app", "data_root_dir", fallback="")
-        self._subject_prefix = self.config.get("app", "subject_prefix", fallback="")
+        self._data_root_dir = ""
+        self.data_root_dir = self.config.get("app", "data_root_dir", fallback="")
+        self._subject_prefix = ""
+        self.subject_prefix = self.config.get("app", "subject_prefix", fallback="")
         self.stable_directory_age_sec = self.config.getint("app", "stable_directory_age_sec", fallback=60)
         self.default_pad_zeros = self.config.getint("app", "default_pad_zeros", fallback=6)
         self.directory_structure = json.loads(self.config.get("app", "directories"))
@@ -62,7 +64,6 @@ class _MIResearch_config():
         self.class_obj = self.config.get("app", "class_path", fallback=None) 
 
 
-
     @property
     def data_root_dir(self):
         """Function to return data root from configuration. 
@@ -73,6 +74,14 @@ class _MIResearch_config():
         if len(self._data_root_dir) == 0:
             raise ValueError(f"data_root_dir is not set in config file")
         return self._data_root_dir
+    
+
+    @data_root_dir.setter
+    def data_root_dir(self, value):
+        if value.startswith('~'):
+            value = os.path.expanduser(value)
+        self._data_root_dir = str(os.path.abspath(value))
+
 
     @property
     def subject_prefix(self):
@@ -85,11 +94,23 @@ class _MIResearch_config():
             return None
         return self._subject_prefix
 
+
+    @subject_prefix.setter
+    def subject_prefix(self, value):
+        self._subject_prefix = str(value)
+
+
     @property
     def anon_level(self):
         if (len(self._anon_level) == 0) or (self._anon_level == 'NONE'):
             return None
         return self._anon_level
+    
+    @anon_level.setter
+    def anon_level(self, value):
+        if value is None:
+            value = 'NONE'
+        self._anon_level = str(value)
 
     def printInfo(self):
         print(" ----- MIResearch Configuration INFO -----")
