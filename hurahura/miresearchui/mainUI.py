@@ -34,7 +34,7 @@ if MIResearch_config.DEBUG:
     console_handler.setLevel(logging.DEBUG)
 
 # Create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)s | %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 console_handler.setFormatter(formatter)
 
 # Add handler to logger
@@ -57,7 +57,7 @@ class MIResearchUI():
         self.tableRows = []
         self.port = port
         self.tableCols = [
-            {'field': 'subjID', 'sortable': True, 'checkboxSelection': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
+            {'field': 'subjID', 'sortable': True, 'checkboxSelection': True, 'multiSelect': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
             {'field': 'name', 'editable': True, 
                 'filter': 'agTextColumnFilter', 
                 'sortable': True, 
@@ -106,7 +106,7 @@ class MIResearchUI():
                 self.aggrid = ui.aggrid({
                             'columnDefs': self.tableCols,
                             'rowData': self.tableRows,
-                            # 'rowSelection': 'multiple',
+                            'rowSelection': 'multiple',
                             'stopEditingWhenCellsLoseFocus': True,
                             "pagination" : "true",
                             'domLayout': 'autoHeight',
@@ -115,6 +115,7 @@ class MIResearchUI():
             logger.debug("Creating button row")
             with ui.row():
                 ui.button('Load subject', on_click=self.load_subject, icon='upload')
+                ui.button('Delete selected', on_click=self.delete_selected, icon='delete')
                 ui.button('Shutdown', on_click=self.shutdown, icon='power_settings_new')
         
         logger.debug(f"Running UI on port {self.port}")
@@ -148,7 +149,8 @@ class MIResearchUI():
         logger.debug("Init loading subject")
         try:
             # Simple directory picker without timeout
-            result = await local_file_picker('~', upper_limit=None, multiple=False, DIR_ONLY=True)
+            picker = local_file_picker('~', upper_limit=None, multiple=False, DIR_ONLY=True)
+            result = await picker
             logger.debug(f"Result: {result}")
             
             if (result is None) or (len(result) == 0):
@@ -186,10 +188,59 @@ class MIResearchUI():
         except Exception as e:
             logger.error(f"Error in directory picker: {e}")
             ui.notify(f"Error loading subject: {str(e)}", type='error')
+        self.refresh()
         return True
     
+
+    async def delete_selected(self):
+        logger.info("Checking for selected subjects")
+        selected_rows = await self.aggrid.get_selected_rows()
+        subject_ids = [row.get('subjID', 'Unknown') for row in selected_rows]
+        logger.info(f"Selected rows: {subject_ids}")
+        
+        if not selected_rows:
+            ui.notify("No subjects selected for deletion", type='warning')
+            return
+            
+        # Ask for confirmation
+        count = len(selected_rows)
+        subject_list = ', '.join(subject_ids[:3])  # Show first 3, add "..." if more
+        if count > 3:
+            subject_list += f" and {count - 3} more"
+            
+        message = f"Are you sure you want to delete {count} selected subject(s)?\n\nSubjects: {subject_list}"
+        
+        with ui.dialog() as dialog, ui.card():
+            ui.label(message).classes('text-lg mb-4')
+            with ui.row().classes('w-full justify-end'):
+                ui.button('Cancel', on_click=dialog.close).props('outline')
+                ui.button('Delete', on_click=lambda: self._confirm_delete(subject_ids, dialog), 
+                         classes='bg-red-500 hover:bg-red-600 text-white')
+
+
+    def _confirm_delete(self, subject_ids, dialog):
+        """Handle the actual deletion after user confirmation"""
+        logger.info(f"User confirmed deletion of {len(subject_ids)} subjects")
+        dialog.close()
+        
+        try:
+            # TODO: Implement actual deletion logic here
+            # For now, just log what would be deleted
+            for iSubjectID in subject_ids:
+                logger.info(f"Would delete subject: {iSubjectID}")
+            
+            ui.notify(f"Deletion confirmed for {len(subject_ids)} subject(s)", type='positive')
+            
+            # TODO: Add actual deletion code here
+            # self._perform_deletion(selected_rows)
+            
+        except Exception as e:
+            logger.error(f"Error during deletion: {e}")
+            ui.notify(f"Error during deletion: {str(e)}", type='error')
+    
+    
     # ========================================================================================
-    # SET SUBJECT LIST 
+    # SET SUBJECT LIST
     # ========================================================================================    
     def setSubjectList(self):
         logger.info(f"Setting subject list for {self.dataRoot} with prefix {self.subject_prefix}")
@@ -219,7 +270,7 @@ class MIResearchUI():
                             'open': f"<a href={addr}>View {isubj.subjID}</a>"})
         self.aggrid.options['rowData'] = self.tableRows
         self.aggrid.update()
-        logger.debug(f'Done - {len(self.tableRows)}')
+        logger.debug(f'Done - update table - {len(self.tableRows)} rows')
 
 
     def clearTable(self):
