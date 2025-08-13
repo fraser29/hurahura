@@ -50,7 +50,7 @@ def TEST_specific_actions(args):
     if args.nothing: 
         # Here we build a list of subjects as we go
         for sn in args.subjNList:
-            iSubj = args.MISubjClass(sn, args.dataRoot, args.subjPrefix)
+            iSubj = MIResearch_config.class_obj(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix)
             if iSubj.exists():
                 iSubj.logger.info(f"Subject {iSubj.subjID} exists")
 

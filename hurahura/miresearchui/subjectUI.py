@@ -14,8 +14,8 @@ def subject_page(subjid: str, dataRoot: str, classPath: str):
 
 class SubjectPage:
     def __init__(self, subjid: str, dataRoot: str, classPath: str):
-        self.thisSubj = miui_helpers.subjID_dataRoot_classPathTo_SubjObj(subjid, dataRoot, classPath)
-        self.SubjClass = self.thisSubj.__class__
+        self.SubjClass = mi_subject.get_configured_subject_class(classPath)
+        self.thisSubj = self.SubjClass(subjid, dataRoot, classPath)
         
     def build_page(self):
         self._create_header()
@@ -61,8 +61,6 @@ class SubjectPage:
                 with ui.column().classes('flex-grow'):
                     params = list(inspect.signature(iMethod['method']).parameters.items())[1:]  # Skip 'self'
                     input_fields = []
-                    
-                    # Organize input fields in rows of 3
                     for i in range(0, len(params), 3):
                         with ui.row().classes('w-full gap-4'):
                             for param_name, param in params[i:i+3]:
@@ -70,10 +68,9 @@ class SubjectPage:
                                     default_value = param.default if param.default != inspect.Parameter.empty else ''
                                     input_field = ui.input(label=param_name, value=default_value)
                                     input_fields.append(input_field)
-                
-                # Button column aligned to the right
                 with ui.column().classes('ml-4'):
                     def handle_click(method=iMethod['method'], inputs=input_fields):
+                        ui.notify(f'Running {iMethod["name"]}...', type='info')
                         try:
                             args = [inp.value for inp in inputs]
                             method(self.thisSubj, *args)

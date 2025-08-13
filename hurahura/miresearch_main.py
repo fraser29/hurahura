@@ -131,9 +131,7 @@ groupQ.add_argument('-qDate', dest='qDate',
 
 def checkArgs(args, class_obj=None):
     if args.DEBUG: # Only override if explicitly set
-        print(f"A- MIRESEARCH_DEBUG: {MIResearch_config.DEBUG}")
         MIResearch_config.DEBUG = True
-        print(f"B- MIRESEARCH_DEBUG: {MIResearch_config.DEBUG}")
     # 
     args.RUN_ANON = False
     if args.configFile: 
@@ -157,17 +155,15 @@ def checkArgs(args, class_obj=None):
     if args.LoadMultiForce:
         args.LoadMulti = True
     
-    MISubjClass = mi_subject.AbstractSubject
     if class_obj is not None:
         if isinstance(class_obj, str):
             class_obj = mi_subject.get_configured_subject_class(class_obj)
-        else:
-            MIResearch_config.class_obj = class_obj
+        MIResearch_config.class_obj = class_obj
     if MIResearch_config.class_obj:
         if isinstance(MIResearch_config.class_obj, str):
             MIResearch_config.class_obj = mi_subject.get_configured_subject_class(MIResearch_config.class_obj)
-        MISubjClass = MIResearch_config.class_obj
-    args.MISubjClass = MISubjClass
+    else:
+        MIResearch_config.class_obj = mi_subject.AbstractSubject
     ## -------------
     if args.INFO:
         MIResearch_config.printInfo()
@@ -203,7 +199,7 @@ def runActions(args, extra_runActions=None):
                                              subjNumber=args.subjNList[0],
                                              anonName=args.anonName,
                                              LOAD_MULTI=args.LoadMulti,
-                                             SubjClass=args.MISubjClass,
+                                             SubjClass=MIResearch_config.class_obj,
                                              IGNORE_UIDS=args.LoadMultiForce,
                                              OTHER_DATA_DIR=args.loadPathOther,
                                              QUIET=args.QUIET)
@@ -211,7 +207,7 @@ def runActions(args, extra_runActions=None):
 
     # SPECIAL ACTION - BUILD EMPTY SUBJECT(S)
     elif args.build:
-        subjList = mi_subject.SubjectList([args.MISubjClass(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
         for iSubj in subjList:
             if not iSubj.exists():
                 print(f"Building: {iSubj.subjID}...")
@@ -223,7 +219,7 @@ def runActions(args, extra_runActions=None):
     if len(args.subjNList) > 0:
         if MIResearch_config.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
-        subjList = mi_subject.SubjectList([args.MISubjClass(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
         subjList.reduceToExist(MIResearch_config.DEBUG)
 
         if MIResearch_config.DEBUG:
@@ -318,7 +314,7 @@ def runActions(args, extra_runActions=None):
         MIWatcher = miresearch_watchdog.MIResearch_WatchDog(args.WatchDirectory,
                                         MIResearch_config.data_root_dir,
                                         MIResearch_config.subject_prefix,
-                                        SubjClass=args.MISubjClass,
+                                        SubjClass=MIResearch_config.class_obj,
                                         DEBUG=MIResearch_config.DEBUG)
         MIWatcher.run()
 

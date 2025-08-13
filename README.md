@@ -36,7 +36,7 @@ This package may be easily adapted and expanded upon for a high level control ov
 This is the basic parent class containing fundamental methods for organisation and management. See  [hurahura docs](https://fraser29.github.io/hurahura/) for advanced usage, epsecially via inheritance and polymorphism. 
 
 
-# Configuration
+## Configuration
 
 hurahura uses a miresearch.conf file for configuration. 
 
@@ -54,44 +54,20 @@ For information on files found and variables used run:
 
 `hurahura -INFO` 
 
-## systemctl 
+## File system watcher
 
-Running mi_watcher via systemctl is an attractive application: 
-
-### Ubuntu instructions:
-
-- Build a .service file in /etc/systemd/system:
-
-```ini
-[Unit]
-Description=My mi_watcher Service
-After=network.target
-
-[Service]
-Type=simple
-ExecStart=/path/to/script
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-```
-
-- Build /path/to/script: 
+hurahura can watch a directory for new subjects and load them into the system. This works nicely with [AUTORTHANC](https://github.com/fraser29/autorthanc)
 
 ```bash
-#!/bin/bash
-source /myvenv/bin/activate
-hurahura -WatchDirectory /path/to/watch_directory -config /path/to/my_proj.conf
+hurahura -WatchDirectory /path/to/watch_directory
 ```
 
-- Reload systemd
-- enable service
-- start service
-  
+## UI
+
+hurahura can be run with a UI for easy management of subjects and data. 
+
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable myservice.service
-sudo systemctl start myservice.service
+hurahura -UI
 ```
 
 # Documentation

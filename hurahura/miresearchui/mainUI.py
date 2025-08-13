@@ -3,6 +3,7 @@
 import os
 import sys
 import logging
+import shutil
 from urllib.parse import quote
 from nicegui import ui, app
 from ngawari import fIO
@@ -52,7 +53,7 @@ class MIResearchUI():
     def __init__(self, port=8080) -> None:
         self.dataRoot = MIResearch_config.data_root_dir
         self.subjectList = []
-        self.SubjClass = mi_subject.get_configured_subject_class()
+        self.SubjClass = MIResearch_config.class_obj
         self.subject_prefix = MIResearch_config.subject_prefix
         self.tableRows = []
         self.port = port
@@ -74,7 +75,7 @@ class MIResearchUI():
                 'browserDatePicker': True,
             }},
             {'field': 'StudyID', 'sortable': True, 'filter': 'agNumberColumnFilter', 'filterParams': {'filterOptions': ['equals', 'notEqual', 'lessThan', 'lessThanOrEqual', 'greaterThan', 'greaterThanOrEqual', 'inRange']}},
-            {'field': 'age', 'sortable': True, 'filter': 'agNumberColumnFilter', 'filterParams': {'filterOptions': ['inRange', 'lessThan', 'greaterThan',]}},
+            {'field': 'age', 'sortable': True, 'filter': 'agNumberColumnFilter', 'filterParams': {'filterOptions': ['inRange', 'lessThan', 'greaterThan',]}, 'valueFormatter': 'value.toFixed(2)'},
             {'field': 'status', 'sortable': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
             
             {'field': 'open'} # 
@@ -91,9 +92,7 @@ class MIResearchUI():
         logger.debug("Starting setUpAndRun")
         # Create a container for all UI elements
         with ui.column().classes('w-full h-full') as main_container:
-            logger.debug("Created main container")
             with ui.row().classes('w-full border'):
-                logger.debug("Creating input row")
                 ui.input(label='Data Root', value=self.dataRoot, on_change=self.updateDataRoot).classes('min-w-[32rem]')
                 ui.input(label='Subject Prefix', value=self.subject_prefix, on_change=self.updateSubjectPrefix)
                 ui.space()
@@ -101,7 +100,6 @@ class MIResearchUI():
                 # ui.button('', on_click=self.show_settings_page, icon='settings').classes('ml-auto')
 
             myhtml_column = miui_helpers.get_index_of_field_open(self.tableCols)
-            logger.debug("Creating table row")
             with ui.row().classes('w-full flex-grow border'):
                 self.aggrid = ui.aggrid({
                             'columnDefs': self.tableCols,
@@ -117,6 +115,14 @@ class MIResearchUI():
                 ui.button('Load subject', on_click=self.load_subject, icon='upload')
                 ui.button('Delete selected', on_click=self.delete_selected, icon='delete')
                 ui.button('Shutdown', on_click=self.shutdown, icon='power_settings_new')
+            
+            # Footer
+            with ui.row().classes('w-full bg-gray-100 border-t p-4 mt-8'):
+                with ui.column().classes('w-full text-center'):
+                    ui.label('hurahura - Medical Imaging Research Platform').classes('text-sm text-gray-600')
+                    with ui.row().classes('w-full justify-center mt-2'):
+                        ui.link('Documentation', 'https://fraser29.github.io/hurahura/').classes('text-xs text-blue-600 hover:text-blue-800 mx-2')
+                        ui.link('GitHub', 'https://github.com/fraser29/hurahura').classes('text-xs text-blue-600 hover:text-blue-800 mx-2')
         
         logger.debug(f"Running UI on port {self.port}")
         self.setSubjectList()
@@ -176,6 +182,7 @@ class MIResearchUI():
                     await asyncio.to_thread(mi_subject.createNew_OrAddTo_Subject, choosenDir, self.dataRoot, self.SubjClass)
                     loading_notification.dismiss()
                     ui.notify(f"Loaded subject {self.SubjClass.subjID}", type='positive')
+                    self.refresh()
                     
                 except Exception as e:
                     loading_notification.dismiss()
@@ -188,7 +195,6 @@ class MIResearchUI():
         except Exception as e:
             logger.error(f"Error in directory picker: {e}")
             ui.notify(f"Error loading subject: {str(e)}", type='error')
-        self.refresh()
         return True
     
 
@@ -209,31 +215,31 @@ class MIResearchUI():
             subject_list += f" and {count - 3} more"
             
         message = f"Are you sure you want to delete {count} selected subject(s)?\n\nSubjects: {subject_list}"
+        logger.debug(f"Run confirm dialog:")
         
-        with ui.dialog() as dialog, ui.card():
+        # Create and show the confirmation dialog
+        dialog = ui.dialog()
+        with dialog, ui.card():
             ui.label(message).classes('text-lg mb-4')
             with ui.row().classes('w-full justify-end'):
                 ui.button('Cancel', on_click=dialog.close).props('outline')
-                ui.button('Delete', on_click=lambda: self._confirm_delete(subject_ids, dialog), 
-                         classes='bg-red-500 hover:bg-red-600 text-white')
+                ui.button('Delete', on_click=lambda: self._confirm_delete(subject_ids, dialog)).classes('bg-red-500 hover:bg-red-600 text-white')
+        
+        # Open the dialog
+        dialog.open()
 
 
     def _confirm_delete(self, subject_ids, dialog):
         """Handle the actual deletion after user confirmation"""
         logger.info(f"User confirmed deletion of {len(subject_ids)} subjects")
         dialog.close()
-        
         try:
-            # TODO: Implement actual deletion logic here
-            # For now, just log what would be deleted
             for iSubjectID in subject_ids:
-                logger.info(f"Would delete subject: {iSubjectID}")
-            
+                logger.info(f"Deleting subject: {iSubjectID}")
+                shutil.rmtree(os.path.join(self.dataRoot, iSubjectID))
             ui.notify(f"Deletion confirmed for {len(subject_ids)} subject(s)", type='positive')
-            
-            # TODO: Add actual deletion code here
-            # self._perform_deletion(selected_rows)
-            
+            logger.debug(f"Run confirm dialog: done")
+            self.refresh()
         except Exception as e:
             logger.error(f"Error during deletion: {e}")
             ui.notify(f"Error during deletion: {str(e)}", type='error')
@@ -243,7 +249,7 @@ class MIResearchUI():
     # SET SUBJECT LIST
     # ========================================================================================    
     def setSubjectList(self):
-        logger.info(f"Setting subject list for {self.dataRoot} with prefix {self.subject_prefix}")
+        logger.info(f"Setting subject list for {self.dataRoot} with prefix {self.subject_prefix}. Class: {self.SubjClass}")
         self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
                                                                     subjectPrefix=self.subject_prefix,
                                                                     SubjClass=self.SubjClass)
@@ -301,7 +307,7 @@ class UIRunner():
         _global_ui_runner = self
 
     @staticmethod
-    @ui.page('/miresearch')
+    @ui.page('/miresearch', title='hurahura - Medical Imaging Research')
     def run():
         logger.debug("Page /miresearch accessed")
         global _global_ui_runner
@@ -337,7 +343,10 @@ def runMIUI(port=8081):
     # Create the UI instance
     miui = UIRunner(port=port)
     # Start the NiceGUI server
-    ui.run(port=miui.port, show=True, reload=False)
+    try:
+        ui.run(port=miui.port, show=True, reload=False, favicon='🩻', title='hurahura')
+    except KeyboardInterrupt:
+        logger.info("MIUI shutdown requested by user")
 
 if __name__ in {"__main__", "__mp_main__"}:
     # app.on_shutdown(miui_helpers.cleanup)
