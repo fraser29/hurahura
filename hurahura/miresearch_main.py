@@ -13,7 +13,6 @@ from hurahura import mi_subject
 from hurahura import miresearch_watchdog
 from hurahura.mi_config import MIResearch_config
 
-from hurahura.miresearchui import mainUI
 
 
 ### ====================================================================================================================
@@ -132,7 +131,9 @@ groupQ.add_argument('-qDate', dest='qDate',
 
 def checkArgs(args, class_obj=None):
     if args.DEBUG: # Only override if explicitly set
+        print(f"A- MIRESEARCH_DEBUG: {MIResearch_config.DEBUG}")
         MIResearch_config.DEBUG = True
+        print(f"B- MIRESEARCH_DEBUG: {MIResearch_config.DEBUG}")
     # 
     args.RUN_ANON = False
     if args.configFile: 
@@ -324,9 +325,9 @@ def runActions(args, extra_runActions=None):
 
     ## UI ##
     elif args.UI:
+        from hurahura.miresearchui import mainUI
         mainUI.runMIUI(port=args.UI_port)
-        # miresearchui_path = os.path.join(os.path.dirname(__file__), 'miresearchui')
-        # subprocess.Popen(['python', 'mainUI.py', str(args.UI_port)], cwd=miresearchui_path)
+
 
     if extra_runActions is not None:
         if type(extra_runActions) == list:

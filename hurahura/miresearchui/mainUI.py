@@ -2,6 +2,7 @@
 
 import os
 import sys
+import logging
 from urllib.parse import quote
 from nicegui import ui, app
 from ngawari import fIO
@@ -14,6 +15,31 @@ from hurahura.miresearchui.subjectUI import subject_page
 from hurahura.miresearchui import miui_settings_page
 from hurahura.mi_config import MIResearch_config
 
+print(f"=== Starting mainUI.py === DEBUG: {MIResearch_config.DEBUG}")  
+
+# Set up logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+if MIResearch_config.DEBUG:
+    logger.setLevel(logging.DEBUG)
+
+# Remove all existing handlers first
+for handler in logger.handlers[:]:
+    logger.removeHandler(handler)
+
+# Create console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+if MIResearch_config.DEBUG:
+    console_handler.setLevel(logging.DEBUG)
+
+# Create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+
+# Add handler to logger
+logger.addHandler(console_handler)
+
 
 # ==========================================================================================
 
@@ -24,7 +50,6 @@ from hurahura.mi_config import MIResearch_config
 class MIResearchUI():
 
     def __init__(self, port=8080) -> None:
-        self.DEBUG = MIResearch_config.DEBUG
         self.dataRoot = MIResearch_config.data_root_dir
         self.subjectList = []
         self.SubjClass = mi_subject.get_configured_subject_class()
@@ -50,7 +75,7 @@ class MIResearchUI():
             }},
             {'field': 'StudyID', 'sortable': True, 'filter': 'agNumberColumnFilter', 'filterParams': {'filterOptions': ['equals', 'notEqual', 'lessThan', 'lessThanOrEqual', 'greaterThan', 'greaterThanOrEqual', 'inRange']}},
             {'field': 'age', 'sortable': True, 'filter': 'agNumberColumnFilter', 'filterParams': {'filterOptions': ['inRange', 'lessThan', 'greaterThan',]}},
-            {'field': 'levelCompleted', 'sortable': True, 'filter': 'agNumberColumnFilter', 'filterParams': {'filterOptions': ['lessThan', 'greaterThan',]}},
+            {'field': 'status', 'sortable': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
             
             {'field': 'open'} # 
         ]
@@ -63,24 +88,20 @@ class MIResearchUI():
     # SETUP AND RUN
     # ========================================================================================        
     def setUpAndRun(self):    
-        if self.DEBUG:
-            print(f"DEBUG: Starting setUpAndRun")
+        logger.debug("Starting setUpAndRun")
         # Create a container for all UI elements
         with ui.column().classes('w-full h-full') as main_container:
-            if self.DEBUG:
-                print(f"DEBUG: Created main container")
+            logger.debug("Created main container")
             with ui.row().classes('w-full border'):
-                if self.DEBUG:
-                    print(f"DEBUG: Creating input row")
-                ui.input(label='Data Root', value=self.dataRoot, on_change=self.updateDataRoot)
+                logger.debug("Creating input row")
+                ui.input(label='Data Root', value=self.dataRoot, on_change=self.updateDataRoot).classes('min-w-[32rem]')
                 ui.input(label='Subject Prefix', value=self.subject_prefix, on_change=self.updateSubjectPrefix)
                 ui.space()
                 ui.button('', on_click=self.refresh, icon='refresh').classes('ml-auto')
                 # ui.button('', on_click=self.show_settings_page, icon='settings').classes('ml-auto')
 
             myhtml_column = miui_helpers.get_index_of_field_open(self.tableCols)
-            if self.DEBUG:
-                print(f"DEBUG: Creating table row")
+            logger.debug("Creating table row")
             with ui.row().classes('w-full flex-grow border'):
                 self.aggrid = ui.aggrid({
                             'columnDefs': self.tableCols,
@@ -91,18 +112,15 @@ class MIResearchUI():
                             'domLayout': 'autoHeight',
                                 }, 
                                 html_columns=[myhtml_column]).classes('w-full h-full')
-            if self.DEBUG:
-                print(f"DEBUG: Creating button row")
+            logger.debug("Creating button row")
             with ui.row():
                 ui.button('Load subject', on_click=self.load_subject, icon='upload')
                 ui.button('Shutdown', on_click=self.shutdown, icon='power_settings_new')
         
-        if self.DEBUG:
-            print(f"DEBUG: Running UI on port {self.port}. Debug mode is {self.DEBUG}")
+        logger.debug(f"Running UI on port {self.port}")
         self.setSubjectList()
         
-        if self.DEBUG:
-            print(f"DEBUG: setUpAndRun completed, returning main_container: {main_container}")
+        logger.debug(f"setUpAndRun completed, returning main_container")
         # Return the main container so it's displayed on the page
         return main_container
 
@@ -115,28 +133,30 @@ class MIResearchUI():
     
     
     def refresh(self):
-        print(f"DEBUG: Refreshing subject list for {self.dataRoot} with prefix {self.subject_prefix}")
-        if self.DEBUG:
-            print(f"DEBUG: Refreshing subject list for {self.dataRoot} with prefix {self.subject_prefix}")
+        logger.info(f"Refreshing subject list for {self.dataRoot} with prefix {self.subject_prefix}")
         self.setSubjectList()
 
 
     def shutdown(self):
-        print(f"DEBUG: Shutting down UI")
+        logger.info("Shutting down UI")
         app.shutdown()
 
     # ========================================================================================
     # SUBJECT LEVEL ACTIONS
     # ========================================================================================      
     async def load_subject(self) -> None:
+        logger.debug("Init loading subject")
         try:
             # Simple directory picker without timeout
             result = await local_file_picker('~', upper_limit=None, multiple=False, DIR_ONLY=True)
+            logger.debug(f"Result: {result}")
             
             if (result is None) or (len(result) == 0):
+                logger.debug("No directory chosen")
                 return
             
             choosenDir = result[0]
+            logger.info(f"Directory chosen: {choosenDir}")
             
             # Create loading notification
             loading_notification = ui.notification(
@@ -150,6 +170,7 @@ class MIResearchUI():
             # Run the long operation in background
             async def background_load():
                 try:
+                    logger.info(f"Loading subject from {choosenDir} to {self.dataRoot}")
                     await asyncio.to_thread(mi_subject.createNew_OrAddTo_Subject, choosenDir, self.dataRoot, self.SubjClass)
                     loading_notification.dismiss()
                     ui.notify(f"Loaded subject {self.SubjClass.subjID}", type='positive')
@@ -157,15 +178,13 @@ class MIResearchUI():
                 except Exception as e:
                     loading_notification.dismiss()
                     ui.notify(f"Error loading subject: {str(e)}", type='error')
-                    if self.DEBUG:
-                        print(f"Error loading subject: {e}")
+                    logger.error(f"Error loading subject: {e}")
             
             # Start background task
             ui.timer(0, lambda: background_load(), once=True)
             
         except Exception as e:
-            if self.DEBUG:
-                print(f"Error in directory picker: {e}")
+            logger.error(f"Error in directory picker: {e}")
             ui.notify(f"Error loading subject: {str(e)}", type='error')
         return True
     
@@ -173,13 +192,11 @@ class MIResearchUI():
     # SET SUBJECT LIST 
     # ========================================================================================    
     def setSubjectList(self):
-        if self.DEBUG:
-            print(f"Setting subject list for {self.dataRoot} with prefix {self.subject_prefix}")
+        logger.info(f"Setting subject list for {self.dataRoot} with prefix {self.subject_prefix}")
         self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
                                                                     subjectPrefix=self.subject_prefix,
                                                                     SubjClass=self.SubjClass)
-        if self.DEBUG:
-            print(f"Have {len(self.subjectList)} subjects (should be {len(os.listdir(self.dataRoot))})")
+        logger.info(f"Have {len(self.subjectList)} subjects ({len(os.listdir(self.dataRoot))} possible sub-directories)")
         self.updateTable()
 
     # ========================================================================================
@@ -187,9 +204,7 @@ class MIResearchUI():
     # ========================================================================================  
     def updateTable(self):
         self.clearTable()
-        if self.DEBUG:
-            print(self.aggrid.options['rowData'])
-            print(f"Have {len(self.subjectList)} subjects - building table")
+        logger.info(f"Have {len(self.subjectList)} subjects - building table")
         c0 = 0
         for isubj in self.subjectList:
             c0 += 1
@@ -200,12 +215,11 @@ class MIResearchUI():
                             'DOS': isubj.getStudyDate(),  
                             'StudyID': isubj.getStudyID(),
                             'age': isubj.getAge(), 
-                            'levelCompleted': isubj.getLevelCompleted(),
+                            'status': isubj.getStatus(),
                             'open': f"<a href={addr}>View {isubj.subjID}</a>"})
         self.aggrid.options['rowData'] = self.tableRows
         self.aggrid.update()
-        if self.DEBUG:
-            print(f'Done - {len(self.tableRows)}')
+        logger.debug(f'Done - {len(self.tableRows)}')
 
 
     def clearTable(self):
@@ -238,18 +252,19 @@ class UIRunner():
     @staticmethod
     @ui.page('/miresearch')
     def run():
-        print(f"DEBUG: Page /miresearch accessed")
+        logger.debug("Page /miresearch accessed")
         global _global_ui_runner
         if _global_ui_runner is None:
+            logger.error("UI not initialized")
             return ui.label("Error: UI not initialized")
         
         try:
             # Set up the UI when this page is accessed and return the UI elements
             result = _global_ui_runner.miui.setUpAndRun()
-            print(f"DEBUG: UI setup completed, returning: {result}")
+            logger.debug(f"UI setup completed")
             return result
         except Exception as e:
-            print(f"DEBUG: Error in UI setup: {e}")
+            logger.error(f"Error in UI setup: {e}")
             import traceback
             traceback.print_exc()
             # Return a simple error message if setup fails
@@ -258,7 +273,7 @@ class UIRunner():
     @staticmethod
     @ui.page('/')
     def home():
-        print(f"DEBUG: Home page accessed, redirecting to miresearch")
+        logger.debug("Home page accessed, redirecting to miresearch")
         # Redirect to the miresearch page
         ui.navigate.to('/miresearch')
         return ui.label("Redirecting to MIRESEARCH...")
@@ -279,5 +294,6 @@ if __name__ in {"__main__", "__mp_main__"}:
         port = int(sys.argv[1]) 
     else:
         port = 8081
+    logger.info(f"Starting MIRESEARCH UI on port {port}")
     runMIUI(port=port)
 

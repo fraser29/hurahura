@@ -411,6 +411,11 @@ class AbstractSubject(object):
     def getLevelCompleted(self):
         # this is an abstract method for implementation by subclasses
         return 0.0
+    
+
+    def getStatus(self):
+        # this is an abstract method for implementation by subclasses
+        return 'Unknown'
 
         
     ### FOLDERS / FILES ------------------------------------------------------------------------------------------------
