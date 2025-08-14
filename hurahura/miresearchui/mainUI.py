@@ -50,6 +50,9 @@ logger.addHandler(console_handler)
 # ==========================================================================================
 class MIResearchUI():
 
+    # Constants
+    ROWS_PER_PAGE = 20
+
     def __init__(self, port=8080) -> None:
         self.dataRoot = MIResearch_config.data_root_dir
         self.subjectList = []
@@ -57,6 +60,16 @@ class MIResearchUI():
         self.subject_prefix = MIResearch_config.subject_prefix
         self.tableRows = []
         self.port = port
+        # Add pagination cache
+        self.pageCache = {}  # Cache for loaded pages
+        self.currentPage = 1
+        self.pageSize = self.ROWS_PER_PAGE
+        self.totalSubjects = 0
+        
+        # Store references to UI elements for updates
+        self.page_info_label = None
+        self.page_count_label = None
+        
         self.tableCols = [
             {'field': 'subjID', 'sortable': True, 'checkboxSelection': True, 'multiSelect': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
             {'field': 'name', 
@@ -90,6 +103,7 @@ class MIResearchUI():
     # ========================================================================================        
     def setUpAndRun(self):    
         logger.debug("Starting setUpAndRun")
+        
         # Create a container for all UI elements
         with ui.column().classes('w-full h-full') as main_container:
             with ui.row().classes('w-full border'):
@@ -103,47 +117,12 @@ class MIResearchUI():
             with ui.row().classes('w-full flex-grow border'):
                 self.aggrid = ui.aggrid({
                             'columnDefs': self.tableCols,
-                            'rowData': self.tableRows,
+                            'rowData': [],  # Start with empty data
                             'rowSelection': 'multiple',
                             'stopEditingWhenCellsLoseFocus': True,
-                            "pagination" : "true",
-                            'paginationPageSize': 20,
-                            'cacheBlockSize': 20,
-                            'maxBlocksInCache': 1, 
-                            'domLayout': 'autoHeight',
+                            'domLayout': 'autoHeight'
                                 }, 
                                 html_columns=[myhtml_column]).classes('w-full h-full')
-                
-                # self.aggrid = ui.aggrid({
-                #             'columnDefs': self.tableCols,
-                #             'rowData': self.tableRows,
-                #             'rowSelection': 'multiple',
-                #             'stopEditingWhenCellsLoseFocus': True,
-                #             "pagination" : "true",
-                #             'paginationPageSize': 20,
-                #             'rowModelType': 'infinite',
-                #             'cacheBlockSize': 20,
-                #             'maxBlocksInCache': 1, 
-                #             'domLayout': 'autoHeight',
-                #             'onGridReady': {
-                #                 'function': '''
-                #                 params => {
-                #                     rowCount: null, 
-                #                     const dataSource = {
-                #                         getRows: async function(params2) {
-                #                             const pageSize = params.api.paginationGetPageSize();
-                #                             const currentPage = params.api.paginationGetCurrentPage() + 1;
-                #                             const resp = await fetch(`/data?page=${currentPage}&page_size=${pageSize}`);
-                #                             const json = await resp.json();
-                #                             params2.successCallback(json.rows, json.total);
-                #                         }
-                #                     };
-                #                     params.api.setDatasource(dataSource);
-                #                 }
-                #                 '''
-                #             }
-                #                 }, 
-                #                 html_columns=[myhtml_column]).classes('w-full h-full')
                 
 
             logger.debug("Creating button row")
@@ -151,6 +130,19 @@ class MIResearchUI():
                 ui.button('Load subject', on_click=self.load_subject, icon='upload')
                 ui.button('Delete selected', on_click=self.delete_selected, icon='delete')
                 ui.button('Shutdown', on_click=self.shutdown, icon='power_settings_new')
+                
+                # Add page navigation info
+                with ui.row().classes('w-full justify-center mt-2'):
+                    self.page_info_label = ui.label(f'Page {self.currentPage} of {(self.totalSubjects + self.pageSize - 1) // self.pageSize}').classes('text-sm text-gray-600')
+                    self.page_count_label = ui.label(f'({self.totalSubjects} total subjects, {self.pageSize} per page)').classes('text-xs text-gray-500 ml-2')
+                
+                # Add page navigation controls
+                with ui.row().classes('w-full justify-center mt-2'):
+                    ui.button('First', on_click=self.first_page, icon='first_page').classes('mx-1')
+                    ui.button('Previous', on_click=self.prev_page, icon='navigate_before').classes('mx-1')
+                    ui.input(label='Go to page', value=str(self.currentPage), on_change=self.go_to_page).classes('w-20 mx-2')
+                    ui.button('Next', on_click=self.next_page, icon='navigate_next').classes('mx-1')
+                    ui.button('Last', on_click=self.last_page, icon='last_page').classes('mx-1')
             
             # Footer
             with ui.row().classes('w-full bg-gray-100 border-t p-4 mt-8'):
@@ -160,14 +152,23 @@ class MIResearchUI():
                         ui.link('Documentation', 'https://fraser29.github.io/hurahura/').classes('text-xs text-blue-600 hover:text-blue-800 mx-2')
                         ui.link('GitHub', 'https://github.com/fraser29/hurahura').classes('text-xs text-blue-600 hover:text-blue-800 mx-2')
         
-        logger.debug(f"Running UI on port {self.port}")
+        logger.debug(f"setUpAndRun completed, returning main_container")
+        
+        # Load initial data immediately
         self.setSubjectList()
         
-        logger.debug(f"setUpAndRun completed, returning main_container")
+        # Ensure page display is updated after initial load
+        self.update_page_display()
+        
         # Return the main container so it's displayed on the page
         return main_container
 
-    
+    def addPageChangeHandler(self):
+        """Add JavaScript handler for page changes"""
+        # No longer needed since we're not using aggrid pagination
+        pass
+
+    # ========================================================================================
     def updateDataRoot(self, e):
         self.dataRoot = e.value
     
@@ -177,7 +178,11 @@ class MIResearchUI():
     
     def refresh(self):
         logger.info(f"Refreshing subject list for {self.dataRoot} with prefix {self.subject_prefix}")
+        # Clear cache and reload
+        self.pageCache.clear()
+        self.currentPage = 1
         self.setSubjectList()
+        self.update_page_display()
 
 
     def shutdown(self):
@@ -286,60 +291,147 @@ class MIResearchUI():
     # ========================================================================================    
     def setSubjectList(self):
         logger.info(f"Setting subject list for {self.dataRoot} with prefix {self.subject_prefix}. Class: {self.SubjClass}")
+        # Only get the directory listing, don't load all subjects
         self.subjectList = mi_subject.SubjectList.setByDirectory(self.dataRoot, 
                                                                     subjectPrefix=self.subject_prefix,
                                                                     SubjClass=self.SubjClass)
-        logger.info(f"Have {len(self.subjectList)} subjects ({len(os.listdir(self.dataRoot))} possible sub-directories)")
+        self.totalSubjects = len(self.subjectList)
+        logger.info(f"Found {self.totalSubjects} subjects ({len(os.listdir(self.dataRoot))} possible sub-directories)")
+        
+        # Debug: show what we found
+        if self.totalSubjects == 0:
+            logger.warning("No subjects found!")
+        
+        # Load first page
+        self.loadPage(1)
+        self.updateTable()
+        self.update_page_display()
+
+    def updatePaginationInfo(self):
+        """Update the pagination information in the grid"""
+        # No longer needed since we're not using aggrid pagination
+        pass
+
+    def loadPage(self, page_num):
+        """Load a specific page of data, with caching"""
+        if page_num in self.pageCache:
+            logger.debug(f"Page {page_num} found in cache")
+            return self.pageCache[page_num]
+        
+        logger.info(f"Loading page {page_num} from disk (subjects {((page_num - 1) * self.pageSize) + 1}-{min(page_num * self.pageSize, self.totalSubjects)})")
+        
+        # Check if we have any subjects
+        if not self.subjectList:
+            logger.warning("No subjects available to load")
+            self.pageCache[page_num] = []
+            return []
+        
+        start_idx = (page_num - 1) * self.pageSize
+        end_idx = start_idx + self.pageSize
+        
+        # Get subjects for this page
+        page_subjects = self.subjectList[start_idx:end_idx]
+        page_data = []
+        
+        for isubj in page_subjects:
+            meta = isubj.getMetaDict()
+            classPath = self.SubjClass.__module__ + '.' + self.SubjClass.__name__
+            addr = f"subject_page/{isubj.subjID}?dataRoot={quote(self.dataRoot)}&classPath={quote(classPath)}"
+            page_data.append({
+                'subjID': isubj.subjID, 
+                'name': meta.get('NAME', 'Unknown'),
+                'DOS': meta.get('StudyDate', 'Unknown'),
+                'StudyID': meta.get('StudyID', 'Unknown'),
+                'age': meta.get('Age', 'Unknown'),
+                'status': isubj.getStatus(),
+                'open': f"<a href={addr}>View {isubj.subjID}</a>"
+            })
+        
+        # Cache this page
+        self.pageCache[page_num] = page_data
+        logger.debug(f"Cached page {page_num} with {len(page_data)} rows")
+        
+        # Keep cache size manageable (keep current page + adjacent pages)
+        self._cleanupCache(page_num)
+        
+        # Update pagination info if this is the first page
+        if page_num == 1:
+            self.updatePaginationInfo()
+        
+        return page_data
+
+    def getPaginationStats(self):
+        """Get current pagination statistics for debugging"""
+        total_pages = (self.totalSubjects + self.pageSize - 1) // self.pageSize
+        cached_pages = list(self.pageCache.keys())
+        return {
+            'total_subjects': self.totalSubjects,
+            'total_pages': total_pages,
+            'current_page': self.currentPage,
+            'page_size': self.pageSize,
+            'cached_pages': cached_pages,
+            'cache_size': len(self.pageCache)
+        }
+
+    def _cleanupCache(self, current_page):
+        """Keep only current page and adjacent pages in cache"""
+        pages_to_keep = {current_page, current_page - 1, current_page + 1}
+        pages_to_remove = [p for p in self.pageCache.keys() if p not in pages_to_keep]
+        
+        for page in pages_to_remove:
+            if page > 0:  # Don't remove page 0
+                del self.pageCache[page]
+                logger.debug(f"Removed page {page} from cache")
+
+    def onPageChanged(self, new_page):
+        """Handle page changes from the grid"""
+        logger.info(f"Page changed to {new_page}")
+        self.currentPage = new_page
+        
+        # Load the new page if not in cache
+        if new_page not in self.pageCache:
+            self.loadPage(new_page)
+        
+        # Update the table
         self.updateTable()
 
     # ========================================================================================
     # UPDATE TABLE
     # ======================================================================================== 
-    @app.get('/data')
-    def getData(self, request):
-        page = int(request.query_params.get('page', 1))
-        page_size = int(request.query_params.get('page_size', 20))
-        start = (page - 1) * page_size
-        end = start + page_size
-        for isubj in self.subjectList[start:end]:
-            classPath = self.SubjClass.__module__ + '.' + self.SubjClass.__name__
-            addr = f"subject_page/{isubj.subjID}?dataRoot={quote(self.dataRoot)}&classPath={quote(classPath)}"
-            self.tableRows.append({'subjID': isubj.subjID, 
-                            'name': isubj.getName(), 
-                            'DOS': isubj.getStudyDate(),  
-                            'StudyID': isubj.getStudyID(),
-                            'age': isubj.getAge(), 
-                            'status': isubj.getStatus(),
-                            'open': f"<a href={addr}>View {isubj.subjID}</a>"})
-        logger.info(f"Set tableRows size {len(self.tableRows)}")
-        return {'rows': self.tableRows, 'total': len(self.subjectList)}
-
-    # 
-    #  
     def updateTable(self):
-        self.clearTable()
-        logger.info(f"Have {len(self.subjectList)} subjects - building table")
-        for isubj in self.subjectList[:100]:
-            meta = isubj.getMetaDict()
-            classPath = self.SubjClass.__module__ + '.' + self.SubjClass.__name__
-            addr = f"subject_page/{isubj.subjID}?dataRoot={quote(self.dataRoot)}&classPath={quote(classPath)}"
-            self.tableRows.append({'subjID': isubj.subjID, 
-                            'name': meta.get('NAME', 'Unknown'), # isubj.getName(), 
-                            'DOS': meta.get('StudyDate', 'Unknown'), # isubj.getStudyDate(),  
-                            'StudyID': meta.get('StudyID', 'Unknown'), # isubj.getStudyID(),
-                            'age': meta.get('Age', 'Unknown'), # isubj.getAge(), 
-                            'status': isubj.getStatus(),
-                            'open': f"<a href={addr}>View {isubj.subjID}</a>"})
-        self.aggrid.options['rowData'] = self.tableRows
+        """Update table with current page data"""
+        # If no page cache exists yet, load the first page
+        if not self.pageCache:
+            self.loadPage(1)
+        
+        current_page_data = self.pageCache.get(self.currentPage, [])
+        if not current_page_data:
+            logger.warning(f"No data found for page {self.currentPage}")
+            return
+            
+        # Update the grid with the current page data
+        logger.info(f"Updating table with {len(current_page_data)} rows for page {self.currentPage}")
+        
+        # Use the proper aggrid update method
+        self.aggrid.options['rowData'] = current_page_data
         self.aggrid.update()
-        logger.debug(f'Done - update table - {len(self.tableRows)} rows')
+        
+        logger.debug(f'Updated table with {len(current_page_data)} rows from page {self.currentPage}')
+        
+        # If still no data, show a fallback message
+        if not current_page_data and self.totalSubjects > 0:
+            logger.warning("No data displayed despite having subjects. Adding fallback data.")
+            # Add some fallback data to see if the grid is working
+            fallback_data = [{'subjID': 'DEBUG', 'name': 'Debug Mode', 'DOS': 'N/A', 'StudyID': 'N/A', 'age': 'N/A', 'status': 'Debug', 'open': 'Debug Link'}]
+            self.aggrid.options['rowData'] = fallback_data
+            self.aggrid.update()
+            logger.info("Added fallback debug data to verify grid functionality")
 
 
     def clearTable(self):
-        # self.subjectList = []
-        tRowCopy = self.tableRows.copy()
-        for i in tRowCopy:
-            self.tableRows.remove(i)
+        self.tableRows = []
+        self.pageCache.clear()
+        self.currentPage = 1
         self.aggrid.update()
 
     # ========================================================================================
@@ -348,7 +440,100 @@ class MIResearchUI():
     def show_settings_page(self):
         ui.navigate.to('/miui_settings')
 
+    def show_pagination_stats(self):
+        stats = self.getPaginationStats()
+        ui.notify(f"Pagination Stats:\nTotal Subjects: {stats['total_subjects']}\nTotal Pages: {stats['total_pages']}\nCurrent Page: {stats['current_page']}\nPage Size: {stats['page_size']}\nCached Pages: {stats['cached_pages']}\nCache Size: {stats['cache_size']}", type='info')
 
+    def test_page_navigation(self):
+        """Debug method to test page navigation"""
+        if self.totalSubjects > self.pageSize:
+            # Try to go to page 2
+            self.currentPage = 2
+            self.loadPage(2)
+            self.updateTable()
+            ui.notify(f"Navigated to page 2, loaded {len(self.pageCache.get(2, []))} rows", type='info')
+        else:
+            ui.notify("Not enough subjects to test pagination", type='warning')
+
+    def check_pagination_status(self):
+        """Check and display pagination status"""
+        total_pages = (self.totalSubjects + self.pageSize - 1) // self.pageSize
+        current_page_data = self.pageCache.get(self.currentPage, [])
+        
+        status_msg = f"""
+        Pagination Status:
+        - Total Subjects: {self.totalSubjects}
+        - Page Size: {self.pageSize}
+        - Total Pages: {total_pages}
+        - Current Page: {self.currentPage}
+        - Current Page Rows: {len(current_page_data)}
+        - Cached Pages: {list(self.pageCache.keys())}
+        """
+        
+        ui.notify(status_msg, type='info', timeout=10)
+        logger.info(f"Pagination status: {total_pages} pages, current page {self.currentPage} has {len(current_page_data)} rows")
+
+
+    def next_page(self):
+        """Navigate to the next page"""
+        total_pages = (self.totalSubjects + self.pageSize - 1) // self.pageSize
+        if self.currentPage < total_pages:
+            self.currentPage += 1
+            self.loadPage(self.currentPage)
+            self.updateTable()
+            self.update_page_display()
+
+    def prev_page(self):
+        """Navigate to the previous page"""
+        if self.currentPage > 1:
+            self.currentPage -= 1
+            self.loadPage(self.currentPage)
+            self.updateTable()
+            self.update_page_display()
+
+    def first_page(self):
+        """Navigate to the first page"""
+        if self.currentPage > 1:
+            self.currentPage = 1
+            self.loadPage(1)
+            self.updateTable()
+            self.update_page_display()
+
+    def last_page(self):
+        """Navigate to the last page"""
+        total_pages = (self.totalSubjects + self.pageSize - 1) // self.pageSize
+        if self.currentPage < total_pages:
+            self.currentPage = total_pages
+            self.loadPage(total_pages)
+            self.updateTable()
+            self.update_page_display()
+
+    def go_to_page(self, e):
+        """Navigate to the page number entered in the input field"""
+        try:
+            page_num = int(e.value)
+            if page_num < 1:
+                page_num = 1
+            elif page_num > (self.totalSubjects + self.pageSize - 1) // self.pageSize:
+                page_num = (self.totalSubjects + self.pageSize - 1) // self.pageSize
+            
+            if page_num != self.currentPage:
+                self.currentPage = page_num
+                self.loadPage(page_num)
+                self.updateTable()
+                self.update_page_display()
+        except ValueError:
+            pass
+
+    def update_page_display(self):
+        """Update the page info display labels"""
+        if self.page_info_label and self.page_count_label:
+            total_pages = (self.totalSubjects + self.pageSize - 1) // self.pageSize
+            self.page_info_label.text = f'Page {self.currentPage} of {total_pages}'
+            self.page_count_label.text = f'({self.totalSubjects} total subjects, {self.pageSize} per page)'
+            logger.debug(f"Updated page display: Page {self.currentPage} of {total_pages}")
+
+    # ========================================================================================
 # ==========================================================================================
 # ==========================================================================================
 # Global instance to hold the UI configuration

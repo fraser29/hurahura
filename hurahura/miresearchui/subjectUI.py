@@ -147,6 +147,8 @@ class SubjectPage:
             {'name': 'level', 'label': 'Level', 'field': 'level', 'sortable': True, 'align': 'center'},
             {'name': 'message', 'label': 'Message', 'field': 'message', 'align': 'left'},
         ]
+        if not os.path.exists(self.thisSubj.logfileName):
+            self.thisSubj.logger.info(f"Init log file")
         with open(self.thisSubj.logfileName, 'r') as fid:
             logLines = fid.readlines()
         rowsL = []
