@@ -57,53 +57,60 @@ groupS.add_argument('-anonName', dest='anonName',
                     type=str, default=None)
     
 ## === ACTIONS ===
-groupA = ParentAP.add_argument_group('Actions')
-groupA.add_argument('-Build', dest='build', 
+groupLoad = ParentAP.add_argument_group('Loading Actions')
+groupLoad.add_argument('-Build', dest='build', 
                     help='Build empty subject(s)', 
                     action='store_true')
 # LOADING
-groupA.add_argument('-Load', dest='loadPath', 
+groupLoad.add_argument('-Load', dest='loadPath', 
                     help='Path to load data from (file / directory / tar / tar.gz / zip)', 
                     type=str, default=None)
-groupA.add_argument('-LoadOther', dest='loadPathOther', 
+groupLoad.add_argument('-LoadOther', dest='loadPathOther', 
                     help='Path to load other data from directory (non-DICOM)', 
                     type=str, default=None)
-groupA.add_argument('-LOAD_MULTI', dest='LoadMulti', 
+groupLoad.add_argument('-LOAD_MULTI', dest='LoadMulti', 
                     help='Combine with "Load": Load new subject for each subdirectory under loadPath', 
                     action='store_true')
-groupA.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
+groupLoad.add_argument('-LOAD_MULTI_FORCE', dest='LoadMultiForce', 
                     help='Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory', 
                     action='store_true')
 
 # SUBJECT LEVEL
-groupA.add_argument('-RunPost', dest='subjRunPost', 
+groupSubj = ParentAP.add_argument_group('Subject Level Actions')
+groupSubj.add_argument('-RunPost', dest='subjRunPost', 
                     help='Run post load pipeline', 
                     action='store_true')
-groupA.add_argument('-SubjInfo', dest='subjInfo', 
+groupSubj.add_argument('-Meta', dest='subjRunMeta', 
+                    help='Build subject meta (use FORCE to rebuild)', 
+                    action='store_true')
+groupSubj.add_argument('-SubjInfo', dest='subjInfo', 
                     help='Print info for each subject', 
                     action='store_true')
-groupA.add_argument('-SubjInfoFull', dest='subjInfoFull', 
+groupSubj.add_argument('-SubjInfoFull', dest='subjInfoFull', 
                     help='Print full info for each subject', 
                     action='store_true')
 
 # GROUP ACTIONS
-groupA.add_argument('-SummaryCSV', dest='SummaryCSV', 
+groupGroup = ParentAP.add_argument_group('Group Level Actions')
+groupGroup.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
                     type=str, nargs="*", default=None)
-groupA.add_argument('-Summary', dest='Summary', 
+groupGroup.add_argument('-Summary', dest='Summary', 
                     help='Print summary of provided subjects to commandline (best with -sA option)', 
                     action='store_true')
 
 # WATCH DIRECTORY
-groupA.add_argument('-WatchDirectory', dest='WatchDirectory', 
+groupWatch = ParentAP.add_argument_group('Watch Directory Actions')
+groupWatch.add_argument('-WatchDirectory', dest='WatchDirectory', 
                     help='Will watch given directory for new data and load as new study', 
                     type=str, default=None)
 
 # UI STUFF
-groupA.add_argument('-UI', dest='UI', 
+groupUI = ParentAP.add_argument_group('UI Actions')
+groupUI.add_argument('-UI', dest='UI', 
                     help='Run in UI mode', 
                     action='store_true')
-groupA.add_argument('-UI_port', dest='UI_port', 
+groupUI.add_argument('-UI_port', dest='UI_port', 
                     help='Port to run UI on', 
                     type=int, default=8080)
 
@@ -275,6 +282,14 @@ def runActions(args, extra_runActions=None):
                 if not args.QUIET:
                     print(f"Post load pipeline: {iSubj.subjID}...")
                 iSubj.runPostLoadPipeLine()
+
+        # --- META DATA PIPELINE ---
+        elif args.subjRunMeta:
+            for iSubj in subjList:
+                if not args.QUIET:
+                    print(f"Meta pipeline: {iSubj.subjID}...")
+                iSubj.buildDicomMeta()
+                iSubj.buildSeriesDataMetaCSV(FORCE=args.FORCE)
 
         # --- PRINT INFO ---
         elif args.subjInfo:

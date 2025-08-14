@@ -59,7 +59,7 @@ class MIResearchUI():
         self.port = port
         self.tableCols = [
             {'field': 'subjID', 'sortable': True, 'checkboxSelection': True, 'multiSelect': True, 'filter': 'agTextColumnFilter', 'filterParams': {'filterOptions': ['contains', 'notContains']}},
-            {'field': 'name', 'editable': True, 
+            {'field': 'name', 
                 'filter': 'agTextColumnFilter', 
                 'sortable': True, 
                 'filterParams': {'filterOptions': ['contains', 'notContains', 'startsWith']}},
@@ -107,9 +107,45 @@ class MIResearchUI():
                             'rowSelection': 'multiple',
                             'stopEditingWhenCellsLoseFocus': True,
                             "pagination" : "true",
+                            'paginationPageSize': 20,
+                            'cacheBlockSize': 20,
+                            'maxBlocksInCache': 1, 
                             'domLayout': 'autoHeight',
                                 }, 
                                 html_columns=[myhtml_column]).classes('w-full h-full')
+                
+                # self.aggrid = ui.aggrid({
+                #             'columnDefs': self.tableCols,
+                #             'rowData': self.tableRows,
+                #             'rowSelection': 'multiple',
+                #             'stopEditingWhenCellsLoseFocus': True,
+                #             "pagination" : "true",
+                #             'paginationPageSize': 20,
+                #             'rowModelType': 'infinite',
+                #             'cacheBlockSize': 20,
+                #             'maxBlocksInCache': 1, 
+                #             'domLayout': 'autoHeight',
+                #             'onGridReady': {
+                #                 'function': '''
+                #                 params => {
+                #                     rowCount: null, 
+                #                     const dataSource = {
+                #                         getRows: async function(params2) {
+                #                             const pageSize = params.api.paginationGetPageSize();
+                #                             const currentPage = params.api.paginationGetCurrentPage() + 1;
+                #                             const resp = await fetch(`/data?page=${currentPage}&page_size=${pageSize}`);
+                #                             const json = await resp.json();
+                #                             params2.successCallback(json.rows, json.total);
+                #                         }
+                #                     };
+                #                     params.api.setDatasource(dataSource);
+                #                 }
+                #                 '''
+                #             }
+                #                 }, 
+                #                 html_columns=[myhtml_column]).classes('w-full h-full')
+                
+
             logger.debug("Creating button row")
             with ui.row():
                 ui.button('Load subject', on_click=self.load_subject, icon='upload')
@@ -258,13 +294,14 @@ class MIResearchUI():
 
     # ========================================================================================
     # UPDATE TABLE
-    # ========================================================================================  
-    def updateTable(self):
-        self.clearTable()
-        logger.info(f"Have {len(self.subjectList)} subjects - building table")
-        c0 = 0
-        for isubj in self.subjectList:
-            c0 += 1
+    # ======================================================================================== 
+    @app.get('/data')
+    def getData(self, request):
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))
+        start = (page - 1) * page_size
+        end = start + page_size
+        for isubj in self.subjectList[start:end]:
             classPath = self.SubjClass.__module__ + '.' + self.SubjClass.__name__
             addr = f"subject_page/{isubj.subjID}?dataRoot={quote(self.dataRoot)}&classPath={quote(classPath)}"
             self.tableRows.append({'subjID': isubj.subjID, 
@@ -272,6 +309,25 @@ class MIResearchUI():
                             'DOS': isubj.getStudyDate(),  
                             'StudyID': isubj.getStudyID(),
                             'age': isubj.getAge(), 
+                            'status': isubj.getStatus(),
+                            'open': f"<a href={addr}>View {isubj.subjID}</a>"})
+        logger.info(f"Set tableRows size {len(self.tableRows)}")
+        return {'rows': self.tableRows, 'total': len(self.subjectList)}
+
+    # 
+    #  
+    def updateTable(self):
+        self.clearTable()
+        logger.info(f"Have {len(self.subjectList)} subjects - building table")
+        for isubj in self.subjectList[:100]:
+            meta = isubj.getMetaDict()
+            classPath = self.SubjClass.__module__ + '.' + self.SubjClass.__name__
+            addr = f"subject_page/{isubj.subjID}?dataRoot={quote(self.dataRoot)}&classPath={quote(classPath)}"
+            self.tableRows.append({'subjID': isubj.subjID, 
+                            'name': meta.get('NAME', 'Unknown'), # isubj.getName(), 
+                            'DOS': meta.get('StudyDate', 'Unknown'), # isubj.getStudyDate(),  
+                            'StudyID': meta.get('StudyID', 'Unknown'), # isubj.getStudyID(),
+                            'age': meta.get('Age', 'Unknown'), # isubj.getAge(), 
                             'status': isubj.getStatus(),
                             'open': f"<a href={addr}>View {isubj.subjID}</a>"})
         self.aggrid.options['rowData'] = self.tableRows
