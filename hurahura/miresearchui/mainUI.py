@@ -13,7 +13,7 @@ from hurahura import mi_subject
 from hurahura.miresearchui import miui_helpers
 from hurahura.miresearchui.local_directory_picker import local_file_picker
 from hurahura.miresearchui.subjectUI import subject_page
-from hurahura.miresearchui import miui_settings_page
+# from hurahura.miresearchui import miui_settings_page
 from hurahura.mi_config import MIResearch_config
 
 print(f"=== Starting mainUI.py === DEBUG: {MIResearch_config.DEBUG}")  
@@ -96,7 +96,6 @@ class MIResearchUI():
         self.aggrid = None
         self.page = None  # Add this to store the page reference
 
-        miui_settings_page.initialize_settings_ui(self)
 
     # ========================================================================================
     # SETUP AND RUN
@@ -111,7 +110,6 @@ class MIResearchUI():
                 ui.input(label='Subject Prefix', value=self.subject_prefix, on_change=self.updateSubjectPrefix)
                 ui.space()
                 ui.button('', on_click=self.refresh, icon='refresh').classes('ml-auto')
-                # ui.button('', on_click=self.show_settings_page, icon='settings').classes('ml-auto')
 
             myhtml_column = miui_helpers.get_index_of_field_open(self.tableCols)
             with ui.row().classes('w-full flex-grow border'):
@@ -140,7 +138,7 @@ class MIResearchUI():
                 with ui.row().classes('w-full justify-center mt-2'):
                     ui.button('First', on_click=self.first_page, icon='first_page').classes('mx-1')
                     ui.button('Previous', on_click=self.prev_page, icon='navigate_before').classes('mx-1')
-                    ui.input(label='Go to page', value=str(self.currentPage), on_change=self.go_to_page).classes('w-20 mx-2')
+                    self.page_goto_input = ui.input(label='Go to page', value=str(self.currentPage), on_change=self.go_to_page).classes('w-20 mx-2')
                     ui.button('Next', on_click=self.next_page, icon='navigate_next').classes('mx-1')
                     ui.button('Last', on_click=self.last_page, icon='last_page').classes('mx-1')
             
@@ -307,10 +305,6 @@ class MIResearchUI():
         self.updateTable()
         self.update_page_display()
 
-    def updatePaginationInfo(self):
-        """Update the pagination information in the grid"""
-        # No longer needed since we're not using aggrid pagination
-        pass
 
     def loadPage(self, page_num):
         """Load a specific page of data, with caching"""
@@ -350,14 +344,8 @@ class MIResearchUI():
         # Cache this page
         self.pageCache[page_num] = page_data
         logger.debug(f"Cached page {page_num} with {len(page_data)} rows")
-        
         # Keep cache size manageable (keep current page + adjacent pages)
         self._cleanupCache(page_num)
-        
-        # Update pagination info if this is the first page
-        if page_num == 1:
-            self.updatePaginationInfo()
-        
         return page_data
 
     def getPaginationStats(self):
@@ -412,7 +400,7 @@ class MIResearchUI():
         # Update the grid with the current page data
         logger.info(f"Updating table with {len(current_page_data)} rows for page {self.currentPage}")
         
-        # Use the proper aggrid update method
+        # Use the proper aggrid update method - modify options and call update()
         self.aggrid.options['rowData'] = current_page_data
         self.aggrid.update()
         
@@ -432,46 +420,8 @@ class MIResearchUI():
         self.tableRows = []
         self.pageCache.clear()
         self.currentPage = 1
+        self.aggrid.options['rowData'] = []
         self.aggrid.update()
-
-    # ========================================================================================
-    # SETTINGS PAGE
-    # ========================================================================================      
-    def show_settings_page(self):
-        ui.navigate.to('/miui_settings')
-
-    def show_pagination_stats(self):
-        stats = self.getPaginationStats()
-        ui.notify(f"Pagination Stats:\nTotal Subjects: {stats['total_subjects']}\nTotal Pages: {stats['total_pages']}\nCurrent Page: {stats['current_page']}\nPage Size: {stats['page_size']}\nCached Pages: {stats['cached_pages']}\nCache Size: {stats['cache_size']}", type='info')
-
-    def test_page_navigation(self):
-        """Debug method to test page navigation"""
-        if self.totalSubjects > self.pageSize:
-            # Try to go to page 2
-            self.currentPage = 2
-            self.loadPage(2)
-            self.updateTable()
-            ui.notify(f"Navigated to page 2, loaded {len(self.pageCache.get(2, []))} rows", type='info')
-        else:
-            ui.notify("Not enough subjects to test pagination", type='warning')
-
-    def check_pagination_status(self):
-        """Check and display pagination status"""
-        total_pages = (self.totalSubjects + self.pageSize - 1) // self.pageSize
-        current_page_data = self.pageCache.get(self.currentPage, [])
-        
-        status_msg = f"""
-        Pagination Status:
-        - Total Subjects: {self.totalSubjects}
-        - Page Size: {self.pageSize}
-        - Total Pages: {total_pages}
-        - Current Page: {self.currentPage}
-        - Current Page Rows: {len(current_page_data)}
-        - Cached Pages: {list(self.pageCache.keys())}
-        """
-        
-        ui.notify(status_msg, type='info', timeout=10)
-        logger.info(f"Pagination status: {total_pages} pages, current page {self.currentPage} has {len(current_page_data)} rows")
 
 
     def next_page(self):
@@ -527,9 +477,10 @@ class MIResearchUI():
 
     def update_page_display(self):
         """Update the page info display labels"""
-        if self.page_info_label and self.page_count_label:
+        if self.page_info_label and self.page_count_label and self.page_goto_input:
             total_pages = (self.totalSubjects + self.pageSize - 1) // self.pageSize
             self.page_info_label.text = f'Page {self.currentPage} of {total_pages}'
+            self.page_goto_input.value = str(self.currentPage)
             self.page_count_label.text = f'({self.totalSubjects} total subjects, {self.pageSize} per page)'
             logger.debug(f"Updated page display: Page {self.currentPage} of {total_pages}")
 
