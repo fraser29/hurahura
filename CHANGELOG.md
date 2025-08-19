@@ -2,8 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.26]
+- Feature add - UI dynamic loading of subject for current page. 
+
 ## [0.1.25]
-- Feature add - UI active - for web based user interface. #FIXME: _WORKING_
+- Feature add - UI active - for web based user interface.
 
 ## [0.1.24]
 - Feature add - for watcher - if encounter error - move watched data to "Error" directory
