@@ -156,11 +156,13 @@ class AbstractSubject(object):
         self.dicomMetaTagListStudy = mi_utils.DEFAULT_DICOM_META_TAG_LIST_STUDY
         self.dicomMetaTagListSeries = mi_utils.DEFAULT_DICOM_META_TAG_LIST_SERIES
         self.QUIET = False
-        self.DEBUG = False
+        self.DEBUG = mi_utils.MIResearch_config
         #
         #
         self._logger = None
         self._loggerFH = None
+        # 
+        self.meta_cache = {}
 
 
     ### ----------------------------------------------------------------------------------------------------------------
@@ -240,7 +242,10 @@ class AbstractSubject(object):
         if self._logger is None:
             rr = os.path.split(self.dataRoot)[1]
             self._logger = logging.getLogger(f"{rr}/{self.subjID}")
-            self._logger.setLevel(logging.INFO)
+            if self.DEBUG:
+                self._logger.setLevel(logging.DEBUG)    
+            else:
+                self._logger.setLevel(logging.INFO)
             self._logger.propagate = False  # Set propagate to False by default
             
             # Remove any existing handlers
@@ -330,6 +335,7 @@ class AbstractSubject(object):
             for handler in self.logger.handlers[:]:
                 self.logger.removeHandler(handler)
                 handler.close()
+            self._logger = None
         except IOError:
             pass # If does not exist. 
 
@@ -631,8 +637,16 @@ class AbstractSubject(object):
         return self.getMetaTagValue(tagName, ifNotFound, metaSuffix)
 
 
+    def _cacheMeta(self, suffix):
+        ff = self.getMetaTagsFile(suffix)
+        dd = {}
+        if os.path.isfile(ff):
+            dd = fIO.parseJsonToDictionary(ff)
+        self.meta_cache[suffix] = dd
+
+
     def getMetaDict(self, suffix=""):
-        """Get meta json file as dictionary
+        """Get meta json file as dictionary. Will check if cached. 
 
         Args:
             suffix (str, optional): Suffix of json file. Defaults to "".
@@ -640,11 +654,9 @@ class AbstractSubject(object):
         Returns:
             dict: Meta json file 
         """
-        ff = self.getMetaTagsFile(suffix)
-        dd = {}
-        if os.path.isfile(ff):
-            dd = fIO.parseJsonToDictionary(ff)
-        return dd
+        if suffix not in self.meta_cache.keys():
+            self._cacheMeta(suffix=suffix)
+        return self.meta_cache[suffix]
 
 
     def getMetaTagValue(self, tag, NOT_FOUND=None, metaSuffix=""):
@@ -676,12 +688,17 @@ class AbstractSubject(object):
         Args:
             metaDict (dict): dictionary with key value pairs to update
             metasuffix (str, optional): Suffix of json file. Defaults to "".
+        
+        Returns:
+            str: Full path of file updated
         """
         dd = self.getMetaDict(metasuffix)
         dd.update(metaDict)
-        fIO.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
-        # spydcm.dcmTools.writeDictionaryToJSON(self.getMetaTagsFile(metasuffix), dd)
-        self.logger.info('Updated meta-file')
+        metaFile = self.getMetaTagsFile(metasuffix)
+        fIO.writeDictionaryToJSON(metaFile, dd)
+        self.logger.info(f'Updated meta-file')
+        self._cacheMeta(metasuffix)
+        return metaFile
 
 
     def buildDicomMeta(self):
@@ -1153,6 +1170,14 @@ class SubjectList(list):
             SubjClass = get_configured_subject_class()
         listOfSubjects = getAllSubjects(dataRoot, subjectPrefix, SubjClass=SubjClass)
         return cls(listOfSubjects)
+
+
+    @classmethod
+    def setBySNList(cls, snList, SubjClass=None):
+        if SubjClass is None:
+            SubjClass = get_configured_subject_class()
+        subjList = [SubjClass(i, mi_utils.MIResearch_config.data_root_dir, mi_utils.MIResearch_config.subject_prefix) for i in snList]
+        return cls(subjList)
 
 
     @property
