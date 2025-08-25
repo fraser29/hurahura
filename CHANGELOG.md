@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.27]
+- Feature add - meta cahcing for faster lookup in SubjectList operations. 
+- UI - improvements and optimisations. 
+
 ## [0.1.26]
 - Feature add - UI dynamic loading of subject for current page. 
 
