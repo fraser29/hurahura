@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hurahura"
-version = "0.1.27"
+version = "0.1.28"
 description = "Medical Imaging Research structuring and automation"
 readme = "README.md"
 authors = [

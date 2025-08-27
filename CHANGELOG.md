@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.28]
+- Bug fix: Edge case of default subject class given as "" rather than None. Or class object rather than module path defined. 
+
 ## [0.1.27]
 - Feature add - meta cahcing for faster lookup in SubjectList operations. 
 - UI - improvements and optimisations. 

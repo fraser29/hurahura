@@ -50,6 +50,13 @@ def get_configured_subject_class(subject_class_name=None):
 
     config = mi_utils.MIResearch_config
     subject_class_name = subject_class_name or getattr(config, 'subject_class_name', None)
+    if (subject_class_name is None) or (subject_class_name == ""):
+        subject_obj = getattr(mi_utils.MIResearch_config, 'class_obj', None)
+        if subject_obj is not None:
+            if isinstance(subject_obj, str):
+                subject_class_name = subject_obj
+            else:
+                subject_class_name = subject_obj.__module__ + "." + subject_obj.__name__
 
     if not subject_class_name:
         _CACHED_SUBJECT_CLASS = _SENTINEL_CLASS_NOT_CONFIGURED_OR_FAILED
