@@ -1,20 +1,23 @@
-# Minimal makefile for Sphinx documentation
+# Top-level Makefile for hurahura project
 #
 
-# You can set these variables from the command line, and also
-# from the environment for the first two.
-SPHINXOPTS    ?=
-SPHINXBUILD   ?= sphinx-build
-SOURCEDIR     = source
-BUILDDIR      = build
+.PHONY: help docs docs-clean docs-serve
 
-# Put it first so that "make" without argument is like "make help".
 help:
-	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@echo "Available targets:"
+	@echo "  docs        - Build documentation"
+	@echo "  docs-clean  - Clean documentation build"
+	@echo "  docs-serve  - Serve documentation locally"
+	@echo "  help        - Show this help message"
 
-.PHONY: help Makefile
+docs:
+	@echo "Building documentation..."
+	cd docs && make html
 
-# Catch-all target: route all unknown targets to Sphinx using the new
-# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-%: Makefile
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+docs-clean:
+	@echo "Cleaning documentation build..."
+	cd docs && make clean
+
+docs-serve:
+	@echo "Serving documentation at http://localhost:8000"
+	cd docs && python -m http.server 8000 --directory build/html
