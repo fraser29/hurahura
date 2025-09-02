@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [0.1.29]
+- Feature add: Improved error reporting from subclass failures. 
+
 ## [0.1.28]
 - Bug fix: Edge case of default subject class given as "" rather than None. Or class object rather than module path defined. 
 

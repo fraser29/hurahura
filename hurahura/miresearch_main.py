@@ -6,7 +6,7 @@
 import os
 import sys
 import argparse
-import subprocess
+import traceback
 
 from hurahura import mi_utils
 from hurahura import mi_subject
@@ -349,12 +349,14 @@ def runActions(args, extra_runActions=None):
                     print(f"Error in extra action {iExtra}: Has the configuration been set up correctly (esp. 'class_path')?")
                     raise AttrError
                 except Exception as e:
-                    print(f"Error: {e}") 
+                    print(f"Error: {e}")
+                    traceback.print_exc() 
         else:
             try:
                 extra_runActions(args)
             except Exception as e:
-                print(f"Error: {e}") 
+                print(f"Error: {e}")
+                traceback.print_exc() 
 
 ### ====================================================================================================================
 ### ====================================================================================================================
