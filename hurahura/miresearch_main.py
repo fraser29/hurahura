@@ -111,7 +111,7 @@ groupUI.add_argument('-UI', dest='UI',
                     help='Run in UI mode', 
                     action='store_true')
 groupUI.add_argument('-UI_port', dest='UI_port', 
-                    help='Port to run UI on', 
+                    help='Port to run UI on (default 8080)', 
                     type=int, default=8080)
 
 ## === QUERY ===
