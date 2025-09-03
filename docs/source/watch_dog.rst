@@ -22,4 +22,4 @@ This is best set up as a service and run in the background.
     [Install]
     WantedBy=multi-user.target
 
-See: :ref:`https://fraser29.github.io/autorthanc/` for a DICOM SERVER with auto-download options that work nicely with the watch dog. 
+See: `autorthanc <https://fraser29.github.io/autorthanc/>`_ for a DICOM SERVER with auto-download options that work nicely with the watch dog. 

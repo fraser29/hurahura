@@ -1,5 +1,5 @@
 
-from context import hurahura # This is useful for testing outside of environment
+from .context import hurahura # This is useful for testing outside of environment
 
 import os
 import unittest

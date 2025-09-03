@@ -22,6 +22,7 @@ Welcome to hurahura's documentation!
    web_interface
 
    hurahura
+   modules
 
 
 Indices and tables
