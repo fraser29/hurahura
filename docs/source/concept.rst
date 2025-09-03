@@ -49,4 +49,4 @@ And the files in the META directory are:
 
 Customisation beyond this setup is possible via subclassing the AbstractSubject class. 
 
-See: :ref:`useage` for further details. 
+See: :ref:`usage` for further details. 

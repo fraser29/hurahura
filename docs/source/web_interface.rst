@@ -15,7 +15,7 @@ Then view at: http://localhost:8080
 
 The port can be changed with the -UI_port option (default is 8080).
 
-As with standrad hurahura use parameters are taken from the .conf file passed or configuration settings set (use hurahura -INFO to see what is set). Of course the UI action is also available from a custom setup subclassing the main hurahura class. 
+As with standard hurahura use parameters are taken from the .conf file passed or configuration settings set (use hurahura -INFO to see what is set). Of course the UI action is also available from a custom setup subclassing the main hurahura class. 
 
 The UI allows for easy management of subjects and data. 
 

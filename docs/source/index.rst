@@ -13,9 +13,9 @@ Welcome to hurahura's documentation!
    introduction
    concept
 
-   useage
-   useage_codefree
-   useage_subclass
+   usage
+   usage_codefree
+   usage_subclass
 
    watch_dog
 
