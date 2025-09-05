@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hurahura.mi_utils &mdash; hurahura 0.1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=22607128"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            hurahura
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../concept.html">Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_codefree.html">Usage_codefree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_subclass.html">Usage_subclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../watch_dog.html">Watch Dog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web_interface.html">Web Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hurahura.html">hurahura package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">hurahura</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">hurahura</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hurahura.mi_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hurahura.mi_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">from</span> <span class="nn">hurahura.mi_config</span> <span class="kn">import</span> <span class="n">MIResearch_config</span>
+
+
+
+<span class="n">DEFAULT_DICOM_META_TAG_LIST_STUDY</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AccessionNumber&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;InstitutionName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;BodyPartExamined&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;MagneticFieldStrength&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;Manufacturer&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ManufacturerModelName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;Modality&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PatientBirthDate&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PatientID&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PatientName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PatientSex&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PatientAge&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PatientWeight&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ProtocolName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ReceiveCoilName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ScannerStudyID&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;SoftwareVersions&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;StationName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;StudyDate&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;StudyDescription&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;StudyID&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;StudyInstanceUID&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;StudyTime&quot;</span><span class="p">]</span>
+
+<span class="n">DEFAULT_DICOM_META_TAG_LIST_SERIES</span> <span class="o">=</span> <span class="p">[</span>
+                                <span class="s2">&quot;AcquiredResolution&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;AcquiredTemporalResolution&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;AcquisitionMatrix&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;AcquisitionTime&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;DicomFileName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;EchoTime&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;FlipAngle&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;HeartRate&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;InPlanePhaseEncodingDirection&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;InternalPulseSequenceName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;MagneticFieldStrength&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;Manufacturer&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ManufacturerModelName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PixelBandwidth&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;PulseSequenceName&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ReconstructionDiameter&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;RepetitionTime&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ScanDuration&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ScanningSequence&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;SeriesDescription&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;SeriesNumber&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;SoftwareVersions&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;SpacingBetweenSlices&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;StudyDate&quot;</span><span class="p">]</span>
+
+
+<span class="n">DEFAULT_DICOM_TIME_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;%H%M%S&quot;</span> <span class="c1"># TODO to config (and above) - or from spydcmtk</span>
+
+<span class="n">abcList</span> <span class="o">=</span> <span class="s1">&#39;abcdefghijklmnopqrstuvwxyz&#39;</span>
+<span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s1">&#39;UNKNOWN&#39;</span>
+<span class="n">META</span> <span class="o">=</span> <span class="s2">&quot;META&quot;</span>
+<span class="n">RAW</span> <span class="o">=</span> <span class="s2">&quot;RAW&quot;</span>
+<span class="n">DICOM</span> <span class="o">=</span> <span class="s2">&quot;DICOM&quot;</span>
+<span class="n">OTHER</span> <span class="o">=</span> <span class="s2">&quot;OTHER&quot;</span>
+
+<span class="c1">#==================================================================</span>
+
+<span class="c1">#==================================================================</span>
+<div class="viewcode-block" id="DirectoryStructure">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.DirectoryStructure">[docs]</a>
+<span class="k">class</span> <span class="nc">DirectoryStructure</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">childrenList</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">childrenList</span> <span class="o">=</span> <span class="n">childrenList</span>
+    
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> with children: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">childrenList</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="DirectoryStructureTree">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.DirectoryStructureTree">[docs]</a>
+<span class="k">class</span> <span class="nc">DirectoryStructureTree</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">ss</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">ss</span>
+
+<div class="viewcode-block" id="DirectoryStructureTree.addNewStructure">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.DirectoryStructureTree.addNewStructure">[docs]</a>
+    <span class="k">def</span> <span class="nf">addNewStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_or_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">name_or_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_addTopLevelDirectory</span><span class="p">(</span><span class="n">name_or_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">k1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">name_or_list</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_addSecondLevelDirectory</span><span class="p">(</span><span class="n">name_or_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">name_or_list</span><span class="p">[</span><span class="n">k1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_addTopLevelDirectory</span><span class="p">(</span><span class="n">name_or_list</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_addTopLevelDirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTopLevelName</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DirectoryStructure</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[]))</span>
+    
+    <span class="k">def</span> <span class="nf">_addSecondLevelDirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nameTopLevel</span><span class="p">,</span> <span class="n">nameSecondLevel</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isSecondLevelName</span><span class="p">(</span><span class="n">nameTop</span><span class="o">=</span><span class="n">nameTopLevel</span><span class="p">,</span> <span class="n">nameSecond</span><span class="o">=</span><span class="n">nameSecondLevel</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">nameTopLevel</span><span class="p">:</span>
+                    <span class="n">i</span><span class="o">.</span><span class="n">childrenList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nameSecondLevel</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DirectoryStructureTree.isTopLevelName">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.DirectoryStructureTree.isTopLevelName">[docs]</a>
+    <span class="k">def</span> <span class="nf">isTopLevelName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    
+<div class="viewcode-block" id="DirectoryStructureTree.isSecondLevelName">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.DirectoryStructureTree.isSecondLevelName">[docs]</a>
+    <span class="k">def</span> <span class="nf">isSecondLevelName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nameTop</span><span class="p">,</span> <span class="n">nameSecond</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">nameTop</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i2</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">childrenList</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">i2</span> <span class="o">==</span> <span class="n">nameSecond</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<span class="k">def</span> <span class="nf">_getDefautDirectoryStructureTree</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This builds a Directory tree structure from the config file input</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DirectoryStructureTree: class of Directory trees structure used by misubject</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DEFAULT_DIRECTORY_STRUCTURE_TREE</span> <span class="o">=</span> <span class="n">DirectoryStructureTree</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">directory_structure</span><span class="p">:</span>
+        <span class="n">DEFAULT_DIRECTORY_STRUCTURE_TREE</span><span class="o">.</span><span class="n">addNewStructure</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DEFAULT_DIRECTORY_STRUCTURE_TREE</span>
+
+<div class="viewcode-block" id="buildDirectoryStructureTree">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.buildDirectoryStructureTree">[docs]</a>
+<span class="k">def</span> <span class="nf">buildDirectoryStructureTree</span><span class="p">(</span><span class="n">listOfExtraSubfolders</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This will build the directory structure for a project using the structure</span>
+<span class="sd">        found in config file and any added subfolder names</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        listOfExtraSubfolders (list): A list of subfolders, if an entry is itself a list, </span>
+<span class="sd">            then the first item of that entry is the toplevel subfolder </span>
+<span class="sd">            and the following items are subfolders of that toplevel folder.</span>
+<span class="sd">            Default: empty list                                    </span>
+<span class="sd">            Note: A default structure is always used of:</span>
+<span class="sd">            | - META</span>
+<span class="sd">            | - RAW </span>
+<span class="sd">                    | - DICOM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#  first remove any conflists with default list:</span>
+    <span class="n">DirectoryTree</span> <span class="o">=</span> <span class="n">_getDefautDirectoryStructureTree</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">listOfExtraSubfolders</span><span class="p">:</span>
+        <span class="n">DirectoryTree</span><span class="o">.</span><span class="n">addNewStructure</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DirectoryTree</span></div>
+
+
+
+<div class="viewcode-block" id="getDataRootDir">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.getDataRootDir">[docs]</a>
+<span class="k">def</span> <span class="nf">getDataRootDir</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span></div>
+
+<span class="c1">#==================================================================</span>
+<span class="c1">#==================================================================</span>
+<div class="viewcode-block" id="countFilesInDir">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.countFilesInDir">[docs]</a>
+<span class="k">def</span> <span class="nf">countFilesInDir</span><span class="p">(</span><span class="n">dirName</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dirName</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">dirName</span><span class="p">):</span>  <span class="c1"># @UnusedVariable</span>
+            <span class="n">N</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">N</span></div>
+
+
+<div class="viewcode-block" id="datetimeToStrTime">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.datetimeToStrTime">[docs]</a>
+<span class="k">def</span> <span class="nf">datetimeToStrTime</span><span class="p">(</span><span class="n">dateTimeVal</span><span class="p">,</span> <span class="n">strFormat</span><span class="o">=</span><span class="n">DEFAULT_DICOM_TIME_FORMAT</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">dateTimeVal</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">strFormat</span><span class="p">)</span></div>
+
+
+<span class="c1">#==================================================================</span>
+<div class="viewcode-block" id="encodeString">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.encodeString">[docs]</a>
+<span class="k">def</span> <span class="nf">encodeString</span><span class="p">(</span><span class="n">strIn</span><span class="p">,</span> <span class="n">passcode</span><span class="p">):</span>
+    <span class="n">enc</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">strIn</span><span class="p">)):</span>
+        <span class="n">key_c</span> <span class="o">=</span> <span class="n">passcode</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">passcode</span><span class="p">)]</span>
+        <span class="n">enc_c</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">((</span><span class="nb">ord</span><span class="p">(</span><span class="n">strIn</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="nb">ord</span><span class="p">(</span><span class="n">key_c</span><span class="p">))</span> <span class="o">%</span> <span class="mi">256</span><span class="p">)</span>
+        <span class="n">enc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">enc_c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">urlsafe_b64encode</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="decodeString">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.decodeString">[docs]</a>
+<span class="k">def</span> <span class="nf">decodeString</span><span class="p">(</span><span class="n">encStr</span><span class="p">,</span> <span class="n">passcode</span><span class="p">):</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">enc</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">urlsafe_b64decode</span><span class="p">(</span><span class="n">encStr</span><span class="o">+</span><span class="s1">&#39;==&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="p">)):</span>
+        <span class="n">key_c</span> <span class="o">=</span> <span class="n">passcode</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">passcode</span><span class="p">)]</span>
+        <span class="n">dec_c</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">((</span><span class="mi">256</span> <span class="o">+</span> <span class="nb">ord</span><span class="p">(</span><span class="n">enc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="nb">ord</span><span class="p">(</span><span class="n">key_c</span><span class="p">))</span> <span class="o">%</span> <span class="mi">256</span><span class="p">)</span>
+        <span class="n">dec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dec_c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="readFileToListOfLines">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.readFileToListOfLines">[docs]</a>
+<span class="k">def</span> <span class="nf">readFileToListOfLines</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">commentSymbol</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Read file - return list - elements made up of each line</span>
+<span class="sd">        Will split on &quot;,&quot; if present</span>
+<span class="sd">        Will skip starting with #</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fid</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">fid</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="n">commentSymbol</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="subjFileToSubjN">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.subjFileToSubjN">[docs]</a>
+<span class="k">def</span> <span class="nf">subjFileToSubjN</span><span class="p">(</span><span class="n">subjFile</span><span class="p">):</span>
+    <span class="n">allLines</span> <span class="o">=</span> <span class="n">readFileToListOfLines</span><span class="p">(</span><span class="n">subjFile</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allLines</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">tf</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allLines</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">first_numeric</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">first_numeric</span><span class="p">:])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allLines</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="writeCSVFile">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.writeCSVFile">[docs]</a>
+<span class="k">def</span> <span class="nf">writeCSVFile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">csvFile</span><span class="p">,</span> <span class="n">FIX_NAN</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csvFile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="n">csvWriter</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_MINIMAL</span><span class="p">)</span>
+        <span class="c1">#first write column headers</span>
+        <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">csvWriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">iRow</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">FIX_NAN</span><span class="p">:</span>
+                <span class="n">iRow</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="s1">&#39;nan&#39;</span> <span class="k">else</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">iRow</span><span class="p">]</span>
+            <span class="n">csvWriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">iRow</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">csvFile</span></div>
+
+
+
+<div class="viewcode-block" id="timeToDatetime">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.timeToDatetime">[docs]</a>
+<span class="k">def</span> <span class="nf">timeToDatetime</span><span class="p">(</span><span class="n">timeStr</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iDatetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timeStr</span><span class="p">,</span> <span class="s1">&#39;%H%M%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">iDatetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timeStr</span><span class="p">,</span> <span class="s1">&#39;%H%M%S&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">iDatetime</span></div>
+
+<span class="c1">#==================================================================</span>
+<div class="viewcode-block" id="SubjPrefixError">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.mi_utils.SubjPrefixError">[docs]</a>
+<span class="k">class</span> <span class="nc">SubjPrefixError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; SubjPrefixError</span>
+<span class="sd">            If errors to do with the subject prefix &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg2</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;SubjPrefixError: please provide as imput.&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">msg2</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Fraser M. Callaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

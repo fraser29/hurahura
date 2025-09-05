@@ -1,0 +1,599 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hurahura.tests package &mdash; hurahura 0.1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=22607128"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="hurahura" href="modules.html" />
+    <link rel="prev" title="hurahura.miresearchui package" href="hurahura.miresearchui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            hurahura
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concept.html">Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage_codefree.html">Usage_codefree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage_subclass.html">Usage_subclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="watch_dog.html">Watch Dog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="web_interface.html">Web Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hurahura.html">hurahura package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">hurahura</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="hurahura.miresearchui.html">hurahura.miresearchui package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">hurahura.tests package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hurahura.tests.context">hurahura.tests.context module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hurahura.tests.run_tests">hurahura.tests.run_tests module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestArchiveSubject"><code class="docutils literal notranslate"><span class="pre">TestArchiveSubject</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestMoveSubject"><code class="docutils literal notranslate"><span class="pre">TestMoveSubject</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestRenameSubject"><code class="docutils literal notranslate"><span class="pre">TestRenameSubject</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubject"><code class="docutils literal notranslate"><span class="pre">TestSubject</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubject2"><code class="docutils literal notranslate"><span class="pre">TestSubject2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubject2b"><code class="docutils literal notranslate"><span class="pre">TestSubject2b</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubject3"><code class="docutils literal notranslate"><span class="pre">TestSubject3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubject4"><code class="docutils literal notranslate"><span class="pre">TestSubject4</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjectAnonName"><code class="docutils literal notranslate"><span class="pre">TestSubjectAnonName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjectAnonName2"><code class="docutils literal notranslate"><span class="pre">TestSubjectAnonName2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjectAnonName3"><code class="docutils literal notranslate"><span class="pre">TestSubjectAnonName3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjectAnonName4"><code class="docutils literal notranslate"><span class="pre">TestSubjectAnonName4</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjectAnonName5"><code class="docutils literal notranslate"><span class="pre">TestSubjectAnonName5</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjectRename"><code class="docutils literal notranslate"><span class="pre">TestSubjectRename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjectUseConfFile"><code class="docutils literal notranslate"><span class="pre">TestSubjectUseConfFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjects"><code class="docutils literal notranslate"><span class="pre">TestSubjects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjects2"><code class="docutils literal notranslate"><span class="pre">TestSubjects2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hurahura.tests.run_tests.TestSubjects3"><code class="docutils literal notranslate"><span class="pre">TestSubjects3</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hurahura.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hurahura</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="hurahura.html">hurahura package</a></li>
+      <li class="breadcrumb-item active">hurahura.tests package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/hurahura.tests.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hurahura-tests-package">
+<h1>hurahura.tests package<a class="headerlink" href="#hurahura-tests-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-hurahura.tests.context">
+<span id="hurahura-tests-context-module"></span><h2>hurahura.tests.context module<a class="headerlink" href="#module-hurahura.tests.context" title="Link to this heading"></a></h2>
+</section>
+<section id="module-hurahura.tests.run_tests">
+<span id="hurahura-tests-run-tests-module"></span><h2>hurahura.tests.run_tests module<a class="headerlink" href="#module-hurahura.tests.run_tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestArchiveSubject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestArchiveSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestArchiveSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestArchiveSubject" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestArchiveSubject.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestArchiveSubject.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestArchiveSubject.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestArchiveSubject.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestArchiveSubject.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestArchiveSubject.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestArchiveSubject.test_SubjZip">
+<span class="sig-name descname"><span class="pre">test_SubjZip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestArchiveSubject.test_SubjZip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestArchiveSubject.test_SubjZip" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestMoveSubject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestMoveSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestMoveSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestMoveSubject" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestMoveSubject.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestMoveSubject.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestMoveSubject.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestMoveSubject.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestMoveSubject.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestMoveSubject.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestMoveSubject.test_SubjZip">
+<span class="sig-name descname"><span class="pre">test_SubjZip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestMoveSubject.test_SubjZip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestMoveSubject.test_SubjZip" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestRenameSubject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestRenameSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestRenameSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestRenameSubject" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestRenameSubject.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestRenameSubject.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestRenameSubject.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestRenameSubject.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestRenameSubject.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestRenameSubject.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestRenameSubject.test_SubjRename">
+<span class="sig-name descname"><span class="pre">test_SubjRename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestRenameSubject.test_SubjRename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestRenameSubject.test_SubjRename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubject2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2b">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubject2b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2b" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2b.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2b.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2b.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2b.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2b.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2b.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2b.test_N">
+<span class="sig-name descname"><span class="pre">test_N</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2b.test_N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2b.test_N" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject2b.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject2b.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject2b.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject3">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubject3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject3" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject3.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject3.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject3.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject3.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject3.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject3.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject3.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject3.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject3.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject4">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubject4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject4" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject4.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject4.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject4.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject4.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject4.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject4.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubject4.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubject4.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubject4.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjectAnonName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName2">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjectAnonName2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName2.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName2.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName2.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName2.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName2.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName2.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName2.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName2.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName2.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName3">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjectAnonName3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName3" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName3.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName3.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName3.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName3.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName3.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName3.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName3.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName3.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName3.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName4">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjectAnonName4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName4" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName4.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName4.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName4.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName4.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName4.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName4.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName4.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName4.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName4.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName5">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjectAnonName5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName5" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName5.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName5.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName5.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName5.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName5.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName5.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectAnonName5.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectAnonName5.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectAnonName5.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectRename">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjectRename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectRename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectRename" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectRename.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectRename.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectRename.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectRename.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectRename.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectRename.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectRename.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectRename.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectRename.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectUseConfFile">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjectUseConfFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectUseConfFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectUseConfFile" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectUseConfFile.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectUseConfFile.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectUseConfFile.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectUseConfFile.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectUseConfFile.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectUseConfFile.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjectUseConfFile.test_newSubj">
+<span class="sig-name descname"><span class="pre">test_newSubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjectUseConfFile.test_newSubj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjectUseConfFile.test_newSubj" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects.test_List">
+<span class="sig-name descname"><span class="pre">test_List</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects.test_List"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects.test_List" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects.test_filterList">
+<span class="sig-name descname"><span class="pre">test_filterList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects.test_filterList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects.test_filterList" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects.test_newSubjs">
+<span class="sig-name descname"><span class="pre">test_newSubjs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects.test_newSubjs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects.test_newSubjs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects2">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjects2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects2.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects2.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects2.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects2.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects2.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects2.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects2.test_List">
+<span class="sig-name descname"><span class="pre">test_List</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects2.test_List"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects2.test_List" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects2.test_filterList">
+<span class="sig-name descname"><span class="pre">test_filterList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects2.test_filterList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects2.test_filterList" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects2.test_newSubjs">
+<span class="sig-name descname"><span class="pre">test_newSubjs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects2.test_newSubjs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects2.test_newSubjs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects3">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hurahura.tests.run_tests.</span></span><span class="sig-name descname"><span class="pre">TestSubjects3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects3" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects3.setUpClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects3.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects3.setUpClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects3.tearDownClass">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OVERRIDE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects3.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects3.tearDownClass" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hurahura.tests.run_tests.TestSubjects3.test_newSubjs">
+<span class="sig-name descname"><span class="pre">test_newSubjs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hurahura/tests/run_tests.html#TestSubjects3.test_newSubjs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hurahura.tests.run_tests.TestSubjects3.test_newSubjs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hurahura.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hurahura.tests" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hurahura.miresearchui.html" class="btn btn-neutral float-left" title="hurahura.miresearchui package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="hurahura" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Fraser M. Callaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
