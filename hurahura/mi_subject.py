@@ -224,7 +224,10 @@ class AbstractSubject(object):
         self.close()
 
     def close(self):
-        self.close_logger()
+        try:
+            self.close_logger()
+        except AttributeError:
+            pass # init must have failed before set _logger to None
 
     ### ----------------------------------------------------------------------------------------------------------------
     ### Properties

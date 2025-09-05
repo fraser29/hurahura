@@ -214,7 +214,15 @@ def runActions(args, extra_runActions=None):
 
     # SPECIAL ACTION - BUILD EMPTY SUBJECT(S)
     elif args.build:
-        subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        try:    
+            subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, 
+                                                                           MIResearch_config.data_root_dir, 
+                                                                           MIResearch_config.subject_prefix, 
+                                                                           suffix=args.subjSuffix) for sn in args.subjNList])
+        except TypeError:
+            subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, 
+                                                                           MIResearch_config.data_root_dir, 
+                                                                           MIResearch_config.subject_prefix) for sn in args.subjNList])
         for iSubj in subjList:
             if not iSubj.exists():
                 print(f"Building: {iSubj.subjID}...")
@@ -226,7 +234,15 @@ def runActions(args, extra_runActions=None):
     if len(args.subjNList) > 0:
         if MIResearch_config.DEBUG:
             print(f"SubjList provided is: {args.subjNList}")
-        subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, MIResearch_config.data_root_dir, MIResearch_config.subject_prefix, suffix=args.subjSuffix) for sn in args.subjNList])
+        try:    
+            subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, 
+                                                                           MIResearch_config.data_root_dir, 
+                                                                           MIResearch_config.subject_prefix, 
+                                                                           suffix=args.subjSuffix) for sn in args.subjNList])
+        except TypeError:
+            subjList = mi_subject.SubjectList([MIResearch_config.class_obj(sn, 
+                                                                           MIResearch_config.data_root_dir, 
+                                                                           MIResearch_config.subject_prefix) for sn in args.subjNList])
         subjList.reduceToExist(MIResearch_config.DEBUG)
 
         if MIResearch_config.DEBUG:
