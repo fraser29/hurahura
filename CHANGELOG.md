@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.30]
+- Feature add: Edge case error catch on subjList creatation, if sub-class of AbstractSubject uses a suffix. 
 
 ## [0.1.29]
 - Feature add: Improved error reporting from subclass failures. 
