@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage_subclass &mdash; hurahura 0.1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=22607128"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Watch Dog" href="watch_dog.html" />
+    <link rel="prev" title="Usage_codefree" href="usage_codefree.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            hurahura
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concept.html">Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage_codefree.html">Usage_codefree</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage_subclass</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subclassing-abstractsubject"><em>Subclassing AbstractSubject</em></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="watch_dog.html">Watch Dog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="web_interface.html">Web Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hurahura.html">hurahura package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">hurahura</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hurahura</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage_subclass</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage_subclass.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage-subclass">
+<span id="id1"></span><h1>Usage_subclass<a class="headerlink" href="#usage-subclass" title="Link to this heading"></a></h1>
+<section id="subclassing-abstractsubject">
+<h2><em>Subclassing AbstractSubject</em><a class="headerlink" href="#subclassing-abstractsubject" title="Link to this heading"></a></h2>
+<p>To really take advantage of hurahura subclassing the primary classes is recommended.</p>
+<p>When subclassing a user has access to all functionality of hurahura with all typical tasks of data loading, anonymization, generating summaries, querying etc implemented already. The user may therefore focus on generating their own pipelines and analysis.</p>
+<p>The template below is heavily commented to show how customization may be performed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Template for subclassing AbstractSubject</span>
+
+<span class="c1"># Import miresearch_main and mi_subject from hurahura</span>
+<span class="c1"># miresearch_main is the main function that handles the dispatching of actions to the correct class.</span>
+<span class="c1"># mi_subject is the AbstractSubject class that is sub-classed to create the subject object.</span>
+<span class="kn">from</span> <span class="nn">hurahura</span> <span class="kn">import</span> <span class="n">miresearch_main</span><span class="p">,</span> <span class="n">mi_subject</span>
+
+<span class="c1"># MIResearch_config provides access to the config file.</span>
+<span class="kn">from</span> <span class="nn">hurahura.mi_config</span> <span class="kn">import</span> <span class="n">MIResearch_config</span> <span class="c1"># Provides access to the config file parameters</span>
+
+<span class="k">class</span> <span class="nc">MySubject</span><span class="p">(</span><span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subjectNumber</span><span class="p">,</span>
+                        <span class="n">dataRoot</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span>
+                        <span class="n">subjectPrefix</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">,</span>
+                        <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">AbstractSubject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subjectNumber</span><span class="o">=</span><span class="n">subjectNumber</span><span class="p">,</span>
+                                            <span class="n">dataRoot</span><span class="o">=</span><span class="n">dataRoot</span><span class="p">,</span>
+                                            <span class="n">subjectPrefix</span><span class="o">=</span><span class="n">subjectPrefix</span><span class="p">,</span>
+                                            <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Subject number is the ID (int) of the subject of interest.</span>
+<span class="sd">        dataRoot is the directory where all your SUBJ0000ID subjects are stored.</span>
+<span class="sd">        subjectPrefix is the short prefix ( &quot;SUBJ&quot; in the example above )</span>
+<span class="sd">        suffix is provided for flexibility but is NOT RECOMMENDED to be used.</span>
+
+<span class="sd">        dataRoot and subjectPrefix have default values picked up from your active config file</span>
+<span class="sd">        but these may also be overwritten at the commandline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Some standard information is defined by the *.conf file</span>
+        <span class="c1">#</span>
+        <span class="c1"># example use of customised conf file parameters:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_to_my_atlas</span> <span class="o">=</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;parameters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;example_path_to_atlas&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># see how this is used in runMyAutomaticSegmentationPipeline() below</span>
+
+
+    <span class="c1">### ----------------------------------------------------------------------------------------------------------------</span>
+    <span class="c1">### Overriding methods</span>
+    <span class="c1">### ----------------------------------------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">runPostLoadPipeLine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Example overriding method to run a post load pipeline</span>
+<span class="sd">        This is run after any new subject is loaded.</span>
+<span class="sd">        It can also be run at any time from the command line via</span>
+<span class="sd">        MyProject -s N -RunPost</span>
+<span class="sd">            this will run runPostLoadPipeLine() on subject number N</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running post load pipeline for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Enter post load pipeline steps here</span>
+        <span class="c1"># e.g.</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runMyAutomaticSegmentationPipeline</span><span class="p">()</span> <span class="c1"># See example below</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">printVolumeInfo</span><span class="p">()</span>
+
+
+    <span class="c1">## Example customised pipeline for your data</span>
+    <span class="k">def</span> <span class="nf">runMyAutomaticSegmentationPipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">FORCE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">segmentationOutputFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSegmentationOutputFile</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">FORCE</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">segmentationOutputFile</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_my_atlas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_my_atlas</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Can not run segmentation - atlas not given&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">fancy_MIT_registration_module</span>
+            <span class="n">myFetalBrainDicomsDirectory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findDicomSeries</span><span class="p">(</span><span class="s2">&quot;SeriesDescription_FetalBrain&quot;</span><span class="p">)</span>
+            <span class="n">fancy_MIT_registration_module</span><span class="p">(</span><span class="n">myFetalBrainDicomsDirectory</span><span class="p">,</span>
+                                        <span class="n">outputFile</span><span class="o">=</span><span class="n">segmentationOutputFile</span><span class="p">,</span>
+                                        <span class="n">atlasFile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path_to_my_atlas</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not import fancy_MIT_registration_module &quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error running MIT segmentation code&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+
+    <span class="k">def</span> <span class="nf">calculateWhiteMatterVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">segFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSegmentationOutputFile</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">segFile</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">42</span>  <span class="c1"># it is possible some more fancy calculation is required here - this is just an example</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+
+    <span class="k">def</span> <span class="nf">printVolumeInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateWhiteMatterVolume</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">getAge</span><span class="p">()</span><span class="si">}</span><span class="s2"> years old and has a white matter volume of </span><span class="si">{</span><span class="n">vol</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2"> (via MIT atlas method)&quot;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">getSegmentationOutputFile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getSegmentationDir</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">_Segmentation_MITAtlas.nii&quot;</span><span class="p">)</span>
+
+    <span class="c1">### ----------------------------------------------------------------------------------------------------------------</span>
+    <span class="c1">### Directory paths</span>
+    <span class="c1">### ----------------------------------------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">getSegmentationDir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getDir</span><span class="p">([</span><span class="s2">&quot;SEGMENTATION&quot;</span><span class="p">])</span>
+
+
+
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1">#      THIS IS HOW TO CUSTOMISE COMMAND LINE ACTIONS</span>
+<span class="c1">### ====================================================================================================================</span>
+<span class="k">def</span> <span class="nf">getArgGroup</span><span class="p">():</span>
+    <span class="n">groupMyProject</span> <span class="o">=</span> <span class="n">miresearch_main</span><span class="o">.</span><span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">&#39;MyProject Actions&#39;</span><span class="p">)</span>
+    <span class="c1"># EXAMPLES - CHANGE BELOW</span>
+    <span class="n">groupMyProject</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-vol&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;runVolumeAction&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Run my pipeline specific to these subjects&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">)</span>
+    <span class="n">groupMyProject</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-findMatchingExams&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;findMatchingExams&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Find matching exams for the given subject (use e.g. -sA to query against all subjects)&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+    <span class="c1">#</span>
+    <span class="k">return</span> <span class="n">groupMyProject</span>
+    <span class="c1">##</span>
+
+
+<span class="k">def</span> <span class="nf">MyProject_specific_actions</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an example of how to customise the command line actions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">runVolumeAction</span><span class="p">:</span>
+        <span class="c1"># Here we build a list of subjects as we go</span>
+        <span class="k">for</span> <span class="n">sn</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">:</span>
+            <span class="n">iSubj</span> <span class="o">=</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">(</span><span class="n">sn</span><span class="p">,</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">iSubj</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">iSubj</span><span class="o">.</span><span class="n">printVolumeInfo</span><span class="p">()</span>
+
+
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1">### ====================================================================================================================</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">getArgGroup</span><span class="p">()</span>
+    <span class="c1">##</span>
+    <span class="c1"># Note that any MyProject_specific actions along with the class object are passed to the main function.</span>
+    <span class="c1"># We let the miresearch_main function handle the dispatching of actions to the correct class.</span>
+    <span class="n">miresearch_main</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">extra_runActions</span><span class="o">=</span><span class="p">[</span><span class="n">MyProject_specific_actions</span><span class="p">],</span> <span class="n">class_obj</span><span class="o">=</span><span class="n">MyProjectSubject</span><span class="p">)</span>
+
+
+<span class="c1"># S T A R T</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage_codefree.html" class="btn btn-neutral float-left" title="Usage_codefree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="watch_dog.html" class="btn btn-neutral float-right" title="Watch Dog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Fraser M. Callaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

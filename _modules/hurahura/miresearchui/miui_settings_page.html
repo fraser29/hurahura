@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hurahura.miresearchui.miui_settings_page &mdash; hurahura 0.1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=22607128"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            hurahura
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../concept.html">Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage_codefree.html">Usage_codefree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage_subclass.html">Usage_subclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../watch_dog.html">Watch Dog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../web_interface.html">Web Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hurahura.html">hurahura package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">hurahura</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">hurahura</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hurahura.miresearchui.miui_settings_page</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hurahura.miresearchui.miui_settings_page</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">nicegui</span> <span class="kn">import</span> <span class="n">ui</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># Module-level variable to store the MIResearchUI instance</span>
+<span class="n">_the_miui_instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="initialize_settings_ui">
+<a class="viewcode-back" href="../../../hurahura.miresearchui.html#hurahura.miresearchui.miui_settings_page.initialize_settings_ui">[docs]</a>
+<span class="k">def</span> <span class="nf">initialize_settings_ui</span><span class="p">(</span><span class="n">miui_instance_from_main</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores the MIResearchUI instance for the settings page to use.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_the_miui_instance</span>
+    <span class="n">_the_miui_instance</span> <span class="o">=</span> <span class="n">miui_instance_from_main</span></div>
+
+
+<div class="viewcode-block" id="display_settings_page_standalone">
+<a class="viewcode-back" href="../../../hurahura.miresearchui.html#hurahura.miresearchui.miui_settings_page.display_settings_page_standalone">[docs]</a>
+<span class="nd">@ui</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="s1">&#39;/miui_settings&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">display_settings_page_standalone</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The dedicated page for displaying MIUI settings.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_the_miui_instance</span><span class="p">:</span>
+        <span class="n">create_settings_page</span><span class="p">(</span><span class="n">_the_miui_instance</span><span class="p">)</span> <span class="c1"># Call the existing layout function</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;Error: Settings UI not initialized correctly. MIResearchUI instance is missing.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;text-red-500&#39;</span><span class="p">)</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;Go Home&quot;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">ui</span><span class="o">.</span><span class="n">navigate</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="create_settings_page">
+<a class="viewcode-back" href="../../../hurahura.miresearchui.html#hurahura.miresearchui.miui_settings_page.create_settings_page">[docs]</a>
+<span class="k">def</span> <span class="nf">create_settings_page</span><span class="p">(</span><span class="n">miui_instance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates the settings page for the MIResearchUI.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        miui_instance: An instance of the MIResearchUI class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conf_files_dict</span> <span class="o">=</span> <span class="n">miui_instance</span><span class="o">.</span><span class="n">miui_conf_file_contents</span>
+
+    <span class="c1"># Define helper functions first</span>
+    <span class="k">def</span> <span class="nf">display_config_content</span><span class="p">(</span><span class="n">selected_key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">selected_key</span> <span class="ow">and</span> <span class="n">selected_key</span> <span class="ow">in</span> <span class="n">conf_files_dict</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">conf_files_dict</span><span class="p">[</span><span class="n">selected_key</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">content_display</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File source: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">content_editor</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+                <span class="n">file_content_area</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading file </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;negative&#39;</span><span class="p">)</span>
+                <span class="n">content_display</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not load file: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">content_editor</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content_display</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">content_editor</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">file_content_area</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+    
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">save_changes</span><span class="p">(</span><span class="n">selected_key</span><span class="p">,</span> <span class="n">new_content</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">selected_key</span> <span class="ow">and</span> <span class="n">selected_key</span> <span class="ow">in</span> <span class="n">conf_files_dict</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">conf_files_dict</span><span class="p">[</span><span class="n">selected_key</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved changes to </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;positive&#39;</span><span class="p">)</span>
+                <span class="c1"># Refresh content display</span>
+                <span class="n">display_config_content</span><span class="p">(</span><span class="n">selected_key</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error saving file </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;negative&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;No file selected or key not found.&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_new_config</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">dialog_ref</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Both key and path are required.&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">conf_files_dict</span><span class="p">:</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration key &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; already exists.&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)):</span>
+                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">):</span> 
+                <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> 
+            
+            <span class="n">miui_instance</span><span class="o">.</span><span class="n">_saveMIUI_ConfigFile</span><span class="p">([</span><span class="n">path</span><span class="p">])</span>
+            
+            <span class="n">conf_files_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="n">config_keys_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">conf_files_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">config_keys_select</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added new config: &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; pointing to &#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;positive&#39;</span><span class="p">)</span>
+            <span class="n">dialog_ref</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error adding new config file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;negative&#39;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">add_new_config_dialog</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">dialog</span><span class="p">()</span> <span class="k">as</span> <span class="n">dialog</span><span class="p">,</span> <span class="n">ui</span><span class="o">.</span><span class="n">card</span><span class="p">():</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;Add New Configuration File&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;text-lg font-semibold&#39;</span><span class="p">)</span>
+            <span class="n">new_conf_key_input</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Configuration Key Name&#39;</span><span class="p">)</span>
+            <span class="n">new_conf_path_input</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Full Path to New Config File&#39;</span><span class="p">)</span>
+            
+            <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">row</span><span class="p">():</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Save New Config&#39;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">process_new_config</span><span class="p">(</span><span class="n">new_conf_key_input</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">new_conf_path_input</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dialog</span><span class="p">))</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Cancel&#39;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="n">dialog</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">dialog</span>
+
+    <span class="c1"># UI layout starts here</span>
+    <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">()</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;w-full p-4&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">row</span><span class="p">()</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;w-full items-center mb-4&#39;</span><span class="p">):</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">icon</span><span class="o">=</span><span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">ui</span><span class="o">.</span><span class="n">navigate</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">props</span><span class="p">(</span><span class="s1">&#39;flat round dense&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tooltip</span><span class="p">(</span><span class="s1">&#39;Go to Home Page&#39;</span><span class="p">)</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;MIUI Configuration Files&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;text-2xl font-bold ml-2&#39;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">row</span><span class="p">()</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;w-full mb-4&#39;</span><span class="p">):</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Configuration Keys (saved at </span><span class="si">{</span><span class="n">miui_instance</span><span class="o">.</span><span class="n">miui_conf_file</span><span class="si">}</span><span class="s1">):&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;text-lg mr-2&#39;</span><span class="p">)</span>
+            <span class="n">config_keys_select</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">conf_files_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> 
+                                           <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Select Config&#39;</span><span class="p">,</span> 
+                                           <span class="n">on_change</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">display_config_content</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            
+        <span class="n">file_content_area</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">()</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;w-full p-2 border rounded&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">file_content_area</span><span class="p">:</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File Content:&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;text-lg font-semibold mb-2&#39;</span><span class="p">)</span>
+            <span class="n">content_display</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;text-mono whitespace-pre-wrap&#39;</span><span class="p">)</span>
+            <span class="n">content_editor</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">textarea</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Edit Content&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;w-full&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">props</span><span class="p">(</span><span class="s1">&#39;outlined rows=10&#39;</span><span class="p">)</span>
+            
+        <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">row</span><span class="p">()</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s1">&#39;w-full mt-4&#39;</span><span class="p">):</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Save Changes&#39;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">save_changes</span><span class="p">(</span><span class="n">config_keys_select</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">content_editor</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Add New Config File&#39;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="n">add_new_config_dialog</span><span class="p">)</span>
+
+    <span class="n">file_content_area</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Fraser M. Callaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

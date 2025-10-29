@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hurahura.miresearch_watchdog &mdash; hurahura 0.1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=22607128"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            hurahura
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../concept.html">Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_codefree.html">Usage_codefree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_subclass.html">Usage_subclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../watch_dog.html">Watch Dog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web_interface.html">Web Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hurahura.html">hurahura package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">hurahura</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">hurahura</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hurahura.miresearch_watchdog</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hurahura.miresearch_watchdog</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">watchdog.observers</span> <span class="kn">import</span> <span class="n">Observer</span>
+<span class="kn">from</span> <span class="nn">watchdog.events</span> <span class="kn">import</span> <span class="n">FileSystemEventHandler</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">hurahura</span> <span class="kn">import</span> <span class="n">mi_subject</span>
+<span class="kn">from</span> <span class="nn">hurahura.mi_config</span> <span class="kn">import</span> <span class="n">MIResearch_config</span>
+
+
+<span class="c1"># ====================================================================================================</span>
+<span class="c1"># ====================================================================================================</span>
+<div class="viewcode-block" id="getLogger">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.getLogger">[docs]</a>
+<span class="k">def</span> <span class="nf">getLogger</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">logfileName</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
+       <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">logfileName</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> | </span><span class="si">%(levelname)-7s</span><span class="s1"> | </span><span class="si">%(name)s</span><span class="s1"> | </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span> 
+                                    <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">-%b-%y %H:%M:%S&#39;</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;===== INIT </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s1"> LOGGER ===== &#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">logger</span></div>
+
+
+<span class="c1"># ====================================================================================================</span>
+<span class="c1"># ====================================================================================================</span>
+<div class="viewcode-block" id="MIResearch_WatchDog">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_WatchDog">[docs]</a>
+<span class="k">class</span> <span class="nc">MIResearch_WatchDog</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A watchdog for MI Research built off watchdog</span>
+<span class="sd">    Will watch a directory and load new subjects as they arrive</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directoryToWatch</span><span class="p">,</span> 
+                 <span class="n">dataStorageRoot</span><span class="p">,</span>
+                 <span class="n">subjectPrefix</span><span class="p">,</span>
+                 <span class="n">SubjClass</span><span class="o">=</span><span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">,</span>
+                 <span class="n">DEBUG</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span> <span class="o">=</span> <span class="n">directoryToWatch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span> <span class="o">=</span> <span class="n">dataStorageRoot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjectPrefix</span> <span class="o">=</span> <span class="n">subjectPrefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SubjClass</span> <span class="o">=</span> <span class="n">SubjClass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recursive</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="n">DEBUG</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span><span class="p">,</span> <span class="s1">&#39;MIResearch-PROCESSING&#39;</span><span class="p">)</span>
+        <span class="c1"># self.completeDir = os.path.join(self.directoryToWatch, &#39;MIResearch-COMPLETE&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errorDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span><span class="p">,</span> <span class="s1">&#39;MIResearch-ERROR&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processDir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errorDir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># os.makedirs(self.completeDir, exist_ok=True)</span>
+        <span class="c1"># If storage dir not exist (but root directory does exist) then make</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span><span class="p">):</span> 
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span><span class="p">)[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="n">subjectPrefix</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processDir</span><span class="p">,</span> <span class="s2">&quot;mi_watcher.log&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="c1"># </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span> <span class="o">=</span> <span class="n">MIResearch_SubdirectoryHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">subjectPrefix</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">SubjClass</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="o">.</span><span class="n">processDir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processDir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="o">.</span><span class="n">errorDir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorDir</span>
+        <span class="c1"># self.event_handler.completeDir = self.completeDir</span>
+
+
+<div class="viewcode-block" id="MIResearch_WatchDog.run">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_WatchDog.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
+        <span class="n">observer</span> <span class="o">=</span> <span class="n">Observer</span><span class="p">()</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">recursive</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting MIResearch_WatchDog&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; watching: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; storage destination: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; subject prefix: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subjectPrefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; SubjectClass: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SubjClass</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; RUNNING IN DEBUG MODE&quot;</span><span class="p">)</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; -------------- OBSERVER STARTED --------------&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MIResearch_WatchDog watching </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span><span class="si">}</span><span class="s2"> killed.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Closing cleanly. &quot;</span><span class="p">)</span>
+            <span class="n">observer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="get_directory_modified_time">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.get_directory_modified_time">[docs]</a>
+<span class="k">def</span> <span class="nf">get_directory_modified_time</span><span class="p">(</span><span class="n">directory_path</span><span class="p">):</span>
+    <span class="n">modified_time</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)</span>
+    <span class="c1"># Walk through the directory and its subdirectories</span>
+    <span class="k">for</span> <span class="n">foldername</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">directory_path</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">foldername</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">file_modified_time</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">modified_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">modified_time</span><span class="p">,</span> <span class="n">file_modified_time</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">modified_time</span></div>
+
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">MIResearch_SubdirectoryHandler</span><span class="p">(</span><span class="n">FileSystemEventHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directoryToWatch</span><span class="p">,</span> 
+                 <span class="n">dataStorageRoot</span><span class="p">,</span>
+                 <span class="n">subjectPrefix</span><span class="p">,</span>
+                 <span class="n">logger</span><span class="p">,</span>
+                 <span class="n">SubjClass</span><span class="o">=</span><span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">,</span>
+                 <span class="n">DEBUG</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MIResearch_SubdirectoryHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directoryToWatch</span> <span class="o">=</span> <span class="n">directoryToWatch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span> <span class="o">=</span> <span class="n">dataStorageRoot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjectPrefix</span> <span class="o">=</span> <span class="n">subjectPrefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SubjClass</span> <span class="o">=</span> <span class="n">SubjClass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="n">DEBUG</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.WORKING&#39;</span><span class="p">,</span> <span class="s1">&#39;MIResearch-&#39;</span><span class="p">]</span>
+        <span class="c1"># Polling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pollDelay</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pollStable</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">stable_directory_age_sec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pollDelay</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pollTimeOut</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pollStable</span>
+        <span class="c1"># NOTE:</span>
+        <span class="c1"># self.processDir and self.errorDir are set on the FileSystemEventHandler by the MIResearch_WatchDog class</span>
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler.on_moved">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_moved">[docs]</a>
+    <span class="k">def</span> <span class="nf">on_moved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">is_directory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory moved/renamed: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">dest_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_action</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">dest_path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    _action processing interrupted : </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler.on_created">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_created">[docs]</a>
+    <span class="k">def</span> <span class="nf">on_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">is_directory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory created: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_action</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    _action processing interrupted : </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.tar&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.tar.gz&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Archive created: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Note other archives are not handled</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_action</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    _action processing interrupted : </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;kill_watcher&#39;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyboardInterrupt</span></div>
+
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler.on_deleted">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler.on_deleted">[docs]</a>
+    <span class="k">def</span> <span class="nf">on_deleted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;deleted: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">pass</span></div>
+
+    <span class="c1"># def on_modified(self, event):</span>
+    <span class="c1">#     pass</span>
+
+    <span class="k">def</span> <span class="nf">_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_subdirectory_full</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New subdirectory detected: </span><span class="si">{</span><span class="n">new_subdirectory_full</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">subdirectory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">new_subdirectory_full</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches_ignore_pattern</span><span class="p">(</span><span class="n">subdirectory</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ignoring subdirectory: </span><span class="si">{</span><span class="n">new_subdirectory_full</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stable</span><span class="p">(</span><span class="n">new_subdirectory_full</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;STABLE: </span><span class="si">{</span><span class="n">new_subdirectory_full</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Want to process a directory - but if already being processed then need to deal with that first. </span>
+            <span class="n">matchingProcessing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findMatchingProcessingDirs</span><span class="p">(</span><span class="n">subdirectory</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matchingProcessing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">already_exec_directory</span> <span class="ow">in</span> <span class="n">matchingProcessing</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found already executing directory: </span><span class="si">{</span><span class="n">already_exec_directory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DELETING </span><span class="si">{</span><span class="n">already_exec_directory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span> 
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">already_exec_directory</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">NotADirectoryError</span><span class="p">:</span> <span class="c1"># MAY BE A zip or tar file</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">already_exec_directory</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Directory &#39;</span><span class="si">{</span><span class="n">already_exec_directory</span><span class="si">}</span><span class="s2">&#39; does not exist - maybe just finished.&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1">## </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">execute_loadDirectory</span><span class="p">(</span><span class="n">new_subdirectory_full</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler.findMatchingProcessingDirs">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler.findMatchingProcessingDirs">[docs]</a>
+    <span class="k">def</span> <span class="nf">findMatchingProcessingDirs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_path</span><span class="p">):</span>
+        <span class="n">matchingProcessing</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: check </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">processDir</span><span class="si">}</span><span class="s2"> for matching </span><span class="si">{</span><span class="n">src_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">iDir</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processDir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">src_path</span> <span class="ow">in</span> <span class="n">iDir</span><span class="p">:</span>
+                <span class="n">matchingProcessing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processDir</span><span class="p">,</span> <span class="n">iDir</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">matchingProcessing</span></div>
+
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler.is_stable">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler.is_stable">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_stable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this new directory is stable (no change in modified time)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            directory_path (str): the directory to check for stability</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if stable AND not already being processed. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">stable_start_time</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="c1"># Check if the timeout has been reached</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pollTimeOut</span><span class="p">):</span> 
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">stable_start_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Initialize stable_start_time on the first iteration</span>
+                <span class="n">stable_start_time</span> <span class="o">=</span> <span class="n">current_time</span>
+            <span class="n">modified_time</span> <span class="o">=</span> <span class="n">get_directory_modified_time</span><span class="p">(</span><span class="n">directory_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">modified_time</span> <span class="o">&gt;</span> <span class="n">stable_start_time</span><span class="p">:</span> 
+                <span class="n">stable_start_time</span> <span class="o">=</span> <span class="n">modified_time</span>
+            <span class="k">if</span> <span class="n">current_time</span> <span class="o">-</span> <span class="n">stable_start_time</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pollStable</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory has remained stable for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pollStable</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pollDelay</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler.matches_ignore_pattern">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler.matches_ignore_pattern">[docs]</a>
+    <span class="k">def</span> <span class="nf">matches_ignore_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subdirectory</span><span class="p">):</span>
+        <span class="c1"># Check if the subdirectory matches the ignore pattern</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">subdirectory</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="MIResearch_SubdirectoryHandler.execute_loadDirectory">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearch_SubdirectoryHandler.execute_loadDirectory">[docs]</a>
+    <span class="k">def</span> <span class="nf">execute_loadDirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directoryToLoad</span><span class="p">):</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+        <span class="n">src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">directoryToLoad</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">directoryToLoad_process</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">directoryToLoad</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processDir</span><span class="p">,</span> <span class="n">uid</span><span class="o">+</span><span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">src_path</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*** BEGIN PROCESSING </span><span class="si">{</span><span class="n">directoryToLoad_process</span><span class="si">}</span><span class="s2"> ***&quot;</span><span class="p">)</span>
+            <span class="n">newSubjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">directoryToLoad_process</span><span class="p">,</span>
+                                                <span class="n">dataRoot</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataStorageRoot</span><span class="p">,</span>
+                                                <span class="n">SubjClass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">SubjClass</span><span class="p">,</span>
+                                                <span class="n">subjPrefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subjectPrefix</span><span class="p">,</span>
+                                                <span class="n">OTHER_DATA_DIR</span><span class="o">=</span><span class="n">directoryToLoad_process</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while loading subject: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Move the directory to the error directory</span>
+                <span class="n">finalCompleteDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errorDir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">directoryToLoad_process</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">finalCompleteDir</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">finalCompleteDir</span><span class="si">}</span><span class="s2"> exists - will delete before moving </span><span class="si">{</span><span class="n">directoryToLoad_process</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">finalCompleteDir</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">directoryToLoad_process</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorDir</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while loading subject: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2"> data moved to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">errorDir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   FINISHED LOADING </span><span class="si">{</span><span class="n">directoryToLoad_process</span><span class="si">}</span><span class="s2"> ===&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">directoryToLoad_process</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   DELETED </span><span class="si">{</span><span class="n">directoryToLoad_process</span><span class="si">}</span><span class="s2"> ===&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NotADirectoryError</span><span class="p">:</span> <span class="c1"># MAY BE A zip or tar file</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">directoryToLoad_process</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   DELETED </span><span class="si">{</span><span class="n">directoryToLoad_process</span><span class="si">}</span><span class="s2"> ===&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred while deleting </span><span class="si">{</span><span class="n">directoryToLoad_process</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;=== FINISHED PROCESSING </span><span class="si">{</span><span class="n">directoryToLoad_process</span><span class="si">}</span><span class="s2"> ===&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1">### ====================================================================================================================</span>
+<div class="viewcode-block" id="MIResearchWatchDogError">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_watchdog.MIResearchWatchDogError">[docs]</a>
+<span class="k">class</span> <span class="nc">MIResearchWatchDogError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A custom error class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;An error occurred&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Fraser M. Callaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
