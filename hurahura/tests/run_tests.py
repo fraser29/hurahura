@@ -1,7 +1,14 @@
 
-from .context import hurahura # This is useful for testing outside of environment
-
+# This is useful for testing outside of environment
+import sys
 import os
+try:
+    from .context import hurahura
+except ImportError:
+    # If running directly, import context as a module
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+    from hurahura.tests.context import hurahura
+
 import unittest
 import shutil
 
