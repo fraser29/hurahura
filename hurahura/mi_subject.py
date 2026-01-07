@@ -1094,7 +1094,7 @@ class AbstractSubject(object):
         self.logger.info(f"Start rsyncToOtherDataroot for {self.subjID} at {self.dataRoot} to {otherDataRoot}")
         if os.name == "posix":
             try:
-                result = subprocess.run(["rsync", "-av", self.getTopDir(), otherDataRoot], 
+                result = subprocess.run(["rsync", "-av", "--inplace", self.getTopDir(), otherDataRoot], 
                                         check=True,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)

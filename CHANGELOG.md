@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.32]
+- Bug fix: rsyncToOtherDataroot now uses --inplace option to avoid potential cross-filesystem bugs.  
+
 ## [0.1.30]
 - Feature add: Edge case error catch on subjList creatation, if sub-class of AbstractSubject uses a suffix. 
 
