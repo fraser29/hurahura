@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.33]
+- Feature add: rsyncToOtherDataroot now uses --whole-file option to avoid potential cross-filesystem bugs.  
+
 ## [0.1.32]
 - Bug fix: rsyncToOtherDataroot now uses --inplace option to avoid potential cross-filesystem bugs.  
 
