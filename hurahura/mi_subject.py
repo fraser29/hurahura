@@ -767,8 +767,15 @@ class AbstractSubject(object):
 
 
     def getDicomSeriesDir_Description(self, seriesDescription):
+        """
+        Get the directory of the first series matching the description string.
+        Use getSeriesNumbersMatchingDescriptionStr to get all series (as dict)
+        Returns None if no series is found.
+        """
         dd = self.getSeriesNumbersMatchingDescriptionStr(seriesDescription)
         seNs = dd.keys()
+        if len(seNs) == 0:
+            return None
         seN = min(seNs)
         return self.getDicomSeriesDir(seN)
 

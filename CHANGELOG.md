@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1]
+- Update dependencies for spydmtk and ngawari to fix some DICOM to VTI issues (esp. with 3D DICOM)
+- Bug fix in get series directory by description string - now returns None if no series is found.
+
 ## [0.1.33]
 - Feature add: rsyncToOtherDataroot now uses --whole-file option to avoid potential cross-filesystem bugs.  
 
