@@ -14,3 +14,7 @@ See: :ref:`usage_codefree` for basic customization.
 See: :ref:`usage_subclass` for more advanced customization. 
 
 See: :ref:`watch_dog` for automation of loading subjects from an "*INCOMING*" directory. 
+
+See: :ref:`anonymisation` for anonymisation of data. 
+
+See: :ref:`web_interface` for a web interface to hurahura data. 

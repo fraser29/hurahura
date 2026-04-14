@@ -12,17 +12,25 @@ Welcome to the **hurahura** project documentation!
 Overview
 --------
 
-The **hurahura** project aims to provide a comprehensive platform for organizing and managing medical imaging research projects. It offers tools and utilities to streamline the research process, from data collection and preprocessing to analysis and visualization.
+The **hurahura** project aims to provide a comprehensive framework for organising and managing medical imaging research projects. It offers tools and utilities to standardise storage, organisation, logging and automation of typical tasks in medical imaging research.
 
 Features
 --------
 
-- **Project Organization**: Easily organize your medical imaging research projects, experiments, and datasets in a structured manner.
-- **Data Management**: Efficiently manage medical imaging datasets, including storage, retrieval, and preprocessing.
-- **Analysis Tools**: Access a variety of tools and algorithms for medical image analysis
-- **Visualization**: Visualize medical imaging data and analysis results using interactive visualizations and plots.
-- **Collaboration**: Collaborate with colleagues and peers by sharing projects, datasets, and analysis pipelines.
-- **Customization**: Customize and extend the platform to suit your specific research needs and workflows.
+- **Project Organisation**: Easily organise your medical imaging research projects, experiments, and datasets in a structured manner.
+   - Tools for loading new datasets, including automated via a *watch directory* feature.
+   - Tools for querying and summarising data.
+   - **hurahura** relies on the DICOM standard for data organisation and retrieval.
+- **Data Management**: Efficiently manage medical imaging datasets.
+   - Tools for anonymising data.
+   - Tools for logging data.
+   - Tools for summarising data.
+   - Tools for querying data.
+- **Extendable**: **hurahura** aims to provide a standard framework that is intended to be extended for a range of specialised tasks.
+   - Example: A subclass may be created to handle a specific type of data, such as a particular type of imaging modality or a particular type of analysis.
+- **User Friendly**: **hurahura** aims to provide a user friendly interface for data management and querying.
+   - No database is employed - all data is stored in a simple directory structure.
+   - A web interface is provided for easy management of subjects and data.
 
 Getting Started
 ----------------
