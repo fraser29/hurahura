@@ -17,6 +17,8 @@ Welcome to hurahura's documentation!
    usage_codefree
    usage_subclass
 
+   anonymisation
+
    watch_dog
 
    web_interface

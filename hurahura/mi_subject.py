@@ -888,11 +888,21 @@ class AbstractSubject(object):
     @ui_method(description="Anonymise subject", category="Anonymisation", order=1)
     def anonymise(self, anonName=None, anonID="", QUIET=False):
         """
+        Anonymise the subject
+
         Check if anonName is valid and return anonName and anonID
         If anonName = SOFT then set an encoded name in meta file and retain PatientID - anonymise DICOMS
         If anonName = HARD then set encoded name in meta file to "Unknown" - anonymise DICOMS
         If anonName is None then anonymise DICOMS
         Else anonymise DICOMS with anonName for Name and PatientID
+
+        Args:
+            anonName (str, optional): The anonymisation level to use. Defaults to None.
+            anonID (str, optional): The anonymisation ID to use. Defaults to "".
+            QUIET (bool, optional): Whether to suppress output. Defaults to False.
+
+        Returns:
+            None
         """
         # Check if called via UI
         called_via_ui = getattr(self.anonymise, '_called_via_ui', False)
@@ -982,9 +992,15 @@ class AbstractSubject(object):
 
     def getAge(self):
         """
+        Get the age of the subject. 
         This returns a float, and is slightly wrong in account of leap years.
         This is intentional.
-        :return: years - float
+
+        Args:
+            None
+
+        Returns:
+            float: The age of the subject
         """
         dd = self.getMetaDict()
         if "Age" in dd:

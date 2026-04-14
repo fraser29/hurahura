@@ -15,25 +15,36 @@ In the configuration file *anon_level* may be set to:
 
 - **NONE**: No anonymisation is performed.
 - **SOFT**: *Appropriate for in-house use*
-  - The patient name is anonymised in DICOM files by replacing with an empty string.
-  - The PatientID is retained in META file and DICOM files.
-  - The PatientName is replaced with an empty string in DICOM files.
-  - All PN tags are replaced with an empty string or ``"anonymous"`` as appropriate.
-  - Date of birth, institution and adresses are anonymised.
-  - In the Meta file the ``"NAME"`` (surname) and ``"FIRST_NAMES"`` tags are encoded with the subject ID.
-  - This is recoverable if necessary. See :ref:`mi_subject`, ``AbstractSubject.getName()``, and ``AbstractSubject.getName_FirstNames()``.
-  - The age is retained in the META file.
+
+    - The patient name is anonymised in DICOM files by replacing with an empty string.
+    - The PatientID is retained in META file and DICOM files.
+    - The PatientName is replaced with an empty string in DICOM files.
+    - All PN tags are replaced with an empty string or ``"anonymous"`` as appropriate.
+    - Date of birth, institution and adresses are anonymised.
+    - In the Meta file the ``"NAME"`` (surname) and ``"FIRST_NAMES"`` tags are encoded with the subject ID.
+    - This is recoverable if necessary. 
+    
+        - Functions:  ``AbstractSubject.getName()``, and ``AbstractSubject.getName_FirstNames()`` will return decoded names. .
+    - The age is retained in the META file.
 - **HARD**: *Appropriate for public release / sharing*
-  - The patient name and ID are anonymised in DICOM files by replacing with an empty string.
-  - In the Meta file the ``"NAME"`` (surname) and ``"FIRST_NAMES"`` tags are set to encoded versions of ``"Name-Unknown"`` and ``"FirstNames-Unknown"``.
-  - See :ref:`mi_subject`: ``AbstractSubject.getName()`` and ``AbstractSubject.getName_FirstNames()`` return ``"Name-Unknown"`` and ``"FirstNames-Unknown"`` respectively.
-  - The age is retained in the META file.
+
+    - The patient name is anonymised in DICOM files by replacing with an empty string.
+    - The PatientID is retained in META file and DICOM files.
+    - The PatientName is replaced with an empty string in DICOM files.
+    - All PN tags are replaced with an empty string or ``"anonymous"`` as appropriate.
+    - Date of birth, institution and adresses are anonymised.
+    - In the Meta file the ``"NAME"`` (surname) and ``"FIRST_NAMES"`` tags are set to encoded versions of ``"Name-Unknown"`` and ``"FirstNames-Unknown"``.
+    
+        - Functions: ``AbstractSubject.getName()`` and ``AbstractSubject.getName_FirstNames()`` will return ``"Name-Unknown"`` and ``"FirstNames-Unknown"`` respectively.
+    - The age is retained in the META file.
 
 Alternatively, the anonymisation level can be specified for each subject via the command line:
 
 .. code-block:: bash
 
-    hurahura -s N -anon SOFT
+    hurahura -s N -anon SubjABC
 
     # Anonymise subject N with name "SubjABC" using the SOFT anonymisation level.
+
+Even deeper control is possible at a code level by accessing the ``AbstractSubject`` class and using the ``anonymise`` method.
 
