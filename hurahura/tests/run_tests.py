@@ -13,6 +13,7 @@ import unittest
 import shutil
 
 from hurahura import mi_subject
+from hurahura import mi_database
 from hurahura.mi_config import MIResearch_config
 
 
@@ -452,6 +453,76 @@ class TestSubjectAnonName5(unittest.TestCase):
     def tearDownClass(cls, OVERRIDE=False):
         if (not DEBUG) or OVERRIDE:
             shutil.rmtree(cls.tmpDir)
+
+
+class TestDatabase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpDir = os.path.join(this_dir, 'TestDatabase')
+        cls.db_path = os.path.join(cls.tmpDir, 'hurahura.db')
+        if os.path.isdir(cls.tmpDir):
+            cls.tearDownClass(True)
+        os.makedirs(cls.tmpDir)
+        mi_database.reset_database_instance()
+        MIResearch_config.runConfigParser(os.path.join(this_dir, 'test_db.conf'))
+        MIResearch_config.data_root_dir = cls.tmpDir
+        cls.db_path = MIResearch_config.database_path
+        if os.path.isfile(cls.db_path):
+            os.remove(cls.db_path)
+        cls.newSubj = mi_subject.createNew_OrAddTo_Subject(
+            P1, dataRoot=cls.tmpDir, subjPrefix='MI', QUIET=True
+        )[0]
+
+    def test_sync_on_meta_build(self):
+        self.assertTrue(os.path.isfile(self.db_path))
+        db = mi_database.get_database()
+        rows = db.query_subjects(where_sql="subject_id = ?", params=(self.newSubj.subjID,))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["StudyDate"], "20140409")
+
+    def test_update_meta_refreshes_db(self):
+        self.newSubj.updateMetaFile({"CustomTag": "alpha"})
+        db = mi_database.get_database()
+        cur = db._conn.cursor()
+        cur.execute(
+            "SELECT json_text FROM meta_json WHERE subject_id = ? AND meta_suffix = ''",
+            (self.newSubj.subjID,),
+        )
+        row = cur.fetchone()
+        self.assertIn("CustomTag", row["json_text"])
+
+    def test_external_json_edit_syncs_on_read(self):
+        meta_file = self.newSubj.getMetaTagsFile()
+        dd = self.newSubj.getMetaDict()
+        dd["ExternalEdit"] = "from_disk"
+        import json
+        with open(meta_file, "w", encoding="utf-8") as fh:
+            json.dump(dd, fh)
+        self.newSubj.meta_cache = {}
+        self.newSubj.getMetaDict()
+        db = mi_database.get_database()
+        cur = db._conn.cursor()
+        cur.execute(
+            "SELECT json_text FROM meta_json WHERE subject_id = ? AND meta_suffix = ''",
+            (self.newSubj.subjID,),
+        )
+        self.assertIn("ExternalEdit", cur.fetchone()["json_text"])
+
+    def test_full_db_sync(self):
+        n = mi_database.sync_all_subjects_in_data_root()
+        self.assertGreaterEqual(n, 1)
+
+    @classmethod
+    def tearDownClass(cls, OVERRIDE=False):
+        mi_database.reset_database_instance()
+        MIResearch_config.database_enabled = False
+        if (not DEBUG) or OVERRIDE:
+            db_path = getattr(cls, 'db_path', None)
+            if db_path and os.path.isfile(db_path):
+                os.remove(db_path)
+            tmp_dir = getattr(cls, 'tmpDir', None)
+            if tmp_dir and os.path.isdir(tmp_dir):
+                shutil.rmtree(tmp_dir)
 
 
 class TestSubjectUseConfFile(unittest.TestCase):

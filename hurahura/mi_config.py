@@ -51,8 +51,36 @@ class _MIResearch_config():
                     self.params[section][option] = self.config.get(section, option)
 
         self.subject_class_name = self.config.get("app", "class_path", fallback=None) 
-        self.class_obj = self.config.get("app", "class_path", fallback=None) 
+        self.class_obj = self.config.get("app", "class_path", fallback=None)
 
+        self.database_enabled = self.config.getboolean(
+            "database", "enabled", fallback=False
+        )
+        self._database_path = self.config.get("database", "db_path", fallback="")
+        self.database_sync_on_meta_write = self.config.getboolean(
+            "database", "sync_on_meta_write", fallback=True
+        )
+        from hurahura.mi_database import DatabaseConfig
+        self.database_field_config = DatabaseConfig.from_parser(self.config)
+
+
+    def _resolve_optional_path(self, value: str):
+        if not value or not str(value).strip():
+            return None
+        value = str(value).strip()
+        if value.startswith("~"):
+            value = os.path.expanduser(value)
+        return os.path.abspath(value)
+
+    @property
+    def database_path(self):
+        """SQLite file path; default is hurahura.db in the data root."""
+        if self._database_path and len(self._database_path.strip()):
+            path = self._database_path.strip()
+            if path.startswith("~"):
+                path = os.path.expanduser(path)
+            return os.path.abspath(path)
+        return os.path.join(self.data_root_dir, "hurahura.db")
 
     @property
     def data_root_dir(self):

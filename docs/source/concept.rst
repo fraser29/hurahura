@@ -5,7 +5,8 @@ Concept
 
 The purpose of hurahura is a medical imaging data management service. 
 
-The storage system is intentionally kept simple. No database is employed. 
+The storage system is intentionally kept simple. By default no database is employed;
+an optional local SQLite index may be enabled (see :ref:`database`). 
 
 From a root directory a new subdirectory is built per “examination” as a new “subject”. 
 

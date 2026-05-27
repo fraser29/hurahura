@@ -30,6 +30,7 @@ from ngawari import fIO
 import inspect  
 
 from hurahura import mi_utils
+from hurahura import mi_database
 
 
 _CACHED_SUBJECT_CLASS = None
@@ -487,9 +488,13 @@ class AbstractSubject(object):
         if os.path.isdir(newName):
             shutil.rmtree(newName)
         os.rename(self.getTopDir(), newName)
+        old_subj_id = oldID
         self.subjectPrefix = newSubjID
         self._subjN = None
         self._renameLogger()
+        db = mi_database.get_database()
+        if db is not None:
+            db.rename_subject(old_subj_id, self.subjID)
         self.logger.warning(f"New logger after subjID changed from {oldID} to {self.subjID}")
         self.logger.warning(" *** THIS WILL LIKELY HAVE BREAKING CONSEQUENCES ***")        
         self.buildDicomMeta()
@@ -648,6 +653,7 @@ class AbstractSubject(object):
 
 
     def _cacheMeta(self, suffix):
+        mi_database.maybe_refresh_subject_meta_from_database(self, meta_suffix=suffix)
         ff = self.getMetaTagsFile(suffix)
         dd = {}
         if os.path.isfile(ff):
@@ -708,6 +714,8 @@ class AbstractSubject(object):
         fIO.writeDictionaryToJSON(metaFile, dd)
         self.logger.info(f'Updated meta-file')
         self._cacheMeta(metasuffix)
+        if mi_utils.MIResearch_config.database_enabled and mi_utils.MIResearch_config.database_sync_on_meta_write:
+            mi_database.sync_subject_to_database(self, meta_suffix=metasuffix, meta_dict=dd)
         return metaFile
 
 

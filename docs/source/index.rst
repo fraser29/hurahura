@@ -12,6 +12,7 @@ Welcome to hurahura's documentation!
 
    introduction
    concept
+   database
 
    usage
    usage_codefree
