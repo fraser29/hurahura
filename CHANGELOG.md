@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2]
+- Feature add - Overview command line option to print quick overview of DB and all subjects
+- Feature add - if negative subject number is given, get last N subjects. 
+- Feature add - UI improvements and optimisations. 
+- Bug fix - Series number in UI now shows number of images in series. 
+- Bug fix - Error handling in UI now shows error message. 
+- Feature add - Structure to build true (sqlite) database of subjects and series. (optional)
+
 ## [0.2.1]
 - Update dependencies for spydmtk and ngawari to fix some DICOM to VTI issues (esp. with 3D DICOM)
 - Bug fix in get series directory by description string - now returns None if no series is found.
