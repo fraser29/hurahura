@@ -1235,6 +1235,13 @@ class SubjectList(list):
         return f"{len(self)} subjects of {self[0].subjectPrefix} at {self[0].dataRoot}"
 
 
+    def printOverview(self):
+        print(f"Overview: ")
+        print(f"  Dataroot: {self[0].dataRoot}")
+        print(f"  Subject prefix: {self[0].subjectPrefix}")
+        print(f"  Subject class: {self[0].__class__.__name__} at {self[0].__class__.__module__}")
+        print(f"  Subjects: {len(self)} from {self[0].subjN} to {self[-1].subjN}")
+
     def reduceToExist(self, VERBOSE=False):
         toRemove = []
         for i in self:

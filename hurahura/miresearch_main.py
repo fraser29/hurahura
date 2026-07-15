@@ -93,6 +93,7 @@ groupSubj.add_argument('-SubjInfoFull', dest='subjInfoFull',
 
 # GROUP ACTIONS
 groupGroup = ParentAP.add_argument_group('Group Level Actions')
+groupGroup.add_argument('-Overview', dest='Overview', help='Print quick overview of DB and all subjects', action='store_true') 
 groupGroup.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
                     type=str, nargs="*", default=None)
@@ -180,10 +181,19 @@ def checkArgs(args, class_obj=None):
     if args.INFO:
         MIResearch_config.printInfo()
         sys.exit(1)
+    if args.Overview:
+        subjList = mi_subject.SubjectList().setByDirectory(MIResearch_config.data_root_dir, 
+                                                            MIResearch_config.subject_prefix, 
+                                                            SubjClass=MIResearch_config.class_obj)
+        subjList.printOverview()
+        sys.exit(1)
     setNList(args=args)
 
 
 def setNList(args):
+    if (len(args.subjNList) == 1) and (args.subjNList[0] < 0): # If negative - get last N subjects
+        nSubjs = max(mi_subject.getAllSubjectsN(MIResearch_config.data_root_dir, MIResearch_config.subject_prefix))
+        args.subjNList = list(range(nSubjs + args.subjNList[0], nSubjs + 1))
     if args.AllSubjs:
         args.subjNList = mi_subject.getAllSubjectsN(MIResearch_config.data_root_dir, MIResearch_config.subject_prefix)
     else:

@@ -111,10 +111,13 @@ class SubjectPage:
         metaDict = self.thisSubj.getMetaDict()
         seriesList = metaDict.get('Series', []) # Not actually reading dicoms here - just grabbing metadata
         for iSeries in seriesList:
+            nImages = iSeries.get('nSlice', 'UNKNOWN')
+            if nImages == 'UNKNOWN':
+                nImages = iSeries.get('ImagesInAcquisition', 'UNKNOWN')
             rowsSe.append({
                 "sernum": iSeries.get('SeriesNumber', 'UNKNOWN'), 
                 "serdesc": iSeries.get('SeriesDescription', 'UNKNOWN'), 
-                "ndcm": iSeries.get('nSlice', 'UNKNOWN'), 
+                "ndcm": nImages, 
                 "_series": iSeries
             })
         
