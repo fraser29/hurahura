@@ -12,6 +12,7 @@ from hurahura import mi_utils
 from hurahura import mi_subject
 from hurahura import miresearch_watchdog
 from hurahura.mi_config import MIResearch_config
+from hurahura import mi_database
 
 
 
@@ -92,11 +93,15 @@ groupSubj.add_argument('-SubjInfoFull', dest='subjInfoFull',
 
 # GROUP ACTIONS
 groupGroup = ParentAP.add_argument_group('Group Level Actions')
+groupGroup.add_argument('-Overview', dest='Overview', help='Print quick overview of DB and all subjects', action='store_true') 
 groupGroup.add_argument('-SummaryCSV', dest='SummaryCSV', 
                     help='Write summary CSV file (give output file name)', 
                     type=str, nargs="*", default=None)
 groupGroup.add_argument('-Summary', dest='Summary', 
                     help='Print summary of provided subjects to commandline (best with -sA option)', 
+                    action='store_true')
+groupGroup.add_argument('-DBSync', dest='DBSync', 
+                    help='Rebuild optional SQLite database from all subjects META JSON (requires [database] enabled in config)', 
                     action='store_true')
 
 # WATCH DIRECTORY
@@ -143,6 +148,7 @@ def checkArgs(args, class_obj=None):
     args.RUN_ANON = False
     if args.configFile: 
         MIResearch_config.runConfigParser(args.configFile)
+        mi_database.reset_database_instance()
     #
     if args.dataRoot is not None:
         MIResearch_config.data_root_dir = args.dataRoot
@@ -175,10 +181,19 @@ def checkArgs(args, class_obj=None):
     if args.INFO:
         MIResearch_config.printInfo()
         sys.exit(1)
+    if args.Overview:
+        subjList = mi_subject.SubjectList().setByDirectory(MIResearch_config.data_root_dir, 
+                                                            MIResearch_config.subject_prefix, 
+                                                            SubjClass=MIResearch_config.class_obj)
+        subjList.printOverview()
+        sys.exit(1)
     setNList(args=args)
 
 
 def setNList(args):
+    if (len(args.subjNList) == 1) and (args.subjNList[0] < 0): # If negative - get last N subjects
+        nSubjs = max(mi_subject.getAllSubjectsN(MIResearch_config.data_root_dir, MIResearch_config.subject_prefix))
+        args.subjNList = list(range(nSubjs + args.subjNList[0], nSubjs + 1))
     if args.AllSubjs:
         args.subjNList = mi_subject.getAllSubjectsN(MIResearch_config.data_root_dir, MIResearch_config.subject_prefix)
     else:
@@ -325,6 +340,15 @@ def runActions(args, extra_runActions=None):
                     
 
         # === SUBJECT GROUP ACTIONS ===
+        # --- Database sync ---
+        elif args.DBSync:
+            if not MIResearch_config.database_enabled:
+                print("ERROR: -DBSync requires [database] enabled = true in miresearch.conf")
+                sys.exit(1)
+            n = mi_database.sync_all_subjects_in_data_root()
+            if not args.QUIET:
+                print(f"Database sync complete: {n} subjects at {MIResearch_config.database_path}")
+
         # --- SummaryCSV ---
         elif args.SummaryCSV is not None:
             if not args.QUIET:

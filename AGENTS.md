@@ -15,7 +15,7 @@ Published docs: https://fraser29.github.io/hurahura/
 | **META** | Logs, extracted tag JSON, `summary.csv` for querying without opening every DICOM. |
 | **AbstractSubject** | Base class in `hurahura/mi_subject.py` — extend for study-specific pipelines. |
 
-There is **no database**; behaviour is defined by the filesystem layout and META files.
+By default there is **no database**; behaviour is defined by the filesystem layout and META files. Optional **SQLite** (`[database]` in `miresearch.conf`, see `docs/source/database.rst`) mirrors META JSON for local SQL queries.
 
 ## Repository layout
 
@@ -24,6 +24,7 @@ hurahura/
   mi_subject.py          # AbstractSubject, SubjectList, loading, meta, anonymisation
   mi_utils.py            # DirectoryStructureTree, DICOM tag lists, helpers
   mi_config.py           # miresearch.conf parsing (MIResearch_config singleton)
+  mi_database.py         # optional SQLite index of META JSON (config-gated)
   miresearch_main.py     # CLI entry (hurahura), argparse groups, runActions
   miresearch_watchdog.py # Watch-directory auto-load (pairs with AUTORTHANC)
   miresearch.conf        # Default config shipped with package
@@ -76,6 +77,7 @@ Important `[app]` keys:
 - `data_root_dir`, `subject_prefix`, `directories` (JSON list, e.g. `[["RAW", "DICOM"], "META"]`)
 - `class_path` — dotted path to custom `AbstractSubject` subclass
 - `anon_level` — `NONE` | `SOFT` | `HARD` (see `docs/source/anonymisation.rst`)
+- `[database]` — `enabled`, `db_path`, `sync_on_meta_write`, `study_columns`, `meta_suffixes`, `meta_sync_all`, `extra_fields` (optional local SQLite)
 
 String values in `.conf` must **not** use quotes except inside JSON list values (double-quoted).
 
@@ -153,4 +155,5 @@ Representative flags (see `hurahura -h` for full list):
 | Subject ops | `-RunPost`, `-Meta`, `-SubjInfo`, `-anonName` |
 | Group | `-Summary`, `-SummaryCSV` |
 | Watch / UI | `-WatchDirectory`, `-UI`, `-UI_port` |
+| Database | `-DBSync` (with `[database] enabled`) |
 | Debug | `-INFO`, `-DEBUG`, `-QUIET`, `-FORCE` |
