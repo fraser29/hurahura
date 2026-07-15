@@ -69,14 +69,14 @@ class SubjectPage:
                                     input_field = ui.input(label=param_name, value=default_value)
                                     input_fields.append(input_field)
                 with ui.column().classes('ml-4'):
-                    def handle_click(method=iMethod['method'], inputs=input_fields):
-                        ui.notify(f'Running {iMethod["name"]}...', type='info')
+                    def handle_click(method=iMethod['method'], inputs=input_fields, name=iMethod['name']):
+                        ui.notify(f'Running {name}...', type='info')
                         try:
                             args = [inp.value for inp in inputs]
                             method(self.thisSubj, *args)
-                            ui.notify(f'Method {iMethod["name"]} completed', type='positive')
+                            ui.notify(f'Method {name} completed', type='positive')
                         except Exception as e:
-                            ui.notify(f'Error: {iMethod["name"]}: {str(e)}', type='negative')
+                            ui.notify(f'Error: {name}: {str(e)}', type='negative')
                     
                     ui.button(display_name, on_click=handle_click).classes('self-end')
 
