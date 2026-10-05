@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3]
+- Feature add - getStartTime_EndTimeOfExam now returns datetime objects if RETURN_DATETIME is True.
+- Utils function timeToDatetime now takes (optional) dateStr as an argument to return true datetime (not just time).
+
 ## [0.2.2]
 - Feature add - Overview command line option to print quick overview of DB and all subjects
 - Feature add - if negative subject number is given, get last N subjects. 

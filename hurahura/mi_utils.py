@@ -224,11 +224,27 @@ def writeCSVFile(data, header, csvFile, FIX_NAN=False):
     return csvFile
 
 
-def timeToDatetime(timeStr):
-    try:
-        iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S.%f')
+def timeToDatetime(timeStr, dateStr=None):
+    """
+    Convert a time string to a datetime object
+    
+    Args:
+        timeStr (str): The time string to convert
+        dateStr (str): The date string to convert. If None, the time string is assumed to be in the current date.
+        
+    Returns:
+        datetime: The datetime object
+    """
+    try:   
+        if dateStr is not None:
+            iDatetime = datetime.datetime.strptime(dateStr + ' ' + timeStr, '%Y%m%d %H%M%S.%f')
+        else:
+            iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S.%f')
     except ValueError:
-        iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S')
+        if dateStr is not None:
+            iDatetime = datetime.datetime.strptime(dateStr + ' ' + timeStr, '%Y%m%d %H%M%S')
+        else:
+            iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S')
     return iDatetime
 #==================================================================
 class SubjPrefixError(Exception):

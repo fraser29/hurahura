@@ -557,16 +557,21 @@ class AbstractSubject(object):
         return int(seNum)
 
 
-    def getStartTime_EndTimeOfExam(self):
+    def getStartTime_EndTimeOfExam(self, RETURN_DATETIME=False):
         NN = self.getListOfSeNums()
         Ns = min(NN)
         Ne = max([i for i in NN if i < 99])
         df = self.getSeriesMetaAsDataFrame()
+        studyDate_Start = list(df.loc[df['SeriesNumber']==Ns,'StudyDate'])[0]
+        studyDate_End = list(df.loc[df['SeriesNumber']==Ne,'StudyDate'])[0]
+        t1 = self.getStartTimeForSeriesN_HHMMSS(Ns, df=df)
         t2 = self.getStartTimeForSeriesN_HHMMSS(Ne, df=df)
-        t2 = mi_utils.timeToDatetime(str(t2))
+        t2 = mi_utils.timeToDatetime(str(t2), dateStr=studyDate_End)
         endT = t2 + datetime.timedelta(0, self.getTimeTakenForSeriesN_s(Ne, df=df))
+        if RETURN_DATETIME:
+            return mi_utils.timeToDatetime(str(t1), dateStr=studyDate_Start), endT
         endT_HHMMSS = datetime.datetime.strftime(endT, '%H%M%S')
-        return self.getStartTimeForSeriesN_HHMMSS(Ns), endT_HHMMSS
+        return t1, endT_HHMMSS
 
 
     def getTimeTakenForSeriesN_s(self, N, df=None):
@@ -588,11 +593,23 @@ class AbstractSubject(object):
 
 
     def getDifferenceBetweenStartTimesOfTwoScans_s(self, seN1, seN2):
+        """
+        Get the difference between the start times of two scans in seconds
+        
+        Args:
+            seN1 (int): The series number of the first scan
+            seN2 (int): The series number of the second scan
+            
+        Returns:
+            int: The difference between the start times of the two scans in seconds
+        """
         df = self.getSeriesMetaAsDataFrame()
+        studyDate_1 = list(df.loc[df['SeriesNumber']==seN1,'StudyDate'])[0]
+        studyDate_2 = list(df.loc[df['SeriesNumber']==seN2,'StudyDate'])[0]
         t1 = self.getStartTimeForSeriesN_HHMMSS(seN1, df)
         t2 = self.getStartTimeForSeriesN_HHMMSS(seN2, df)
-        t1 = mi_utils.timeToDatetime(str(t1))
-        t2 = mi_utils.timeToDatetime(str(t2))
+        t1 = mi_utils.timeToDatetime(str(t1), dateStr=studyDate_1)
+        t2 = mi_utils.timeToDatetime(str(t2), dateStr=studyDate_2)
         return (t2-t1).seconds
 
 
@@ -874,6 +891,15 @@ class AbstractSubject(object):
 
 
     def getStudyDate(self, RETURN_Datetime=False):
+        """
+        Get the study date
+        
+        Args:
+            RETURN_Datetime (bool, optional): Whether to return the date as a datetime object. Defaults to False.
+            
+        Returns:
+            str: The study date
+        """
         dos = self.getMetaTagValue('StudyDate')
         if RETURN_Datetime:
             spydcm.dcmTools.dbDateToDateTime(dos)
