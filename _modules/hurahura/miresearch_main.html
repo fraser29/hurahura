@@ -1,0 +1,540 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hurahura.miresearch_main &mdash; hurahura 0.1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=22607128"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            hurahura
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../concept.html">Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">Optional local database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_codefree.html">Usage_codefree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_subclass.html">Usage_subclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../anonymisation.html">Anonymisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../watch_dog.html">Watch Dog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../web_interface.html">Web Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hurahura.html">hurahura package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">hurahura</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">hurahura</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hurahura.miresearch_main</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hurahura.miresearch_main</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">"""Module that exposes the routines and utilities making up MIRESEARCH</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura</span><span class="w"> </span><span class="kn">import</span> <span class="n">mi_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura</span><span class="w"> </span><span class="kn">import</span> <span class="n">mi_subject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura</span><span class="w"> </span><span class="kn">import</span> <span class="n">miresearch_watchdog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura.mi_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MIResearch_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura</span><span class="w"> </span><span class="kn">import</span> <span class="n">mi_database</span>
+
+
+
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1">#          ARGUEMTENT PARSING AND ACTIONS </span>
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1"># Override error to show help on argparse error (missing required argument etc)</span>
+<div class="viewcode-block" id="MiResearchParser">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_main.MiResearchParser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MiResearchParser</span><span class="p">(</span><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">):</span>
+<div class="viewcode-block" id="MiResearchParser.error">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_main.MiResearchParser.error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'error: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">'</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+</div>
+
+
+<span class="n">ParentAP</span> <span class="o">=</span> <span class="n">MiResearchParser</span><span class="p">(</span><span class="n">epilog</span><span class="o">=</span><span class="s2">"Written Fraser M. Callaghan. MRZentrum, University Children's Hospital Zurich"</span><span class="p">)</span>
+
+<span class="n">groupM</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'Management Parameters'</span><span class="p">)</span>
+<span class="n">groupM</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-config'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'configFile'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Path to configuration file to use.'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupM</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-FORCE'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'FORCE'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'force action - use with caution'</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupM</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-QUIET'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'QUIET'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Suppress progress bars and logging to terminal'</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupM</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-INFO'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'INFO'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Provide setup (configuration) info and exit.'</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupM</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-DEBUG'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'DEBUG'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Run in DEBUG mode (save intermediate steps, increase log output)'</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+
+<span class="n">groupS</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'Subject Definition'</span><span class="p">)</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-s'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjNList'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Subject number(s)'</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">"*"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-sA'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'AllSubjs'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'All subjects'</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-sf'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjNListFile'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Subject numbers in file'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-sR'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjRange'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Subject range'</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-y'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'dataRoot'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Path of root data directory (where subjects are stored) [default None -&gt; may be set in config file]'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-sPrefix'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjPrefix'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Subject prefix [default None -&gt; will get from config file OR dataRoot]'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-sSuffix'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjSuffix'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Subject suffix [default ""]'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+<span class="n">groupS</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-anonName'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'anonName'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Set to anonymise newly loaded subject. Set to true to use for WatchDirectory. [default None]'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    
+<span class="c1">## === ACTIONS ===</span>
+<span class="n">groupLoad</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'Loading Actions'</span><span class="p">)</span>
+<span class="n">groupLoad</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-Build'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'build'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Build empty subject(s)'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="c1"># LOADING</span>
+<span class="n">groupLoad</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-Load'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'loadPath'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Path to load data from (file / directory / tar / tar.gz / zip)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupLoad</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-LoadOther'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'loadPathOther'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Path to load other data from directory (non-DICOM)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupLoad</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-LOAD_MULTI'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'LoadMulti'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Combine with "Load": Load new subject for each subdirectory under loadPath'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupLoad</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-LOAD_MULTI_FORCE'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'LoadMultiForce'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Combine with "Load": Force to ignore studyUIDs and load new ID per subdirectory'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+
+<span class="c1"># SUBJECT LEVEL</span>
+<span class="n">groupSubj</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'Subject Level Actions'</span><span class="p">)</span>
+<span class="n">groupSubj</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-RunPost'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjRunPost'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Run post load pipeline'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupSubj</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-Meta'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjRunMeta'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Build subject meta (use FORCE to rebuild)'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupSubj</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-SubjInfo'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjInfo'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Print info for each subject'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupSubj</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-SubjInfoFull'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'subjInfoFull'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Print full info for each subject'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+
+<span class="c1"># GROUP ACTIONS</span>
+<span class="n">groupGroup</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'Group Level Actions'</span><span class="p">)</span>
+<span class="n">groupGroup</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-Overview'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'Overview'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Print quick overview of DB and all subjects'</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span> 
+<span class="n">groupGroup</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-SummaryCSV'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'SummaryCSV'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Write summary CSV file (give output file name)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">"*"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupGroup</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-Summary'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'Summary'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Print summary of provided subjects to commandline (best with -sA option)'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupGroup</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-DBSync'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'DBSync'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Rebuild optional SQLite database from all subjects META JSON (requires [database] enabled in config)'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+
+<span class="c1"># WATCH DIRECTORY</span>
+<span class="n">groupWatch</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'Watch Directory Actions'</span><span class="p">)</span>
+<span class="n">groupWatch</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-WatchDirectory'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'WatchDirectory'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Will watch given directory for new data and load as new study'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># UI STUFF</span>
+<span class="n">groupUI</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'UI Actions'</span><span class="p">)</span>
+<span class="n">groupUI</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-UI'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'UI'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Run in UI mode'</span><span class="p">,</span> 
+                    <span class="n">action</span><span class="o">=</span><span class="s1">'store_true'</span><span class="p">)</span>
+<span class="n">groupUI</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-UI_port'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'UI_port'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Port to run UI on (default 8080)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">8080</span><span class="p">)</span>
+
+<span class="c1">## === QUERY ===</span>
+<span class="n">groupQ</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">'Query'</span><span class="p">)</span>
+<span class="n">groupQ</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-qSeriesDesc'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'qSeriesDesc'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Query based on a series description (must provide -s* option)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupQ</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-qPID'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'qPID'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Query based on patient ID (must provide -s* option)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupQ</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-qPatName'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'qPatName'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Query based on a patient name (must provide -s* option)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupQ</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-qExamID'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'qExamID'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Query based on exam (scanner assigned) ID (must provide -s* option)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">groupQ</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-qDate'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'qDate'</span><span class="p">,</span> 
+                    <span class="n">help</span><span class="o">=</span><span class="s1">'Query based on study date: provide start and end, YYYYMMDD (must provide -s* option)'</span><span class="p">,</span> 
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1">#           CHECK ARGS</span>
+<span class="c1">### ====================================================================================================================</span>
+
+<div class="viewcode-block" id="checkArgs">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_main.checkArgs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">checkArgs</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">class_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span> <span class="c1"># Only override if explicitly set</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># </span>
+    <span class="n">args</span><span class="o">.</span><span class="n">RUN_ANON</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">configFile</span><span class="p">:</span> 
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">runConfigParser</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">configFile</span><span class="p">)</span>
+        <span class="n">mi_database</span><span class="o">.</span><span class="n">reset_database_instance</span><span class="p">()</span>
+    <span class="c1">#</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataRoot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">dataRoot</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">subjPrefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">subjPrefix</span>
+    <span class="c1"># NOTE: anon slightly different to other settings:</span>
+    <span class="c1"># - anon_level used in Config (NONE, SOFT, HARD)</span>
+    <span class="c1"># - but option to specify a specific anonName for each subject here (args.anonName)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">anonName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="n">args</span><span class="o">.</span><span class="n">anonName</span> <span class="o">=</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">anon_level</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">args</span><span class="o">.</span><span class="n">RUN_ANON</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Running MIRESEARCH with dataRoot </span><span class="si">{</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">loadPath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">loadPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">loadPath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">LoadMultiForce</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">LoadMulti</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="k">if</span> <span class="n">class_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">class_obj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">get_configured_subject_class</span><span class="p">(</span><span class="n">class_obj</span><span class="p">)</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span> <span class="o">=</span> <span class="n">class_obj</span>
+    <span class="k">if</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">get_configured_subject_class</span><span class="p">(</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span>
+    <span class="c1">## -------------</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">INFO</span><span class="p">:</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">printInfo</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">Overview</span><span class="p">:</span>
+        <span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">SubjectList</span><span class="p">()</span><span class="o">.</span><span class="n">setByDirectory</span><span class="p">(</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> 
+                                                            <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">,</span> 
+                                                            <span class="n">SubjClass</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">)</span>
+        <span class="n">subjList</span><span class="o">.</span><span class="n">printOverview</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">setNList</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="setNList">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_main.setNList">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">setNList</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span> <span class="c1"># If negative - get last N subjects</span>
+        <span class="n">nSubjs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">mi_subject</span><span class="o">.</span><span class="n">getAllSubjectsN</span><span class="p">(</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">))</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nSubjs</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nSubjs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">AllSubjs</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">getAllSubjectsN</span><span class="p">(</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjRange</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjRange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">subjRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNListFile</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="o">+</span><span class="n">mi_utils</span><span class="o">.</span><span class="n">subjFileToSubjN</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjNListFile</span><span class="p">)</span></div>
+
+    <span class="c1"># args.subjNList = sorted(list(set(args.subjNList)))</span>
+
+
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1">#           RUN ACTIONS</span>
+<span class="c1">### ====================================================================================================================</span>
+<div class="viewcode-block" id="runActions">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_main.runActions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">runActions</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">extra_runActions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="c1"># --- LOAD ---</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">loadPath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Running MIRESEARCH with loadPath </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">loadPath</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">loadDirectory</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">loadPath</span><span class="p">,</span>
+                                             <span class="n">dataRoot</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span>
+                                             <span class="n">subjPrefix</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">,</span>
+                                             <span class="n">subjNumber</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                             <span class="n">anonName</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">anonName</span><span class="p">,</span>
+                                             <span class="n">LOAD_MULTI</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">LoadMulti</span><span class="p">,</span>
+                                             <span class="n">SubjClass</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">,</span>
+                                             <span class="n">IGNORE_UIDS</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">LoadMultiForce</span><span class="p">,</span>
+                                             <span class="n">OTHER_DATA_DIR</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">loadPathOther</span><span class="p">,</span>
+                                             <span class="n">QUIET</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span> <span class="o">=</span> <span class="p">[</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjN</span> <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">]</span>
+
+    <span class="c1"># SPECIAL ACTION - BUILD EMPTY SUBJECT(S)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">build</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>    
+            <span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">SubjectList</span><span class="p">([</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">(</span><span class="n">sn</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">,</span> 
+                                                                           <span class="n">suffix</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">subjSuffix</span><span class="p">)</span> <span class="k">for</span> <span class="n">sn</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">SubjectList</span><span class="p">([</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">(</span><span class="n">sn</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">)</span> <span class="k">for</span> <span class="n">sn</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">iSubj</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Building: </span><span class="si">{</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+                <span class="n">iSubj</span><span class="o">.</span><span class="n">initDirectoryStructure</span><span class="p">()</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span> <span class="o">=</span> <span class="p">[</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjN</span> <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">]</span>
+
+    <span class="c1"># ------------------------------------------------------------------------------------------------------------------------------</span>
+    <span class="c1"># SUBJECT LEVEL actions</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"SubjList provided is: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>    
+            <span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">SubjectList</span><span class="p">([</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">(</span><span class="n">sn</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">,</span> 
+                                                                           <span class="n">suffix</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">subjSuffix</span><span class="p">)</span> <span class="k">for</span> <span class="n">sn</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">SubjectList</span><span class="p">([</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">(</span><span class="n">sn</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span> 
+                                                                           <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">)</span> <span class="k">for</span> <span class="n">sn</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">])</span>
+        <span class="n">subjList</span><span class="o">.</span><span class="n">reduceToExist</span><span class="p">(</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+                <span class="n">iSubj</span><span class="o">.</span><span class="n">setDEBUGMode</span><span class="p">(</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">loadPathOther</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subjList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">subjList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">addOtherData</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">loadPathOther</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: -LoadOther option only supported for single subject"</span><span class="p">)</span>
+
+        <span class="c1"># --- QUERY ---</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">qSeriesDesc</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Searching: </span><span class="si">{</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">iSubj</span><span class="o">.</span><span class="n">getSeriesNumbersMatchingDescriptionStr</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">qSeriesDesc</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iSubj</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">qPID</span><span class="p">:</span>
+            <span class="n">subList</span> <span class="o">=</span> <span class="n">subjList</span><span class="o">.</span><span class="n">findSubjMatchingPatientID</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">qPID</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subList</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">iSubj</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">qPatName</span><span class="p">:</span>
+            <span class="n">subList</span> <span class="o">=</span> <span class="n">subjList</span><span class="o">.</span><span class="n">findSubjMatchingName</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">qPatName</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subList</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">iSubj</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">qExamID</span><span class="p">:</span>
+            <span class="n">subList</span> <span class="o">=</span> <span class="n">subjList</span><span class="o">.</span><span class="n">findSubjMatchingStudyID</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">qExamID</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subList</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">iSubj</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">qDate</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">subList</span> <span class="o">=</span> <span class="n">subjList</span><span class="o">.</span><span class="n">filterSubjectListByDOS</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">qDate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">qDate</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subList</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">iSubj</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+
+        <span class="c1"># --- ANONYMISE ---</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">RUN_ANON</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">anonName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Anonymise: </span><span class="si">{</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+                    <span class="n">iSubj</span><span class="o">.</span><span class="n">anonymise</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">anonName</span><span class="p">)</span>
+
+        <span class="c1"># --- POST LOAD PIPELINE ---</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">subjRunPost</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Post load pipeline: </span><span class="si">{</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+                <span class="n">iSubj</span><span class="o">.</span><span class="n">runPostLoadPipeLine</span><span class="p">()</span>
+
+        <span class="c1"># --- META DATA PIPELINE ---</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">subjRunMeta</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Meta pipeline: </span><span class="si">{</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+                <span class="n">iSubj</span><span class="o">.</span><span class="n">buildDicomMeta</span><span class="p">()</span>
+                <span class="n">iSubj</span><span class="o">.</span><span class="n">buildSeriesDataMetaCSV</span><span class="p">(</span><span class="n">FORCE</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">FORCE</span><span class="p">)</span>
+
+        <span class="c1"># --- PRINT INFO ---</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">subjInfo</span><span class="p">:</span>
+            <span class="n">HEADER</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="n">iSubj</span><span class="o">.</span><span class="n">getInfoStr</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">HEADER</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+                    <span class="n">HEADER</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]))</span>
+
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">subjInfoFull</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iSubj</span> <span class="ow">in</span> <span class="n">subjList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Info: </span><span class="si">{</span><span class="n">iSubj</span><span class="o">.</span><span class="n">subjID</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+                <span class="n">iSubj</span><span class="o">.</span><span class="n">infoFull</span><span class="p">()</span>
+                    
+
+        <span class="c1"># === SUBJECT GROUP ACTIONS ===</span>
+        <span class="c1"># --- Database sync ---</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">DBSync</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">database_enabled</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"ERROR: -DBSync requires [database] enabled = true in miresearch.conf"</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">mi_database</span><span class="o">.</span><span class="n">sync_all_subjects_in_data_root</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Database sync complete: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> subjects at </span><span class="si">{</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">database_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="c1"># --- SummaryCSV ---</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">SummaryCSV</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Info: writting summary for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">)</span><span class="si">}</span><span class="s2"> subjects at </span><span class="si">{</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">SummaryCSV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">SummaryCSV</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  With tags: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">SummaryCSV</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">subjList</span><span class="o">.</span><span class="n">writeSummaryCSV</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">SummaryCSV</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">extra_series_tags</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">SummaryCSV</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        
+        <span class="c1"># --- Summary ---</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">Summary</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">QUIET</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Info: summary for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">subjNList</span><span class="p">)</span><span class="si">}</span><span class="s2"> subjects at </span><span class="si">{</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">subjList</span><span class="p">)</span>
+
+    <span class="c1">## WATCH DIRECTORY ##</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">WatchDirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">MIWatcher</span> <span class="o">=</span> <span class="n">miresearch_watchdog</span><span class="o">.</span><span class="n">MIResearch_WatchDog</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">WatchDirectory</span><span class="p">,</span>
+                                        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span><span class="p">,</span>
+                                        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">,</span>
+                                        <span class="n">SubjClass</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">class_obj</span><span class="p">,</span>
+                                        <span class="n">DEBUG</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="n">MIWatcher</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+
+    <span class="c1">## UI ##</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">UI</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">hurahura.miresearchui</span><span class="w"> </span><span class="kn">import</span> <span class="n">mainUI</span>
+        <span class="n">mainUI</span><span class="o">.</span><span class="n">runMIUI</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">UI_port</span><span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="n">extra_runActions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">extra_runActions</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iExtra</span> <span class="ow">in</span> <span class="n">extra_runActions</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">iExtra</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">AttrError</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error in extra action </span><span class="si">{</span><span class="n">iExtra</span><span class="si">}</span><span class="s2">: Has the configuration been set up correctly (esp. 'class_path')?"</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">AttrError</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">extra_runActions</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> </div>
+
+
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1">### ====================================================================================================================</span>
+<span class="c1"># S T A R T</span>
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../hurahura.html#hurahura.miresearch_main.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">extra_runActions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">class_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="n">ParentAP</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">checkArgs</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">class_obj</span><span class="p">)</span> <span class="c1"># Will substitute from config files if can</span>
+    <span class="n">runActions</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">extra_runActions</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"__main__"</span><span class="p">,</span> <span class="s2">"__mp_main__"</span><span class="p">}:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Fraser M. Callaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
