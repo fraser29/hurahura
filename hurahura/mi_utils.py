@@ -237,14 +237,14 @@ def timeToDatetime(timeStr, dateStr=None):
     """
     try:   
         if dateStr is not None:
-            iDatetime = datetime.datetime.strptime(dateStr + ' ' + timeStr, '%Y%m%d %H%M%S.%f')
+            iDatetime = datetime.datetime.strptime(str(dateStr) + ' ' + str(timeStr), '%Y%m%d %H%M%S.%f')
         else:
-            iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S.%f')
+            iDatetime = datetime.datetime.strptime(str(timeStr), '%H%M%S.%f')
     except ValueError:
         if dateStr is not None:
-            iDatetime = datetime.datetime.strptime(dateStr + ' ' + timeStr, '%Y%m%d %H%M%S')
+            iDatetime = datetime.datetime.strptime(str(dateStr) + ' ' + str(timeStr), '%Y%m%d %H%M%S')
         else:
-            iDatetime = datetime.datetime.strptime(timeStr, '%H%M%S')
+            iDatetime = datetime.datetime.strptime(str(timeStr), '%H%M%S')
     return iDatetime
 #==================================================================
 class SubjPrefixError(Exception):

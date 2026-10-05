@@ -566,10 +566,10 @@ class AbstractSubject(object):
         studyDate_End = list(df.loc[df['SeriesNumber']==Ne,'StudyDate'])[0]
         t1 = self.getStartTimeForSeriesN_HHMMSS(Ns, df=df)
         t2 = self.getStartTimeForSeriesN_HHMMSS(Ne, df=df)
-        t2 = mi_utils.timeToDatetime(str(t2), dateStr=studyDate_End)
+        t2 = mi_utils.timeToDatetime(str(t2), dateStr=str(studyDate_End))
         endT = t2 + datetime.timedelta(0, self.getTimeTakenForSeriesN_s(Ne, df=df))
         if RETURN_DATETIME:
-            return mi_utils.timeToDatetime(str(t1), dateStr=studyDate_Start), endT
+            return mi_utils.timeToDatetime(str(t1), dateStr=str(studyDate_Start)), endT
         endT_HHMMSS = datetime.datetime.strftime(endT, '%H%M%S')
         return t1, endT_HHMMSS
 
@@ -608,8 +608,8 @@ class AbstractSubject(object):
         studyDate_2 = list(df.loc[df['SeriesNumber']==seN2,'StudyDate'])[0]
         t1 = self.getStartTimeForSeriesN_HHMMSS(seN1, df)
         t2 = self.getStartTimeForSeriesN_HHMMSS(seN2, df)
-        t1 = mi_utils.timeToDatetime(str(t1), dateStr=studyDate_1)
-        t2 = mi_utils.timeToDatetime(str(t2), dateStr=studyDate_2)
+        t1 = mi_utils.timeToDatetime(str(t1), dateStr=str(studyDate_1))
+        t2 = mi_utils.timeToDatetime(str(t2), dateStr=str(studyDate_2))
         return (t2-t1).seconds
 
 

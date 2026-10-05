@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [0.2.4]
+- Bug fix - timeToDatetime - force strings for dateStr and timeStr. 
+
 ## [0.2.3]
 - Feature add - getStartTime_EndTimeOfExam now returns datetime objects if RETURN_DATETIME is True.
 - Utils function timeToDatetime now takes (optional) dateStr as an argument to return true datetime (not just time).
