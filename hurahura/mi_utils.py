@@ -1,4 +1,5 @@
 import os
+import math
 import base64
 import csv
 import datetime
@@ -155,7 +156,41 @@ def buildDirectoryStructureTree(listOfExtraSubfolders=[]):
 
 def getDataRootDir():
     return MIResearch_config.data_root_dir
+
 #==================================================================
+def update_tags_dict(d, updates, remove_zero=False):
+    """Update a dictionary with a dictionary of tags - if update tag is empty of null, then it is not updated
+
+    Args:
+        d (dict): The dictionary to update
+        updates (dict): The dictionary of tags to update
+        remove_zero (bool): If True, then zero values are removed
+
+    Returns:
+        dict: The updated dictionary
+    """
+    def is_empty(v):
+        if v is None:
+            return True
+        if isinstance(v, float) and math.isnan(v):
+            return True
+        if isinstance(v, (str, list, tuple, dict, set)) and len(v) == 0:
+            return True
+        if remove_zero and isinstance(v, (int, float)) and not isinstance(v, bool) and v == 0:
+            return True
+        return False
+
+    for k, v in updates.items():
+        if is_empty(v):
+            continue
+
+        if isinstance(v, dict) and isinstance(d.get(k), dict):
+            update_tags_dict(d[k], v, remove_zero)
+        else:
+            d[k] = v
+
+    return d
+
 #==================================================================
 def countFilesInDir(dirName):
     N = 0
@@ -246,6 +281,7 @@ def timeToDatetime(timeStr, dateStr=None):
         else:
             iDatetime = datetime.datetime.strptime(str(timeStr), '%H%M%S')
     return iDatetime
+
 #==================================================================
 class SubjPrefixError(Exception):
     ''' SubjPrefixError

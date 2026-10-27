@@ -90,6 +90,15 @@ groupSubj.add_argument('-SubjInfo', dest='subjInfo',
 groupSubj.add_argument('-SubjInfoFull', dest='subjInfoFull', 
                     help='Print full info for each subject', 
                     action='store_true')
+groupSubj.add_argument('-setTag', dest='setTagValue', 
+                    help='Set tag value for each subject', 
+                    nargs=2, default=None)
+groupSubj.add_argument('-setPatientID', dest='setPatientID', 
+                    help='Set patient ID for each subject', 
+                    type=str, default=None)
+groupSubj.add_argument('-setPatName', dest='setPatName', 
+                    help='Set patient name (FirstName^LastName) for each subject', 
+                    type=str, default=None)
 
 # GROUP ACTIONS
 groupGroup = ParentAP.add_argument_group('Group Level Actions')
@@ -269,6 +278,17 @@ def runActions(args, extra_runActions=None):
                 subjList[0].addOtherData(args.loadPathOther)
             else:
                 print(f"Warning: -LoadOther option only supported for single subject")
+
+        # --- SET TAGS ---
+        if args.setTagValue is not None:
+            for iSubj in subjList:
+                iSubj.setTagValue(args.setTagValue[0], args.setTagValue[1])
+        if args.setPatientID is not None:
+            for iSubj in subjList:
+                iSubj.setTagValue('PatientID', args.setPatientID)
+        if args.setPatName is not None:
+            for iSubj in subjList:
+                iSubj.setTagValue('PatientName', args.setPatName)
 
         # --- QUERY ---
         if args.qSeriesDesc:

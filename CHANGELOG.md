@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.5]
+- Feature add - setTag command line option to set tags for each subject.
+- Feature add - setPatientID command line option to set patient ID for each subject.
+- Feature add - setPatName command line option to set patient name (FirstName^LastName) for each subject.
+- Bug fix - updating of meta tags now removes empty/null tags from update to avoid overwriting manually set tags. 
 
 ## [0.2.4]
 - Bug fix - timeToDatetime - force strings for dateStr and timeStr. 

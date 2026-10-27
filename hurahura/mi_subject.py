@@ -726,7 +726,7 @@ class AbstractSubject(object):
             str: Full path of file updated
         """
         dd = self.getMetaDict(metasuffix)
-        dd.update(metaDict)
+        dd = mi_utils.update_tags_dict(dd, metaDict, remove_zero=True)
         metaFile = self.getMetaTagsFile(metasuffix)
         fIO.writeDictionaryToJSON(metaFile, dd)
         self.logger.info(f'Updated meta-file')
