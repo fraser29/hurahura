@@ -1,0 +1,958 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hurahura.tests.run_tests &mdash; hurahura 0.1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=22607128"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            hurahura
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../concept.html">Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">Optional local database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage_codefree.html">Usage_codefree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage_subclass.html">Usage_subclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../anonymisation.html">Anonymisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../watch_dog.html">Watch Dog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../web_interface.html">Web Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hurahura.html">hurahura package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">hurahura</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">hurahura</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hurahura.tests.run_tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hurahura.tests.run_tests</h1><div class="highlight"><pre>
+<span></span>
+<span class="c1"># This is useful for testing outside of environment</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">hurahura</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># If running directly, import context as a module</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">'..'</span><span class="p">,</span> <span class="s1">'..'</span><span class="p">)))</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hurahura.tests.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">hurahura</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura</span><span class="w"> </span><span class="kn">import</span> <span class="n">mi_subject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura</span><span class="w"> </span><span class="kn">import</span> <span class="n">mi_database</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hurahura.mi_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MIResearch_config</span>
+
+
+<span class="n">this_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">TEST_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TEST_DATA'</span><span class="p">,</span> <span class="s1">'SINGLE'</span><span class="p">)</span>
+<span class="n">P1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s1">'P1'</span><span class="p">)</span>
+<span class="n">P2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s1">'P2'</span><span class="p">)</span>
+<span class="n">P3</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s2">"P3"</span><span class="p">)</span>
+<span class="n">P4</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s2">"P4"</span><span class="p">)</span>
+<span class="n">P4_extra</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s2">"P4_extra"</span><span class="p">)</span>
+<span class="n">PZip</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s2">"P4.zip"</span><span class="p">)</span>
+<span class="n">PTar</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s2">"P3.tar"</span><span class="p">)</span>
+<span class="n">PTarGZ</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="s2">"P4.tar.gz"</span><span class="p">)</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">DEBUG</span>
+
+<div class="viewcode-block" id="TestSubject">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubject</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubject.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubject'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">subjectPrefix</span><span class="o">=</span><span class="s1">'MI'</span><span class="p">,</span> <span class="n">dataRoot</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">QUIET</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">loadDicomsToSubject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">HIDE_PROGRESSBAR</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">loadDicomsToSubject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">HIDE_PROGRESSBAR</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubject.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">countNumberOfDicoms</span><span class="p">(),</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect number of dicoms"</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">buildSeriesDataMetaCSV</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getSeriesMetaCSV</span><span class="p">()))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">buildDicomMeta</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getMetaTagsFile</span><span class="p">()))</span>
+
+        <span class="n">pWeight</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getMetaTagValue</span><span class="p">(</span><span class="s1">'PatientWeight'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">pWeight</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - weight"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getMetaTagValue</span><span class="p">(</span><span class="s1">'StudyDate'</span><span class="p">),</span> <span class="s2">"20140409"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - studydate"</span><span class="p">)</span>
+
+        <span class="n">nSE_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getSeriesNumbersMatchingDescriptionStr</span><span class="p">(</span><span class="s1">'RVLA'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">nSE_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">41</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Error finding se matching SeriesDescription"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubject.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="TestSubject2">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubject2</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubject2.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubject2'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="c1"># this forces a poor form of subjID - tests that subjN wrong later</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MI2'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">anonymise</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestSubject2.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MI2000001'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">countNumberOfDicoms</span><span class="p">(),</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect number of dicoms"</span><span class="p">)</span>
+
+        <span class="n">pWeight</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getTagValue</span><span class="p">(</span><span class="s1">'PatientWeight'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">pWeight</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - weight"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getTagValue</span><span class="p">(</span><span class="s1">'StudyDate'</span><span class="p">),</span> <span class="s2">"20140409"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - studydate"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">subjN</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"SubjN 1 is wrong"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">subjN</span><span class="p">,</span> <span class="mi">2000001</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"SubjN 2000001 is wrong"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubject2.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubject2b">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2b">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubject2b</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubject2b.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2b.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubject2b'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj1a</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'OTHER'</span><span class="p">,</span> <span class="n">padZeros</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj1b</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'TMP'</span><span class="p">,</span> <span class="n">padZeros</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">"_NN"</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj1a</span><span class="o">.</span><span class="n">loadDicomsToSubject</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj1b</span><span class="o">.</span><span class="n">loadDicomsToSubject</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
+        <span class="c1"># We add new subjet. Matching prefix (ignores suffix) auto increments number</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj2</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'TMP'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubject2b.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2b.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'OTHER001'</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="TestSubject2b.test_N">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2b.test_N">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_N</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj1b</span><span class="o">.</span><span class="n">subjN</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"TestSubject2b: 1 subjN is wrong"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj2</span><span class="o">.</span><span class="n">subjN</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"TestSubject2b: 2 subjN is wrong"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubject2b.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject2b.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubject3">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject3">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubject3</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span> <span class="c1"># No number in ID</span>
+<div class="viewcode-block" id="TestSubject3.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject3.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubject3'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MySpecialID'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">renameSubjID</span><span class="p">(</span><span class="s2">"MySpecialID"</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">anonymise</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestSubject3.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject3.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MySpecialID'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">countNumberOfDicoms</span><span class="p">(),</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect number of dicoms"</span><span class="p">)</span>
+
+        <span class="n">newSubjObj2</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="n">subjectNumber</span><span class="o">=</span><span class="s2">"MySpecialID"</span><span class="p">,</span> <span class="n">dataRoot</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+
+        <span class="n">pWeight</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">newSubjObj2</span><span class="o">.</span><span class="n">getTagValue</span><span class="p">(</span><span class="s1">'PatientWeight'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">pWeight</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - weight"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newSubjObj2</span><span class="o">.</span><span class="n">getTagValue</span><span class="p">(</span><span class="s1">'StudyDate'</span><span class="p">),</span> <span class="s2">"20140409"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - studydate"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubject3.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject3.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubject4">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject4">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubject4</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubject4.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject4.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubject4'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIV'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">anonymise</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestSubject4.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject4.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIV000001'</span><span class="p">)))</span>
+        <span class="n">tStart</span><span class="p">,</span> <span class="n">tEnd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getStartTime_EndTimeOfExam</span><span class="p">()</span>
+        <span class="n">tTotal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getTotalScanTime_s</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">tStart</span><span class="p">,</span> <span class="mf">94627.4875</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">tEnd</span><span class="p">,</span> <span class="s1">'094627'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">tTotal</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">countNumberOfDicoms</span><span class="p">(),</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect number of dicoms"</span><span class="p">)</span>
+
+        <span class="n">pWeight</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getTagValue</span><span class="p">(</span><span class="s1">'PatientWeight'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">pWeight</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - weight"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getTagValue</span><span class="p">(</span><span class="s1">'StudyDate'</span><span class="p">),</span> <span class="s2">"20140409"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Got incorrect tag - studydate"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubject4.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubject4.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubjectRename">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectRename">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjectRename</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjectRename.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectRename.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjectRename'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIV'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">anonymise</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectRename.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectRename.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIV000001'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">renameSubjID</span><span class="p">(</span><span class="s2">"SUBJA_28.999.032"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'SUBJA_28.999.032'</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectRename.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectRename.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubjects">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjects</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjects.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjects'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj1</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">subjectPrefix</span><span class="o">=</span><span class="s1">'MI'</span><span class="p">,</span> <span class="n">dataRoot</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj1</span><span class="o">.</span><span class="n">QUIET</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj1</span><span class="o">.</span><span class="n">loadDicomsToSubject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">HIDE_PROGRESSBAR</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj2</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">subjectPrefix</span><span class="o">=</span><span class="s1">'MI'</span><span class="p">,</span> <span class="n">dataRoot</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj2</span><span class="o">.</span><span class="n">QUIET</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj2</span><span class="o">.</span><span class="n">loadDicomsToSubject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="n">HIDE_PROGRESSBAR</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj2</span><span class="o">.</span><span class="n">buildDicomMeta</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj3</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">subjectPrefix</span><span class="o">=</span><span class="s1">'MI'</span><span class="p">,</span> <span class="n">dataRoot</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj3</span><span class="o">.</span><span class="n">QUIET</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj3</span><span class="o">.</span><span class="n">loadDicomsToSubject</span><span class="p">(</span><span class="n">P3</span><span class="p">,</span> <span class="n">HIDE_PROGRESSBAR</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Can't do this as multiple subjects - how do i want to handle this</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">SubjectList</span><span class="o">.</span><span class="n">setByDirectory</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubjects.test_newSubjs">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects.test_newSubjs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubjs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MI000001'</span><span class="p">)))</span></div>
+
+    
+<div class="viewcode-block" id="TestSubjects.test_List">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects.test_List">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_List</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjList</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"Error making subject list"</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="TestSubjects.test_filterList">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects.test_filterList">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_filterList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">filtList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjList</span><span class="o">.</span><span class="n">filterSubjectListByDOS</span><span class="p">(</span><span class="s1">'20111014'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtList</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"Error filtering subject list"</span><span class="p">)</span></div>
+
+        
+
+<div class="viewcode-block" id="TestSubjects.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+        
+<div class="viewcode-block" id="TestSubjects2">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjects2</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjects2.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects2.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjects2'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">subjList</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">TEST_DIR</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIBB'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">LOAD_MULTI</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubjects2.test_newSubjs">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects2.test_newSubjs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubjs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIBB000001'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIBB000002'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIBB000003'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIBB000004'</span><span class="p">)))</span> <span class="c1"># This false as "4" finds subject already exists and adds to </span></div>
+
+    
+<div class="viewcode-block" id="TestSubjects2.test_List">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects2.test_List">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_List</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjList</span><span class="p">),</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"Error making subject list"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subjList</span><span class="o">.</span><span class="n">reduceToSet</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjList</span><span class="p">),</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"Error making subject list after reduce"</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="TestSubjects2.test_filterList">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects2.test_filterList">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_filterList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">filtList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjList</span><span class="o">.</span><span class="n">filterSubjectListByDOS</span><span class="p">(</span><span class="s1">'20111014'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtList</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"Error filtering subject list"</span><span class="p">)</span></div>
+
+        
+
+<div class="viewcode-block" id="TestSubjects2.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects2.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+                
+<div class="viewcode-block" id="TestSubjects3">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects3">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjects3</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjects3.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects3.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjects3'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">subj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P3</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIP'</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"SubjectNumber1"</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubjects3.test_newSubjs">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects3.test_newSubjs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubjs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIP000001'</span><span class="p">)))</span></div>
+
+    
+<div class="viewcode-block" id="TestSubjects3.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjects3.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+        
+<div class="viewcode-block" id="TestArchiveSubject">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestArchiveSubject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestArchiveSubject</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestArchiveSubject.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestArchiveSubject.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestArchiveSubject'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">subj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIZ'</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"SubjectNumber1"</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestArchiveSubject.test_SubjZip">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestArchiveSubject.test_SubjZip">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_SubjZip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIZ000001'</span><span class="p">)))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'ZIP'</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'ZIP-onheRaw'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subj</span><span class="o">.</span><span class="n">zipUpSubject</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'ZIP'</span><span class="p">),</span> <span class="n">EXCLUDE_RAW</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subj</span><span class="o">.</span><span class="n">zipUpSubject</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'ZIP-onheRaw'</span><span class="p">),</span> <span class="n">EXCLUDE_RAW</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="TestArchiveSubject.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestArchiveSubject.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+                
+        
+<div class="viewcode-block" id="TestMoveSubject">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestMoveSubject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestMoveSubject</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMoveSubject.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestMoveSubject.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestMoveSubject'</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestMoveSubject2'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir2</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir2</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">subj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MI-A'</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"SubjectNumber1"</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestMoveSubject.test_SubjZip">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestMoveSubject.test_SubjZip">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_SubjZip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MI-A000001'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subj</span><span class="o">.</span><span class="n">countNumberOfDicoms</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subj</span><span class="o">.</span><span class="n">archiveSubject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir2</span><span class="p">,</span> <span class="s1">'MI-A000001'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subj</span><span class="o">.</span><span class="n">countNumberOfDicoms</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">AbstractSubject</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">subjectPrefix</span><span class="o">=</span><span class="s1">'MI-A'</span><span class="p">,</span> <span class="n">dataRoot</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newSubj</span><span class="o">.</span><span class="n">countNumberOfDicoms</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="TestMoveSubject.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestMoveSubject.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir2</span><span class="p">)</span></div>
+</div>
+
+                
+<div class="viewcode-block" id="TestRenameSubject">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestRenameSubject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestRenameSubject</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRenameSubject.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestRenameSubject.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestRenameSubject'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">subj1</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P3</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIZ'</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"SubjectNumber1"</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">subj2</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIZ'</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"SubjectNumber2"</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestRenameSubject.test_SubjRename">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestRenameSubject.test_SubjRename">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_SubjRename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'MIZ000001'</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subj1</span><span class="o">.</span><span class="n">renameSubjID</span><span class="p">(</span><span class="s1">'Subject1'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subj2</span><span class="o">.</span><span class="n">renameSubjID</span><span class="p">(</span><span class="s1">'Subject2'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'Subject2'</span><span class="p">)))</span></div>
+
+        <span class="c1"># self.subjList = mi_subject.SubjectList.setByDirectory(self.tmpDir)</span>
+        <span class="c1"># print(self.subjList)</span>
+        <span class="c1"># self.assertEqual(len(self.subjList), 2, "Error subject list wrong size")</span>
+        <span class="c1"># sorted(self.subjList)</span>
+
+<div class="viewcode-block" id="TestRenameSubject.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestRenameSubject.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+        
+
+<div class="viewcode-block" id="TestSubjectAnonName">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjectAnonName</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjectAnonName.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjectAnonName'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIN'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">firstNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getName_FirstNames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"Subject"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect name"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstNames</span><span class="p">,</span> <span class="s2">"Another"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect first name"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName2">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjectAnonName2</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjectAnonName2.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName2.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjectAnonName2'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIN2'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"SOFT"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName2.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName2.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">firstNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getName_FirstNames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"Subject"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect name"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstNames</span><span class="p">,</span> <span class="s2">"Another"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect first name"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName2.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName2.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubjectAnonName3">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName3">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjectAnonName3</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjectAnonName3.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName3.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjectAnonName3'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIN2'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"HARD"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj2</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIN2'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"HARD"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName3.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName3.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">firstNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getName_FirstNames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"Name-Unknown"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect name"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstNames</span><span class="p">,</span> <span class="s2">"FirstNames-Unknown"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect first name"</span><span class="p">)</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">firstNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj2</span><span class="o">.</span><span class="n">getName_FirstNames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"Name-Unknown"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect name"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstNames</span><span class="p">,</span> <span class="s2">"FirstNames-Unknown"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect first name"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName3.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName3.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubjectAnonName4">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName4">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjectAnonName4</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjectAnonName4.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName4.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjectAnonName4'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIN2'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"PostmanPat"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName4.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName4.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">firstNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getName_FirstNames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"PostmanPat"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect name"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstNames</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect first name"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName4.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName4.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubjectAnonName5">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName5">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjectAnonName5</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjectAnonName5.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName5.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestSubjectAnonName5'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MIN2'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">anonName</span><span class="o">=</span><span class="s2">"Builder^Bob^The"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName5.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName5.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">firstNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getName_FirstNames</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"Builder"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect name"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">firstNames</span><span class="p">,</span> <span class="s2">"Bob_The"</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"Incorrect first name"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectAnonName5.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectAnonName5.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestDatabase">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestDatabase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestDatabase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDatabase.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestDatabase.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TestDatabase'</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="s1">'hurahura.db'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="n">mi_database</span><span class="o">.</span><span class="n">reset_database_instance</span><span class="p">()</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">runConfigParser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'test_db.conf'</span><span class="p">))</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">data_root_dir</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">database_path</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">db_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">db_path</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span>
+            <span class="n">P1</span><span class="p">,</span> <span class="n">dataRoot</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="n">subjPrefix</span><span class="o">=</span><span class="s1">'MI'</span><span class="p">,</span> <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestDatabase.test_sync_on_meta_build">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestDatabase.test_sync_on_meta_build">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_sync_on_meta_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">))</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">mi_database</span><span class="o">.</span><span class="n">get_database</span><span class="p">()</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query_subjects</span><span class="p">(</span><span class="n">where_sql</span><span class="o">=</span><span class="s2">"subject_id = ?"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">subjID</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"StudyDate"</span><span class="p">],</span> <span class="s2">"20140409"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestDatabase.test_update_meta_refreshes_db">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestDatabase.test_update_meta_refreshes_db">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_update_meta_refreshes_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">updateMetaFile</span><span class="p">({</span><span class="s2">"CustomTag"</span><span class="p">:</span> <span class="s2">"alpha"</span><span class="p">})</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">mi_database</span><span class="o">.</span><span class="n">get_database</span><span class="p">()</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">"SELECT json_text FROM meta_json WHERE subject_id = ? AND meta_suffix = ''"</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">subjID</span><span class="p">,),</span>
+        <span class="p">)</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">"CustomTag"</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">"json_text"</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="TestDatabase.test_external_json_edit_syncs_on_read">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestDatabase.test_external_json_edit_syncs_on_read">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_external_json_edit_syncs_on_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getMetaTagsFile</span><span class="p">()</span>
+        <span class="n">dd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getMetaDict</span><span class="p">()</span>
+        <span class="n">dd</span><span class="p">[</span><span class="s2">"ExternalEdit"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"from_disk"</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">meta_file</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dd</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">meta_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getMetaDict</span><span class="p">()</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">mi_database</span><span class="o">.</span><span class="n">get_database</span><span class="p">()</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">"SELECT json_text FROM meta_json WHERE subject_id = ? AND meta_suffix = ''"</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">subjID</span><span class="p">,),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">"ExternalEdit"</span><span class="p">,</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="s2">"json_text"</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="TestDatabase.test_full_db_sync">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestDatabase.test_full_db_sync">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_full_db_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">mi_database</span><span class="o">.</span><span class="n">sync_all_subjects_in_data_root</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertGreaterEqual</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestDatabase.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestDatabase.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">mi_database</span><span class="o">.</span><span class="n">reset_database_instance</span><span class="p">()</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">database_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">db_path</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">'db_path'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">db_path</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">db_path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
+            <span class="n">tmp_dir</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">'tmpDir'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tmp_dir</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">):</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestSubjectUseConfFile">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectUseConfFile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubjectUseConfFile</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestSubjectUseConfFile.setUpClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectUseConfFile.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'TEST_ROOT'</span><span class="p">)</span> <span class="c1"># This is matched in conf file</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span>
+        <span class="n">MIResearch_config</span><span class="o">.</span><span class="n">runConfigParser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">'testA.conf'</span><span class="p">))</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">newSubj</span> <span class="o">=</span> <span class="n">mi_subject</span><span class="o">.</span><span class="n">createNew_OrAddTo_Subject</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> 
+                                                           <span class="n">dataRoot</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">,</span> <span class="c1"># Can't set this in conf file</span>
+                                                           <span class="n">subjPrefix</span><span class="o">=</span><span class="n">MIResearch_config</span><span class="o">.</span><span class="n">subject_prefix</span><span class="p">,</span> 
+                                                           <span class="n">QUIET</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectUseConfFile.test_newSubj">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectUseConfFile.test_newSubj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_newSubj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newSubj</span><span class="o">.</span><span class="n">getTopDir</span><span class="p">(),</span> <span class="s2">"TEST"</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="TestSubjectUseConfFile.tearDownClass">
+<a class="viewcode-back" href="../../../hurahura.tests.html#hurahura.tests.run_tests.TestSubjectUseConfFile.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">OVERRIDE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">DEBUG</span><span class="p">)</span> <span class="ow">or</span> <span class="n">OVERRIDE</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">tmpDir</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># class TestMisc(unittest.TestCase):</span>
+<span class="c1">#     def test_DefaultRootDir(self):</span>
+<span class="c1">#         if DEBUG:</span>
+<span class="c1">#             self.assertEqual(mi_utils.getDataRoot(), '"/Volume/MRI_DATA"', "Error Default DataRoot")</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             self.assertEqual(mi_utils.getDataRoot(), "''", "Error Default DataRoot")</span>
+    
+        
+<span class="c1"># class TestLoadCompressed(unittest.TestCase):</span>
+
+<span class="c1">#     @classmethod</span>
+<span class="c1">#     def setUpClass(cls):</span>
+<span class="c1">#         cls.tmpDir = os.path.join(this_dir, 'tmpTestCompress')</span>
+<span class="c1">#         if os.path.isdir(cls.tmpDir):</span>
+<span class="c1">#             cls.tearDownClass(True)</span>
+<span class="c1">#         os.makedirs(cls.tmpDir)</span>
+<span class="c1">#         mi_subject.createNew_OrAddTo_Subject(PZip, cls.tmpDir, subjPrefix='MIZ', QUIET=True)</span>
+<span class="c1">#         mi_subject.createNew_OrAddTo_Subject(PTar, cls.tmpDir, subjPrefix='MIT', QUIET=True)</span>
+<span class="c1">#         cls.subjList = mi_subject.createNew_OrAddTo_Subject(PTarGZ, cls.tmpDir, subjPrefix='MITZ', QUIET=True, LOAD_MULTI=True)</span>
+
+
+<span class="c1">#     def test_LoadZip(self):</span>
+<span class="c1">#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000001')))</span>
+<span class="c1">#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIZ000002')))</span>
+<span class="c1">#         dFile = self.subjList[1].getDicomFile(99, 1)</span>
+<span class="c1">#         self.assertTrue(os.path.isfile(dFile), f'Not finding dcm file for {self.subjList[1].subjID}')</span>
+
+<span class="c1">#     def test_LoadTar(self):</span>
+<span class="c1">#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000001')))</span>
+<span class="c1">#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MIT000002')))</span>
+
+<span class="c1">#     def test_LoadTarZ(self):</span>
+<span class="c1">#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000001')))</span>
+<span class="c1">#         self.assertTrue(os.path.isdir(os.path.join(self.tmpDir, 'MITZ000002')))</span>
+
+<span class="c1">#     @classmethod</span>
+<span class="c1">#     def tearDownClass(cls, OVERRIDE=False):</span>
+<span class="c1">#         if (not DEBUG) or OVERRIDE:</span>
+<span class="c1">#             shutil.rmtree(cls.tmpDir)</span>
+        
+
+        
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Running miresearch tests (DEBUG=</span><span class="si">{</span><span class="n">DEBUG</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Fraser M. Callaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
